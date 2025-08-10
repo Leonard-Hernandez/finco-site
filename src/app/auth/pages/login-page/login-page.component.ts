@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -12,6 +12,7 @@ export default class LoginPageComponent {
 
   fb = inject(FormBuilder);
   authService = inject(AuthService);
+  router = inject(Router);
 
   loginForm = this.fb.group({
     username: ['', [Validators.required]],
@@ -21,7 +22,7 @@ export default class LoginPageComponent {
   onSubmit() {
     this.authService.login(this.loginForm.value.username!, this.loginForm.value.password!).subscribe(
       (user) => {
-        console.log(user);
+        this.router.navigate(['/']);
       },
       (error) => {
         console.error(error);

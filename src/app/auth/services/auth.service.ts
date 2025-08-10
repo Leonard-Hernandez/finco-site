@@ -6,6 +6,7 @@ import { catchError, map, switchMap, throwError } from 'rxjs';
 import { User } from '../interfaces/user.interface';
 import { TokenPayload } from '../interfaces/token-payload.interface';
 import { Router } from '@angular/router';
+import { UserRegister } from '../interfaces/userregister.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -20,8 +21,16 @@ export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
 
-  register() {
-
+  register(user: UserRegister) {
+    return this.http.post<User>(`${this.apiUrl}/users`, user).pipe(
+      map((user: User) => {
+        this.router.navigate(['/auth/login']);
+      }),
+      catchError((error) => {
+        console.error('failed to get user:', error);
+        throw error;
+      })
+    );
   }
 
   login(username: string, password: string) {
@@ -54,8 +63,6 @@ export class AuthService {
         console.log(this.roles);
         console.log(this.user);
         console.log(this.token);
-
-        this.router.navigate(['/']);
       }),
       catchError((error) => {
         console.error('failed to get user:', error);

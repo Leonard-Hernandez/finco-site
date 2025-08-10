@@ -18,7 +18,7 @@
       class="bg-white/10 backdrop-blur-md rounded-2xl p-8 shadow-xl border border-white/5"
     >
       <form
-        class="space-y-6"
+        class="space-y-6" (ngSubmit)="onSubmit()" [formGroup]="registerForm"
       >
         <!-- Username Field -->
         <div class="space-y-2">
@@ -37,10 +37,11 @@
               </svg>
             </div>
             <input
-              id="username"
+              id="name"
               type="text"
               placeholder="Choose a username"
               class="block w-full pl-10 pr-3 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
+              formControlName="name"
             />
           </div>
         </div>
@@ -66,6 +67,7 @@
               type="email"
               placeholder="your@email.com"
               class="block w-full pl-10 pr-3 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
+              formControlName="email"
             />
           </div>
         </div>
@@ -91,6 +93,7 @@
               type="password"
               placeholder="••••••••"
               class="block w-full pl-10 pr-10 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
+              formControlName="password"
             />
             <button
               type="button"
