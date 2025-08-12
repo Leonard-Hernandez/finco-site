@@ -1,7 +1,8 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
-import { UserRegister } from '../../interfaces/userregister.interface';
+import { UserRegister } from '../../interfaces/user-register.interface';
+import { catchError, map, of } from 'rxjs';
 
 @Component({
   selector: 'app-register-page',
@@ -9,6 +10,8 @@ import { UserRegister } from '../../interfaces/userregister.interface';
   templateUrl: './register-page.component.html'
 })
 export class RegisterPageComponent {
+
+  private _hasError = signal<boolean>(false);
 
   fb = inject(FormBuilder);
   authService = inject(AuthService);
@@ -20,14 +23,36 @@ export class RegisterPageComponent {
   });
 
   onSubmit() {
-    this.authService.register(this.registerForm.value as UserRegister).subscribe(
-      (user) => {
+
+    if(!this.validForm()) return;
+
+    const user : UserRegister = {
+      name: this.registerForm.value.name!,
+      password: this.registerForm.value.password!,
+      email: this.registerForm.value.email!
+    };
+
+
+    this.authService.register(user).pipe(
+      map((user) => {
         console.log(user);
-      },
-      (error) => {
+      }),
+      catchError((error) => {
         console.error(error);
-      }
+        return of(null);
+      })
     );
+  }
+
+  validForm(): boolean {
+    if (!this.registerForm.valid) {
+      this._hasError.set(true);
+      setTimeout(() => {
+        this._hasError.set(false);
+      }, 3000);
+      return false;
+    }
+    return true;
   }
 
 }
