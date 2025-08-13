@@ -1,7 +1,7 @@
 export interface User {
     id: number;
-    username: string;
+    name: string;
     email: string;
-    registrationDat : Date;
+    registrationDate : Date;
     enabled : boolean;
 }

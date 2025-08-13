@@ -2,23 +2,24 @@ import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { catchError, map, of } from 'rxjs';
+import { ErrorModalComponent } from "../../../shared/components/error-modal/error-modal.component";
 
 @Component({
   selector: 'app-login-page',
-  imports: [RouterLink, ReactiveFormsModule],
+  standalone: true,
+  imports: [RouterLink, ReactiveFormsModule, ErrorModalComponent],
   templateUrl: './login-page.component.html'
 })
 export default class LoginPageComponent {
 
-  private _hasError = signal(false);
+  _hasError = signal(false);
 
   fb = inject(FormBuilder);
   authService = inject(AuthService);
   router = inject(Router);
 
   loginForm = this.fb.group({
-    username: ['', [Validators.required]],
+    username: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(4)]]
   });
 
@@ -30,17 +31,16 @@ export default class LoginPageComponent {
       password: this.loginForm.value.password!
     };
     
-    console.log(userLogin);
-
-    this.authService.login(userLogin.username, userLogin.password).pipe(
-      map((user) => {
+    this.authService.login(userLogin.username, userLogin.password).subscribe((isAuthenticated) => {
+      if(isAuthenticated) {
         this.router.navigate(['/']);
-      }),
-      catchError((error) => {
-        console.error(error);
-        return of(null);
-      })
-    );
+      } else {
+        this._hasError.set(true);
+        setTimeout(() => {
+          this._hasError.set(false);
+        }, 3000);
+      }
+    })
   }
 
   validForm(): boolean {

@@ -10,17 +10,35 @@
     <h1 class="text-3xl text-finco-primary-color">Finco</h1>
   </a>
 
-  <a
-    routerLink='/auth/login'
-    class="
-        my-2 mx-3 px-4 p-1 
+  @if(this.authService.authStatus() === 'authenticated') {
+    <span class="text-finco-primary-color text-ri font-bold">{{this.authService.user()?.name}}
+    <a
+      routerLink='/auth/login'
+      class="
+          my-2 mx-3 px-4 p-1 
         bg-finco-button-bg-color 
         rounded-2xl
         active:bg-finco-primary-color
         hover:bg-finco-secondary-color
         transition duration-150
         "        
-  >
+  > 
+    <span class="text-finco-bg-color font-bold " (click)="this.authService.logout()">log out</span>
+  </a>
+  </span>
+  } @else {
+    <a
+      routerLink='/auth/login'
+      class="
+          my-2 mx-3 px-4 p-1 
+        bg-finco-button-bg-color 
+        rounded-2xl
+        active:bg-finco-primary-color
+        hover:bg-finco-secondary-color
+        transition duration-150
+        "        
+  > 
     <span class="text-finco-bg-color font-bold ">log in</span>
   </a>
+  }
 </header>

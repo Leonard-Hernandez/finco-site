@@ -94,3 +94,9 @@
     </div>
   </div>
 </div>
+
+<app-error-modal
+  [_message]="'Invalid Credentials'"
+  [_details]="'Please verify your email and password'"
+  [_signal]="_hasError()"
+/>

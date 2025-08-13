@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { User } from '../../../auth/interfaces/user.interface';
+import { AuthService } from '../../../auth/services/auth.service';
 
 @Component({
   selector: 'app-finco-header',
@@ -7,5 +9,7 @@ import { RouterLink } from '@angular/router';
   templateUrl: './finco-header.component.html'
 })
 export class FincoHeaderComponent {
+
+  authService = inject(AuthService)
 
 }

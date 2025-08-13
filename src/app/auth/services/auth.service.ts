@@ -29,7 +29,9 @@ export class AuthService {
 
   authStatus = computed<authStatus>(() => {
     if (this._authStatus() === 'checking') return 'checking';
-    if (this._user()) return 'authenticated';
+    if (this._user()) {
+      return 'authenticated';
+    }
     return 'not-authenticated';
   });
 
@@ -38,13 +40,13 @@ export class AuthService {
   roles = computed(() => this._roles());
 
   login(username: string, password: string) {
-    console.log(username, password);
-    return this.http.post(`${environment.url}/auth/login`, { username, password }).pipe(
-      map((resp) => {
-        console.log(resp);
-        //this.handleAuthSuccess(resp);
+    return this.http.post<AuthResponse>(`${environment.url}/auth/login`, { username, password }).pipe(
+      map((resp: AuthResponse) => {
+        this.handleAuthSuccess(resp);
       }),
-      catchError((error) =>  this.handleAuthError(error))
+      catchError((error) => {
+        return this.handleAuthError(error);
+      })
     );
   }
 
@@ -53,18 +55,18 @@ export class AuthService {
       map((resp) => {
         this.router.navigate(['/auth/login']);
       }),
-      catchError((error) =>  this.handleAuthError(error))
+      catchError((error) => this.handleAuthError(error))
     );
   }
 
   checkStatus(): Observable<boolean> {
     const token = localStorage.getItem('token');
     if (!token) {
-      this.logout;
+      this.logout();
       return of(false);
     }
 
-    return this.http.get<AuthResponse>(`${environment.url}/auth/check-status`).pipe(
+    return this.http.get<AuthResponse>(`${environment.url}/auth/check-status`, { headers: { 'Authorization': `Bearer ${token}` } }).pipe(
       map((resp) => {
         this.handleAuthSuccess(resp);
         return true;
@@ -79,19 +81,19 @@ export class AuthService {
     this._user.set(null);
     this._token.set(null);
     this._roles.set(null);
-    localStorage.removeItem('roles');
+    localStorage.removeItem('token');
   }
 
   private handleAuthSuccess({ token, user }: AuthResponse) {
     this._user.set(user);
     this._token.set(token);
     this._roles.set(this.getRoles(token));
+    this._authStatus.set('authenticated');
 
     localStorage.setItem('token', token);
   }
 
   private handleAuthError(error: any) {
-    console.log(error);
     this.logout();
     return of(false);
   }
@@ -107,7 +109,6 @@ export class AuthService {
         return role.startsWith('ROLE_') ? role.substring(5) : role;
       });
     } catch (error) {
-      console.error('Error parsing token roles:', error);
       return [];
     }
   }

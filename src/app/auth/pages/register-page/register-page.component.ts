@@ -2,19 +2,21 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { UserRegister } from '../../interfaces/user-register.interface';
-import { catchError, map, of } from 'rxjs';
+import { Router } from '@angular/router';
+import { ErrorModalComponent } from "../../../shared/components/error-modal/error-modal.component";
 
 @Component({
   selector: 'app-register-page',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, ErrorModalComponent],
   templateUrl: './register-page.component.html'
 })
 export class RegisterPageComponent {
 
-  private _hasError = signal<boolean>(false);
+  _hasError = signal<boolean>(false);
 
   fb = inject(FormBuilder);
   authService = inject(AuthService);
+  router = inject(Router)
 
   registerForm = this.fb.group({
     name: ['', [Validators.required]],
@@ -33,15 +35,17 @@ export class RegisterPageComponent {
     };
 
 
-    this.authService.register(user).pipe(
-      map((user) => {
-        console.log(user);
-      }),
-      catchError((error) => {
-        console.error(error);
-        return of(null);
-      })
-    );
+    this.authService.register(user).subscribe({
+      next: (success) => {
+        this.router.navigate(['/auth/login']);
+      },
+      error: (error) => {
+        this._hasError.set(true);
+        setTimeout(() => {
+          this._hasError.set(false);
+        }, 3000);
+      }
+    });
   }
 
   validForm(): boolean {
