@@ -39,11 +39,9 @@ export class AuthService {
   token = computed(() => this._token());
   roles = computed(() => this._roles());
 
-  login(username: string, password: string) {
+  login(username: string, password: string): Observable<boolean> {
     return this.http.post<AuthResponse>(`${environment.url}/auth/login`, { username, password }).pipe(
-      map((resp: AuthResponse) => {
-        this.handleAuthSuccess(resp);
-      }),
+      map((resp: AuthResponse) => this.handleAuthSuccess(resp)),
       catchError((error) => {
         return this.handleAuthError(error);
       })
@@ -52,9 +50,7 @@ export class AuthService {
 
   register(userRegister: UserRegister) {
     return this.http.post(`${environment.url}/users`, userRegister).pipe(
-      map((resp) => {
-        this.router.navigate(['/auth/login']);
-      }),
+      map((resp) => this.router.navigate(['/auth/login'])),
       catchError((error) => this.handleAuthError(error))
     );
   }
@@ -66,11 +62,8 @@ export class AuthService {
       return of(false);
     }
 
-    return this.http.get<AuthResponse>(`${environment.url}/auth/check-status`, { headers: { 'Authorization': `Bearer ${token}` } }).pipe(
-      map((resp) => {
-        this.handleAuthSuccess(resp);
-        return true;
-      }),
+    return this.http.get<AuthResponse>(`${environment.url}/auth/check-status`).pipe(
+      map((resp) => this.handleAuthSuccess(resp)),
       catchError((error: any) => this.handleAuthError(error))
     );
 
@@ -91,6 +84,8 @@ export class AuthService {
     this._authStatus.set('authenticated');
 
     localStorage.setItem('token', token);
+
+    return true;
   }
 
   private handleAuthError(error: any) {
