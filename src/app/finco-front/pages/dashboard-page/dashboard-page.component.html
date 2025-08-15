@@ -1,1 +1,40 @@
-<p>dashboard-page works!</p>
+<div class="flex flex-col py-20 justify-between items-center min-h-screen bg-gradient-to-br from-finco-bg-color to-finco-card-bg-color">
+    <div class="flex flex-col gap-2 min-w-80 font-bold flex-1">
+        <h2 class="text-finco-secondary-color ">
+            Hi Leonard
+        </h2>
+        <app-total [_total]="total()"></app-total>
+    </div>
+
+    <div class="flex flex-col gap-2 min-w-80 font-bold flex-3">
+        <p>Status</p>
+        <div class="w-full h-52 bg-finco-button-bg-color">
+            vamos ganando mucho
+        </div>
+        <div class="flex gap-2 justify-between px-10">
+            <button class="bg-finco-button-bg-color py-1 px-3 rounded-2xl">90 t</button>
+            <button class="bg-finco-button-bg-color py-1 px-3 rounded-2xl">60 t</button>
+            <button class="bg-finco-button-bg-color py-1 px-3 rounded-2xl">30 t</button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-1 min-w-80 font-bold flex-3 justify-center items-center">
+        <p class="col-span-2">grafica de tortas</p>
+        <div class="flex flex-col justify-center items-center">
+            hola
+            <div class="bg-finco-button-bg-color h-15 w-15 rounded-full"></div>
+        </div>
+        <div class="flex flex-col justify-center items-center">
+            hola2
+            <div class="bg-finco-button-bg-color h-15 w-15 rounded-full"></div>
+        </div>
+        <div class="flex flex-col justify-center items-center">
+            hola3
+            <div class="bg-finco-button-bg-color h-15 w-15 rounded-full"></div>
+        </div>
+        <div class="flex flex-col justify-center items-center">
+            hola4
+            <div class="bg-finco-button-bg-color h-15 w-15 rounded-full"></div>
+        </div>
+    </div>
+</div>
