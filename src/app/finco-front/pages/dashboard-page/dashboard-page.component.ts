@@ -1,54 +1,55 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { TransactionService } from '../../../transaction/services/transaction.service';
-import { TransactionFilter } from '../../../transaction/interface/transaction';
-import { Total, TotalComponent } from "../../../shared/components/total/total.component";
+import { Transaction, TransactionFilter, TransactionResponse } from '../../../transaction/interface/transaction';
+import { TotalComponent } from "../../../shared/components/total/total.component";
+import { AuthService } from '../../../auth/services/auth.service';
+import { AccountService } from '../../../account/service/account.service';
+import { rxResource } from '@angular/core/rxjs-interop';
+import { Total } from '../../../account/interface/account.interface';
+import { TransactionChartComponent } from "../../../transaction/components/transaction-chart/transaction-chart.component";
 
 @Component({
-  selector: 'app-dashboard-page',
-  imports: [TotalComponent],
+  imports: [TotalComponent, TransactionChartComponent],
   templateUrl: './dashboard-page.component.html'
 })
 export class DashboardPageComponent {
 
-    total = signal<Total[]>([
-      {
-        total: 10000,
-        currency: 'USD'
-      },
-      {
-        total: 10000,
-        currency: 'MXN'
-      },
-      {
-        total: 100,
-        currency: 'EUR'
-      },
-      {
-        total: 100000,
-        currency: 'GBP'
-      }
-    ]);
+  name = inject(AuthService).user()?.name;
 
-    transactionsService = inject(TransactionService);
+  accountService = inject(AccountService);
+  transactionsService = inject(TransactionService);
 
-    getCategories() {
-        this.transactionsService.GetCategoriesByUser().subscribe((res) => {
-            console.log(res);
-        });
-    }
+  totals = rxResource<Total[], Error>({
+    loader: () => {
+      return this.accountService.getTotals();
+    },
+  });
 
-    getTransactions() {
+  transactions = rxResource<TransactionResponse, Error>({
+    loader: () => {
       const filter: TransactionFilter = {
         pagination: {
           page: 0,
           size: 10,
-          sortBy: 'id',
-          sortDirection: 'desc'
+          sortBy: 'date',
+          sortDirection: 'asc',
         }
       };
-        this.transactionsService.getTransactions(filter).subscribe((res) => {
-            console.log(res);
-        });
-    }
+      return this.transactionsService.getTransactions(filter);
+    },
+  });
 
+  getTransactions() {
+    const filter: TransactionFilter = {
+      pagination: {
+        page: 0,
+        size: 10,
+        sortBy: 'id',
+        sortDirection: 'desc'
+      }
+    };
+    this.transactionsService.getTransactions(filter).subscribe((res) => {
+      console.log(res);
+    });
+  }
 }

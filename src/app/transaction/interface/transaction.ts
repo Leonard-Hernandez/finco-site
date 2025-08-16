@@ -8,14 +8,14 @@ export interface Transaction {
     userId: number;
     account: Account;
     type: string;
-    amount: Decimal;
-    fee: Decimal;
-    date: Date;
+    amount: number;
+    fee: number;
+    date: string;
     description: string;
     category: string;
     goal: Goal;
     trasnferAccount: Account;
-    exchamgeRate: Decimal;
+    exchamgeRate: number;
 }
 
 export interface TransactionResponse {

@@ -1,16 +1,14 @@
-<div class="flex flex-col py-20 justify-between items-center min-h-screen bg-gradient-to-br from-finco-bg-color to-finco-card-bg-color">
-    <div class="flex flex-col gap-2 min-w-80 font-bold flex-1">
+<div class="flex flex-col py-20 justify-between items-center min-h-screen max-h-screen bg-gradient-to-br from-finco-bg-color to-finco-card-bg-color">
+    <div class="flex flex-col min-w-80 font-bold flex-1">
         <h2 class="text-finco-secondary-color ">
-            Hi Leonard
+            Hi {{name}}
         </h2>
-        <app-total [_total]="total()"></app-total>
+        <app-total [_total]="totals.value()!"></app-total>
     </div>
 
-    <div class="flex flex-col gap-2 min-w-80 font-bold flex-3">
-        <p>Status</p>
-        <div class="w-full h-52 bg-finco-button-bg-color">
-            vamos ganando mucho
-        </div>
+    <div class="flex flex-col gap-2 min-w-90 font-bold flex-3">
+        <p class="text-finco-secondary-color">Status</p>
+        <app-transaction-chart [transactions]="transactions.value()!.content"></app-transaction-chart>
         <div class="flex gap-2 justify-between px-10">
             <button class="bg-finco-button-bg-color py-1 px-3 rounded-2xl">90 t</button>
             <button class="bg-finco-button-bg-color py-1 px-3 rounded-2xl">60 t</button>
