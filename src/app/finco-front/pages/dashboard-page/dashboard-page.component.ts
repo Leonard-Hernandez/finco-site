@@ -1,13 +1,13 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { TransactionService } from '../../../transaction/services/transaction.service';
-import { Transaction, TransactionChartOptions, TransactionFilter, TransactionResponse } from '../../../transaction/interface/transaction';
+import { TransactionChartOptions, TransactionFilter, TransactionResponse } from '../../../transaction/interface/transaction';
 import { TotalComponent } from "../../../shared/components/total/total.component";
 import { AuthService } from '../../../auth/services/auth.service';
 import { AccountService } from '../../../account/service/account.service';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { Total } from '../../../account/interface/account.interface';
 import { TransactionChartComponent } from "../../../transaction/components/transaction-chart/transaction-chart.component";
-import { firstValueFrom, map } from 'rxjs';
+import { map } from 'rxjs';
 
 @Component({
   imports: [TotalComponent, TransactionChartComponent],
@@ -16,6 +16,9 @@ import { firstValueFrom, map } from 'rxjs';
 export class DashboardPageComponent {
 
   name = inject(AuthService).user()?.name;
+  accountService = inject(AccountService);
+  transactionsService = inject(TransactionService);
+  totalTransactions = signal<number>(0);
 
   filter = signal<TransactionFilter>({
     pagination: {
@@ -26,10 +29,18 @@ export class DashboardPageComponent {
     }
   });
 
+  totals = rxResource<Total[], Error>({
+    loader: () => {
+      return this.accountService.getTotals();
+    },
+  });
+
   transactions = rxResource({
     request: () => this.filter(),
     loader: () => this.transactionsService.getTransactions(this.filter()).pipe(
       map((response: TransactionResponse) => {
+        console.log(response);
+        this.totalTransactions.set(response.page.totalElements);
         return response.content;
       })
     )
@@ -39,16 +50,20 @@ export class DashboardPageComponent {
     return {
       transactions: this.transactions.value()!,
       splitBy: 'currency',
-      limitSeries: 3
+      limitSeries: 5
     };
   });
 
-  accountService = inject(AccountService);
-  transactionsService = inject(TransactionService);
+  updateFilter(transactions: number) {
+    console.log(transactions);
+    this.filter.set({
+      pagination: {
+        page: 0,
+        size: transactions,
+        sortBy: 'date',
+        sortDirection: 'desc',
+      }
+    });
+  }
 
-  totals = rxResource<Total[], Error>({
-    loader: () => {
-      return this.accountService.getTotals();
-    },
-  });
 }

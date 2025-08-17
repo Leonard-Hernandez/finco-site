@@ -9,7 +9,6 @@ export interface Transaction {
     account: Account;
     type: string;
     amount: number;
-    currency: string;
     fee: number;
     date: string;
     description: string;

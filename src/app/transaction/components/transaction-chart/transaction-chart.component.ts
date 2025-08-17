@@ -1,7 +1,6 @@
-import { Component, computed, effect, input, signal, untracked } from '@angular/core';
-import { AreaData, AreaSeries, createChart, IChartApi, LineData, LineSeries } from 'lightweight-charts';
+import { Component, effect, input, signal } from '@angular/core';
+import { createChart, IChartApi, LineData, LineSeries } from 'lightweight-charts';
 import { Transaction, TransactionChartOptions } from '../../interface/transaction';
-import { rxResource } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-transaction-chart',
@@ -12,25 +11,27 @@ export class TransactionChartComponent {
 
   transactionChartOptions = input.required<TransactionChartOptions>();
   series = signal<string[]>([]);
-  transactionsCount = computed(() => {
-    if (this.transactionChartOptions().transactions !== undefined && this.transactionChartOptions().transactions.length > 0) {
-      return this.transactionChartOptions().transactions.length;
-    }
-    return 0;
-  });
+  transactionsCount = signal<number>(0);
 
-  chart: IChartApi | undefined;
-  classColors = ['text-finco-primary-color', 'text-finco-secondary-color', 'text-finco-button-bg-color'];
-  chartColors = ['#A8E6CE', '#6FFFB0', '#4CAF50'];
+  chart!: IChartApi;
+
+  classColors = ['text-finco-primary-color', 'text-finco-secondary-color', 'text-finco-button-bg-color', 'text-finco-gold-color', 'text-finco-light-blue-color'];
+  chartColors = ['#A8E6CE', '#6FFFB0', '#4CAF50', '#FFD700', '#87CEFA'];
 
   eff = effect(() => {
-    if (this.transactionChartOptions().transactions !== undefined && this.transactionChartOptions().transactions.length > 0) {
-      this.createChart(this.transactionChartOptions());
+    if (this.transactionChartOptions().transactions && this.transactionChartOptions().transactions.length > 0) {
+      this.generateChart();
     }
   })
 
-  createChart(transactionChartOptions: TransactionChartOptions) {
-    const firstChart: IChartApi = createChart(document.getElementById('statusChart')!, {
+  generateChart() {
+    if (this.chart) {
+      this.chart.remove();
+      this.series.set([]);
+      this.transactionsCount.set(0);
+    }
+
+    this.chart = createChart(document.getElementById('statusChart')!, {
       layout: {
         background: { color: '#1B2A34' },
         textColor: '#6FFFB0',
@@ -39,51 +40,72 @@ export class TransactionChartComponent {
         vertLines: { color: '#444' },
         horzLines: { color: '#444' },
       },
+      timeScale: {
+        timeVisible: true,
+        secondsVisible: false,
+      },
     });
 
-    const areaSeries = firstChart.addSeries(LineSeries, { color: this.chartColors[0] });
-    const areaSeries2 = firstChart.addSeries(LineSeries, { color: this.chartColors[1] });
-    const areaSeries3 = firstChart.addSeries(LineSeries, { color: this.chartColors[2] });
+    const areaSeries = this.chart.addSeries(LineSeries, { color: this.chartColors[0] });
+    const areaSeries2 = this.chart.addSeries(LineSeries, { color: this.chartColors[1] });
+    const areaSeries3 = this.chart.addSeries(LineSeries, { color: this.chartColors[2] });
+    const areaSeries4 = this.chart.addSeries(LineSeries, { color: this.chartColors[3] });
+    const areaSeries5 = this.chart.addSeries(LineSeries, { color: this.chartColors[4] });
 
-    let mapCurrency = this.getCurrencyMap();
+    let seriesMap = this.getSeriesMap();
 
-    mapCurrency.forEach((value, key) => {
-      this.series().push(key);
+    let limit = this.transactionChartOptions().limitSeries;
+
+    seriesMap.forEach((value, key) => {
+      if (this.series().length < limit) {
+        this.series.update((series) => {
+          series.push(key);
+          return series;
+        });
+      }
     });
 
-    this.series()[0] ? areaSeries.setData(this.getSeriesData(mapCurrency.get(this.series()[0])!)) : null;
-    this.series()[1] ? areaSeries2.setData(this.getSeriesData(mapCurrency.get(this.series()[1])!)) : null;
-    this.series()[2] ? areaSeries3.setData(this.getSeriesData(mapCurrency.get(this.series()[2])!)) : null;
+    this.series()[0] ? areaSeries.setData(this.getSeriesData(seriesMap.get(this.series()[0])!)) : null;
+    this.series()[1] ? areaSeries2.setData(this.getSeriesData(seriesMap.get(this.series()[1])!)) : null;
+    this.series()[2] ? areaSeries3.setData(this.getSeriesData(seriesMap.get(this.series()[2])!)) : null;
+    this.series()[3] ? areaSeries4.setData(this.getSeriesData(seriesMap.get(this.series()[3])!)) : null;
+    this.series()[4] ? areaSeries5.setData(this.getSeriesData(seriesMap.get(this.series()[4])!)) : null;
 
-    firstChart.timeScale().fitContent();
-
-    return firstChart;
+    this.chart.timeScale().fitContent();
   }
 
-  getCurrencyMap(): Map<string, Transaction[]> {
-    let mapCurrency = new Map<string, Transaction[]>();
+  getSeriesMap(): Map<string, Transaction[]> {
+    let seriesMap = new Map<string, Transaction[]>();
+
     this.transactionChartOptions().transactions.forEach((transaction) => {
       if (transaction.type === 'WITHDRAW' || transaction.type === 'DEPOSIT_GOAL') {
         transaction.amount = transaction.amount * -1;
       }
       transaction.date = transaction.date.split('T')[0];
 
-      if (mapCurrency.has(transaction.currency)) {
-        let transactions: Transaction[] = mapCurrency.get(transaction.currency)!;
+      let key = this.getSeriesKey(transaction);
+
+      if (seriesMap.has(key)) {
+        let transactions: Transaction[] = seriesMap.get(key)!;
         transactions.push(transaction);
-        mapCurrency.set(transaction.currency, transactions);
+        seriesMap.set(key, transactions);
       } else {
-        mapCurrency.set(transaction.currency, [transaction]);
+        seriesMap.set(key, [transaction]);
       }
 
     });
 
-    return mapCurrency;
+    return seriesMap;
   }
 
   getSeriesData(transaction: Transaction[]): LineData[] {
+    this.transactionsCount.update((count) => count + transaction.length);
 
     let map = new Map<string, number>();
+
+    transaction.sort((a, b) => {
+      return a.id - b.id;
+    });
 
     transaction.forEach((transaction) => {
       if (map.has(transaction.date)) {
@@ -100,6 +122,15 @@ export class TransactionChartComponent {
     });
 
     return data;
+  }
+
+  getSeriesKey(transaction: Transaction): string {
+    if (this.transactionChartOptions().splitBy === 'account') {
+      return transaction.account.name;
+    } else if (this.transactionChartOptions().splitBy === 'category') {
+      return transaction.category;
+    }
+    return transaction.account.currency;
   }
 
 }
