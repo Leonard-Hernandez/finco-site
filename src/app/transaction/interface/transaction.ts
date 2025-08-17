@@ -9,6 +9,7 @@ export interface Transaction {
     account: Account;
     type: string;
     amount: number;
+    currency: string;
     fee: number;
     date: string;
     description: string;
@@ -21,6 +22,12 @@ export interface Transaction {
 export interface TransactionResponse {
     page: Page;
     content: Transaction[];
+}
+
+export interface TransactionChartOptions {
+    transactions: Transaction[];
+    splitBy: 'account' | 'currency' | 'category';
+    limitSeries: 1 | 2 | 3 | 4 | 5;
 }
 
 export interface TransactionFilter {

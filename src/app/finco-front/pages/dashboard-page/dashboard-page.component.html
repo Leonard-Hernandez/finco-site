@@ -7,8 +7,7 @@
     </div>
 
     <div class="flex flex-col gap-2 min-w-90 font-bold flex-3">
-        <p class="text-finco-secondary-color">Status</p>
-        <app-transaction-chart [transactions]="transactions.value()!.content"></app-transaction-chart>
+        <app-transaction-chart [transactionChartOptions]="transactionChartOptions()"></app-transaction-chart>
         <div class="flex gap-2 justify-between px-10">
             <button class="bg-finco-button-bg-color py-1 px-3 rounded-2xl">90 t</button>
             <button class="bg-finco-button-bg-color py-1 px-3 rounded-2xl">60 t</button>
