@@ -1,6 +1,7 @@
 import { Component, effect, input, signal } from '@angular/core';
 import { createChart, IChartApi, LineData, LineSeries } from 'lightweight-charts';
 import { Transaction, TransactionChartOptions } from '../../interface/transaction';
+import { CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'app-transaction-chart',
@@ -24,6 +25,11 @@ export class TransactionChartComponent {
     }
   })
 
+  priceFormat = (value: number) => value.toLocaleString('en-US', { 
+    minimumFractionDigits: 2, 
+    maximumFractionDigits: 2 
+});
+
   generateChart() {
     if (this.chart) {
       this.chart.remove();
@@ -43,6 +49,12 @@ export class TransactionChartComponent {
       timeScale: {
         timeVisible: true,
         secondsVisible: false,
+      },
+    });
+
+    this.chart.applyOptions({
+      localization: {
+        priceFormatter: this.priceFormat,
       },
     });
 

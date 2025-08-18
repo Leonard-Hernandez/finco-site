@@ -1,11 +1,10 @@
 import { Component, computed, input } from '@angular/core';
 import { Total } from '../../../account/interface/account.interface';
-import { firstValueFrom } from 'rxjs';
-import { NgClass } from '@angular/common';
+import { CurrencyPipe, NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-total',
-  imports: [NgClass],
+  imports: [NgClass, CurrencyPipe],
   templateUrl: './total.component.html'
 })
 export class TotalComponent {
