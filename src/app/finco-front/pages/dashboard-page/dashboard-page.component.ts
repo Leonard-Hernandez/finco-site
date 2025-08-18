@@ -8,9 +8,10 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { Total } from '../../../account/interface/account.interface';
 import { TransactionChartComponent } from "../../../transaction/components/transaction-chart/transaction-chart.component";
 import { map } from 'rxjs';
+import { TransactionRangesButtonsComponent } from '../../../transaction/components/transaction-ranges-buttons/transaction-ranges-buttons.component';
 
 @Component({
-  imports: [TotalComponent, TransactionChartComponent],
+  imports: [TotalComponent, TransactionChartComponent, TransactionRangesButtonsComponent],
   templateUrl: './dashboard-page.component.html'
 })
 export class DashboardPageComponent {
