@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { TransactionService } from '../../../transaction/services/transaction.service';
 import { TransactionChartOptions, TransactionFilter, TransactionResponse } from '../../../transaction/interface/transaction';
 import { TotalComponent } from "../../../shared/components/total/total.component";
@@ -9,9 +9,10 @@ import { Total } from '../../../account/interface/account.interface';
 import { TransactionChartComponent } from "../../../transaction/components/transaction-chart/transaction-chart.component";
 import { map } from 'rxjs';
 import { TransactionRangesButtonsComponent } from '../../../transaction/components/transaction-ranges-buttons/transaction-ranges-buttons.component';
+import { IncomeExpensePieChartComponent } from "../../../transaction/components/income-expense-pie-chart/income-expense-pie-chart.component";
 
 @Component({
-  imports: [TotalComponent, TransactionChartComponent, TransactionRangesButtonsComponent],
+  imports: [TotalComponent, TransactionChartComponent, TransactionRangesButtonsComponent, IncomeExpensePieChartComponent],
   templateUrl: './dashboard-page.component.html'
 })
 export class DashboardPageComponent {
@@ -40,7 +41,6 @@ export class DashboardPageComponent {
     request: () => this.filter(),
     loader: () => this.transactionsService.getTransactions(this.filter()).pipe(
       map((response: TransactionResponse) => {
-        console.log(response);
         this.totalTransactions.set(response.page.totalElements);
         return response.content;
       })
@@ -55,8 +55,13 @@ export class DashboardPageComponent {
     };
   });
 
+  donuntEffect = effect(() => {
+    if (this.totals.value() === undefined) {
+      return;
+    }
+  });
+
   updateFilter(transactions: number) {
-    console.log(transactions);
     this.filter.set({
       pagination: {
         page: 0,
@@ -66,5 +71,4 @@ export class DashboardPageComponent {
       }
     });
   }
-
 }

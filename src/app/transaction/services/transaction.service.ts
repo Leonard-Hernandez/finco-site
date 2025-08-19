@@ -1,4 +1,4 @@
-import { inject, Injectable, Injector } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../../environments/environment.local';
 import { AuthService } from '../../auth/services/auth.service';
@@ -15,8 +15,6 @@ export class TransactionService {
 
     getTransactions(filter: TransactionFilter): Observable<TransactionResponse> {
 
-        const userId = this.userId!;
-
         let params = new HttpParams()
             .set('page', filter.pagination.page)
             .set('size', filter.pagination.size)
@@ -29,12 +27,11 @@ export class TransactionService {
         filter.type ? params = params.set('type', filter.type) : null;
 
 
-        return this.http.get<TransactionResponse>(`${this.API_URL}/users/${userId}/transactions`, { params });
+        return this.http.get<TransactionResponse>(`${this.API_URL}/users/${this.userId}/transactions`, { params });
     }
 
     GetCategoriesByUser(): Observable<Transaction> {
-        const userId = this.userId!;
-        return this.http.get<Transaction>(`${this.API_URL}/transactions/categories/${userId}`);
+        return this.http.get<Transaction>(`${this.API_URL}/transactions/categories/${this.userId}`);
     }
 
 }
