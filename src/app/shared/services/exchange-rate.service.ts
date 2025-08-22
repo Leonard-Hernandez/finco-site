@@ -1,0 +1,37 @@
+import { HttpClient } from "@angular/common/http";
+import { effect, inject, Injectable, signal } from "@angular/core";
+import { AuthService } from "../../auth/services/auth.service";
+import { environment } from "../../../environments/environment.local";
+import { map, single } from "rxjs";
+
+@Injectable({
+    providedIn: 'root'
+})
+export class ExchangeRateService {
+
+    baseurl = environment.exchangeApiUrl;
+    defaultCurrency = signal<string>(inject(AuthService).user()?.defaultCurrency! || 'USD');
+
+    exchangeRate = signal<any>(null);
+
+    exchangeRateEffec = effect(
+        () => {
+            const response = fetch(`${this.baseurl}${this.defaultCurrency().toLowerCase()}.min.json`);
+            response.then((resp) => resp.json()).then((data) => this.exchangeRate.set(data));
+        }
+    )
+
+
+    private http = inject(HttpClient);
+
+    convert(fromCurrency: string, amount: number): number {
+
+        if (fromCurrency === this.defaultCurrency()) {
+            return amount;
+        }
+
+        return amount / this.exchangeRate()?.[this.defaultCurrency().toLowerCase()]?.[fromCurrency.toLowerCase()];
+
+    }
+
+}

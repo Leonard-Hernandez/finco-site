@@ -94,8 +94,8 @@ export class IncomeExpensePieChartComponent {
 
   generateData() {
 
-    let incomeTransactions = this.transactions()!.filter((transaction) => transaction.type === 'DEPOSIT' || transaction.type === 'WITHDRAW_GOAL');
-    let expenseTransactions = this.transactions()!.filter((transaction) => transaction.type === 'WITHDRAW' || transaction.type === 'DEPOSIT_GOAL');
+    let incomeTransactions = this.transactions()!.filter((transaction) => transaction.type === 'DEPOSIT');
+    let expenseTransactions = this.transactions()!.filter((transaction) => transaction.type === 'WITHDRAW');
 
     let incomeMap = new Map<string, number>();
     let expenseMap = new Map<string, number>();

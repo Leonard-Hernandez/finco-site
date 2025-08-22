@@ -10,6 +10,7 @@ import { TransactionChartComponent } from "../../../transaction/components/trans
 import { map } from 'rxjs';
 import { TransactionRangesButtonsComponent } from '../../../transaction/components/transaction-ranges-buttons/transaction-ranges-buttons.component';
 import { IncomeExpensePieChartComponent } from "../../../transaction/components/income-expense-pie-chart/income-expense-pie-chart.component";
+import { ExchangeRateService } from '../../../shared/services/exchange-rate.service';
 
 @Component({
   imports: [TotalComponent, TransactionChartComponent, TransactionRangesButtonsComponent, IncomeExpensePieChartComponent],
@@ -20,6 +21,7 @@ export class DashboardPageComponent {
   name = inject(AuthService).user()?.name;
   accountService = inject(AccountService);
   transactionsService = inject(TransactionService);
+  exchangeService = inject(ExchangeRateService);
   totalTransactions = signal<number>(0);
 
   filter = signal<TransactionFilter>({
@@ -42,7 +44,10 @@ export class DashboardPageComponent {
     loader: () => this.transactionsService.getTransactions(this.filter()).pipe(
       map((response: TransactionResponse) => {
         this.totalTransactions.set(response.page.totalElements);
-        return response.content;
+        return response.content.map((transaction) => {
+          transaction.amount = this.exchangeService.convert(transaction.account.currency, transaction.amount);
+          return transaction;
+        });
       })
     )
   });
