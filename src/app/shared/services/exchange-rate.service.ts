@@ -1,8 +1,6 @@
-import { HttpClient } from "@angular/common/http";
 import { effect, inject, Injectable, signal } from "@angular/core";
 import { AuthService } from "../../auth/services/auth.service";
 import { environment } from "../../../environments/environment.local";
-import { map, single } from "rxjs";
 
 @Injectable({
     providedIn: 'root'
@@ -20,9 +18,6 @@ export class ExchangeRateService {
             response.then((resp) => resp.json()).then((data) => this.exchangeRate.set(data));
         }
     )
-
-
-    private http = inject(HttpClient);
 
     convert(fromCurrency: string, amount: number): number {
 

@@ -13,6 +13,7 @@ import { ErrorModalComponent } from "../../../shared/components/error-modal/erro
 export class RegisterPageComponent {
 
   _hasError = signal<boolean>(false);
+  _errorDetails = signal<string>('');
 
   fb = inject(FormBuilder);
   authService = inject(AuthService);
@@ -21,17 +22,27 @@ export class RegisterPageComponent {
   registerForm = this.fb.group({
     name: ['', [Validators.required]],
     password: ['', [Validators.required, Validators.minLength(6)]],
-    email: ['', [Validators.required, Validators.email]]
+    email: ['', [Validators.required, Validators.email]],
+    defaultCurrency: ['', [Validators.required, Validators.pattern('^[A-Z]{3}$')]]
   });
 
   onSubmit() {
 
-    if(!this.validForm()) return;
+    this.registerForm.markAllAsTouched();
+
+    if(!this.registerForm.valid) {
+      this._hasError.set(true);
+      setTimeout(() => {
+        this._hasError.set(false);
+      }, 3000);
+      return;
+    }
 
     const user : UserRegister = {
       name: this.registerForm.value.name!,
       password: this.registerForm.value.password!,
-      email: this.registerForm.value.email!
+      email: this.registerForm.value.email!,
+      defaultCurrency: this.registerForm.value.defaultCurrency!.toUpperCase()
     };
 
 
@@ -41,22 +52,12 @@ export class RegisterPageComponent {
       },
       error: (error) => {
         this._hasError.set(true);
+        this._errorDetails.set(error.error);
         setTimeout(() => {
           this._hasError.set(false);
         }, 3000);
       }
     });
-  }
-
-  validForm(): boolean {
-    if (!this.registerForm.valid) {
-      this._hasError.set(true);
-      setTimeout(() => {
-        this._hasError.set(false);
-      }, 3000);
-      return false;
-    }
-    return true;
   }
 
 }
