@@ -1,63 +1,76 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { UserRegister } from '../../interfaces/user-register.interface';
 import { Router } from '@angular/router';
+import { AccountService } from '../../../account/service/account.service';
+import { FormUtils } from '../../../shared/utils/form-utils';
 import { ErrorModalComponent } from "../../../shared/components/error-modal/error-modal.component";
+import { ResponseError } from '../../../shared/interfaces/response-error.interface';
+import { HttpErrorResponse } from '@angular/common/http';
+import { catchError, of } from 'rxjs';
 
 @Component({
   selector: 'app-register-page',
   imports: [ReactiveFormsModule, ErrorModalComponent],
   templateUrl: './register-page.component.html'
 })
-export class RegisterPageComponent {
+export class RegisterPageComponent implements OnInit {
 
-  _hasError = signal<boolean>(false);
-  _errorDetails = signal<string>('');
+  currencies = signal<string[]>([]);
+  hasError = signal<boolean>(false);
+  errorMessage = signal<string>('');
+  errorDetails = signal<string>('');
 
-  fb = inject(FormBuilder);
   authService = inject(AuthService);
+  accountService = inject(AccountService);
   router = inject(Router)
 
+  fb = inject(FormBuilder);
+  formUtils = FormUtils;
+
+  ngOnInit(): void {
+    this.accountService.getCurrencies().subscribe((currencies) => {
+      this.currencies.set(currencies);
+    })
+  }
+
   registerForm = this.fb.group({
-    name: ['', [Validators.required]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
+    name: ['', [Validators.required, Validators.minLength(3)]],
+    password: ['', [Validators.required, Validators.minLength(5)]],
     email: ['', [Validators.required, Validators.email]],
-    defaultCurrency: ['', [Validators.required, Validators.pattern('^[A-Z]{3}$')]]
+    defaultCurrency: ['USD', [Validators.required]]
   });
 
   onSubmit() {
 
     this.registerForm.markAllAsTouched();
 
-    if(!this.registerForm.valid) {
-      this._hasError.set(true);
-      setTimeout(() => {
-        this._hasError.set(false);
-      }, 3000);
+    if (!this.registerForm.valid) {
       return;
     }
 
-    const user : UserRegister = {
+    const user: UserRegister = {
       name: this.registerForm.value.name!,
       password: this.registerForm.value.password!,
       email: this.registerForm.value.email!,
-      defaultCurrency: this.registerForm.value.defaultCurrency!.toUpperCase()
+      defaultCurrency: this.registerForm.value.defaultCurrency!
     };
 
-
     this.authService.register(user).subscribe({
-      next: (success) => {
-        this.router.navigate(['/auth/login']);
-      },
-      error: (error) => {
-        this._hasError.set(true);
-        this._errorDetails.set(error.error);
-        setTimeout(() => {
-          this._hasError.set(false);
-        }, 3000);
-      }
-    });
+        next: (success) => {
+          this.router.navigate(['/auth/login']);
+        },
+        error: (error) => {
+          this.hasError.set(true);
+          const errorResponse = error.error as ResponseError;
+          this.errorMessage.set(errorResponse.error);
+          this.errorDetails.set(errorResponse.message);
+          setTimeout(() => {
+            this.hasError.set(false);
+          }, 3000);
+        }
+      });
   }
 
 }

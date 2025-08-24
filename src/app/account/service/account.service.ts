@@ -17,5 +17,9 @@ export class AccountService {
     getTotals(): Observable<Total[]> {
         return this.http.get<Total[]>(`${this.url}/users/${this.userId}/total-balance`);
     }
+
+    getCurrencies(): Observable<string[]> {
+        return this.http.get<string[]>(`${this.url}/accounts/currencies`);
+    }
     
 }

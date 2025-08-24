@@ -1,6 +1,5 @@
 <div
-  class="min-h-screen w-full bg-gradient-to-br from-finco-bg-color to-finco-card-bg-color flex items-center justify-center p-4"
->
+  class="min-h-screen w-full bg-gradient-to-br from-finco-bg-color to-finco-card-bg-color flex items-center justify-center p-4">
   <div class="w-full max-w-md">
     <div class="text-center mb-8">
       <div class="flex justify-center mb-4">
@@ -11,124 +10,104 @@
       <h1 class="text-3xl font-bold text-finco-primary-color mb-2">
         Create an Account
       </h1>
-      <p class="text-finco-secondary-color">Join Finco today</p>
     </div>
 
-    <div
-      class="bg-white/10 backdrop-blur-md rounded-2xl p-8 shadow-xl border border-white/5"
-    >
-      <form
-        class="space-y-6" (ngSubmit)="onSubmit()" [formGroup]="registerForm"
-      >
+    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-8 shadow-xl border border-white/5">
+      <form class="space-y-6" (ngSubmit)="onSubmit()" [formGroup]="registerForm">
         <!-- Username Field -->
         <div class="space-y-2">
-          <label
-            for="username"
-            class="block text-sm font-medium text-finco-secondary-color"
-          >
+          <label for="username" class="block text-sm font-medium text-finco-secondary-color">
             Username
           </label>
           <div class="relative">
-            <div
-              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-            >
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg class="h-5 w-5 text-finco-primary-color">
                 <use xlink:href="/sprite.svg#user" />
               </svg>
             </div>
-            <input
-              id="name"
-              type="text"
-              placeholder="Choose a username"
+            <input id="name" type="text" placeholder="Choose a username"
               class="block w-full pl-10 pr-3 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
-              formControlName="name"
-            />
+              formControlName="name" />
           </div>
+          @if (formUtils.isValidField(registerForm, 'name')) {
+          <div class="text-red-500">
+            {{ formUtils.getErrorMessage(registerForm, 'name') }}
+          </div>
+          }
         </div>
 
         <!-- Email Field -->
         <div class="space-y-2">
-          <label
-            for="email"
-            class="block text-sm font-medium text-finco-secondary-color"
-          >
+          <label for="email" class="block text-sm font-medium text-finco-secondary-color">
             Email
           </label>
           <div class="relative">
-            <div
-              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-            >
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg class="h-5 w-5 text-finco-primary-color">
                 <use xlink:href="/sprite.svg#email" />
               </svg>
             </div>
-            <input
-              id="email"
-              type="email"
-              placeholder="your@email.com"
+            <input id="email" type="email" placeholder="your@email.com"
               class="block w-full pl-10 pr-3 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
-              formControlName="email"
-            />
+              formControlName="email" />
           </div>
+          @if (formUtils.isValidField(registerForm, 'email')) {
+          <div class="text-red-500">
+            {{ formUtils.getErrorMessage(registerForm, 'email') }}
+          </div>
+          }
         </div>
 
         <!-- Password Field -->
         <div class="space-y-2">
-          <label
-            for="password"
-            class="block text-sm font-medium text-finco-secondary-color"
-          >
+          <label for="password" class="block text-sm font-medium text-finco-secondary-color">
             Password
           </label>
           <div class="relative">
-            <div
-              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-            >
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg class="h-5 w-5 text-finco-primary-color">
                 <use xlink:href="/sprite.svg#lock" />
               </svg>
             </div>
-            <input
-              id="password"
-              type="password"
-              placeholder="••••••••"
+            <input id="password" type="password" placeholder="••••••••"
               class="block w-full pl-10 pr-10 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
-              formControlName="password"
-            />
+              formControlName="password" />
           </div>
+          @if (formUtils.isValidField(registerForm, 'password')) {
+          <div class="text-red-500">
+            {{ formUtils.getErrorMessage(registerForm, 'password') }}
+          </div>
+          }
         </div>
 
+        <!-- Default Currency Field -->
         <div class="space-y-2">
-          <label
-            for="defaultCurrency"
-            class="block text-sm font-medium text-finco-secondary-color"
-          >
+          <label for="defaultCurrency" class="block text-sm font-medium text-finco-secondary-color">
             Default Currency
           </label>
           <div class="relative">
-            <div
-              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-            >
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg class="h-5 w-5 text-finco-primary-color">
-                <use xlink:href="/sprite.svg#dollar" />
+                <use xlink:href="/sprite.svg#currency" />
               </svg>
             </div>
-            <input
-              id="defaultCurrency"
-              type="text"
-              placeholder="USD"
+            <select id="defaultCurrency" placeholder="USD"
               class="block w-full pl-10 pr-3 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
-              formControlName="defaultCurrency"
-            />
+              formControlName="defaultCurrency">
+              @for (currency of currencies(); track $index) {
+              <option [value]="currency" [selected]="currency === 'USD'"
+                class="text-finco-secondary-color bg-finco-bg-color">
+                {{ currency }}
+              </option>
+              }
+            </select>
           </div>
         </div>
 
         <!-- Submit Button -->
         <div class="pt-2">
-          <button
-            type="submit"
-            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-finco-bg-color bg-finco-primary-color hover:bg-finco-primary-color/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-finco-primary-color transition duration-200"
-          >
+          <button type="submit"
+            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-finco-bg-color bg-finco-primary-color hover:bg-finco-primary-color/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-finco-primary-color transition duration-200">
             Create Account
           </button>
         </div>
@@ -138,10 +117,7 @@
       <div class="mt-6 text-center">
         <p class="text-sm text-finco-secondary-color">
           Already have an account?
-          <a
-            routerLink="/auth/login"
-            class="font-medium text-finco-primary-color hover:underline ml-1"
-          >
+          <a routerLink="/auth/login" class="font-medium text-finco-primary-color hover:underline ml-1">
             Sign in
           </a>
         </p>
@@ -150,8 +126,4 @@
   </div>
 </div>
 
-<app-error-modal
-  [_message]="'Invalid Credentials'"
-  [_details]="_errorDetails()"
-  [_signal]="_hasError()"
->
+<app-error-modal [_message]="errorMessage()" [_signal]="hasError()" [_details]="errorDetails()" />

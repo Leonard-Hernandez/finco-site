@@ -11,6 +11,7 @@ import { map } from 'rxjs';
 import { TransactionRangesButtonsComponent } from '../../../transaction/components/transaction-ranges-buttons/transaction-ranges-buttons.component';
 import { IncomeExpensePieChartComponent } from "../../../transaction/components/income-expense-pie-chart/income-expense-pie-chart.component";
 import { ExchangeRateService } from '../../../shared/services/exchange-rate.service';
+import { Router } from '@angular/router';
 
 @Component({
   imports: [TotalComponent, TransactionChartComponent, TransactionRangesButtonsComponent, IncomeExpensePieChartComponent],
@@ -22,6 +23,7 @@ export class DashboardPageComponent {
   accountService = inject(AccountService);
   transactionsService = inject(TransactionService);
   exchangeService = inject(ExchangeRateService);
+  router = inject(Router);
   totalTransactions = signal<number>(0);
 
   filter = signal<TransactionFilter>({
@@ -43,7 +45,11 @@ export class DashboardPageComponent {
     request: () => this.filter(),
     loader: () => this.transactionsService.getTransactions(this.filter()).pipe(
       map((response: TransactionResponse) => {
+        
         this.totalTransactions.set(response.page.totalElements);
+        if(this.totalTransactions() === 0){
+          this.router.navigate(['/accounts']);
+        }
         return response.content.map((transaction) => {
           transaction.amount = this.exchangeService.convert(transaction.account.currency, transaction.amount);
           return transaction;

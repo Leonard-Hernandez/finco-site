@@ -42,6 +42,11 @@
             />
           </div>
         </div>
+        @if (formUtils.isValidField(loginForm, 'username')) {
+          <div class="text-red-500 text-sm mt-0">
+            {{ formUtils.getErrorMessage(loginForm, 'username') }}
+          </div>
+        }
 
         <div class="space-y-2">
           <div class="flex items-center justify-between">
@@ -69,6 +74,11 @@
             />
           </div>
         </div>
+        @if (formUtils.isValidField(loginForm, 'password')) {
+          <div class="text-red-500 text-sm">
+            {{ formUtils.getErrorMessage(loginForm, 'password') }}
+          </div>
+        }
 
         <div>
           <button
@@ -96,7 +106,7 @@
 </div>
 
 <app-error-modal
-  [_message]="'Invalid Credentials'"
-  [_details]="'Please verify your email and password'"
+  [_message]="errorMessage()"
+  [_details]="errorDetails()"
   [_signal]="_hasError()"
 />

@@ -1,8 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../environments/environment.local';
 import { AuthResponse } from '../interfaces/auth-responses.interface';
-import { catchError, map, Observable, of } from 'rxjs';
+import { catchError, map, Observable, of, throwError } from 'rxjs';
 import { User } from '../interfaces/user.interface';
 import { Router } from '@angular/router';
 import { UserRegister } from '../interfaces/user-register.interface';
@@ -88,9 +88,10 @@ export class AuthService {
     return true;
   }
 
-  private handleAuthError(error: any) {
+  private handleAuthError(error: HttpErrorResponse) {
     this.logout();
-    return of(false);
+    console.log(error);
+    return throwError(() => error);
   }
 
   getRoles(token: string): string[] {
