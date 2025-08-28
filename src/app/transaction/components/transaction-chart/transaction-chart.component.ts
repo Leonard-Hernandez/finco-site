@@ -1,7 +1,8 @@
-import { Component, effect, input, signal } from '@angular/core';
+import { Component, effect, inject, input, signal } from '@angular/core';
 import { createChart, IChartApi, LineData, LineSeries } from 'lightweight-charts';
 import { Transaction, TransactionChartOptions } from '../../interface/transaction';
 import { CurrencyPipe } from '@angular/common';
+import { AuthService } from '../../../auth/services/auth.service';
 
 @Component({
   selector: 'app-transaction-chart',
@@ -12,6 +13,7 @@ export class TransactionChartComponent {
 
   transactionChartOptions = input.required<TransactionChartOptions>();
   series = signal<string[]>([]);
+  defaultCurrency = inject(AuthService).user()?.defaultCurrency;
   transactionsCount = signal<number>(0);
 
   chart!: IChartApi;
@@ -95,15 +97,26 @@ export class TransactionChartComponent {
       }
       transaction.date = transaction.date.split('T')[0];
 
-      let key = this.getSeriesKey(transaction);
-
-      if (seriesMap.has(key)) {
-        let transactions: Transaction[] = seriesMap.get(key)!;
-        transactions.push(transaction);
-        seriesMap.set(key, transactions);
+      if (this.transactionChartOptions().splitBy === 'defaultCurrency') {
+        if (seriesMap.has(this.defaultCurrency!)) {
+          let transactions: Transaction[] = seriesMap.get(this.defaultCurrency!)!;
+          transactions.push(transaction);
+          seriesMap.set(this.defaultCurrency!, transactions);
+        } else {
+          seriesMap.set(this.defaultCurrency!, [transaction]);
+        }
       } else {
-        seriesMap.set(key, [transaction]);
+        let key = this.getSeriesKey(transaction);
+  
+        if (seriesMap.has(key)) {
+          let transactions: Transaction[] = seriesMap.get(key)!;
+          transactions.push(transaction);
+          seriesMap.set(key, transactions);
+        } else {
+          seriesMap.set(key, [transaction]);
+        }
       }
+
 
     });
 
@@ -141,7 +154,10 @@ export class TransactionChartComponent {
       return transaction.account.name;
     } else if (this.transactionChartOptions().splitBy === 'category') {
       return transaction.category;
-    }
+    } else if (this.transactionChartOptions().splitBy === 'goal') {
+      return transaction.goal.name;
+    } 
+
     return transaction.account.currency;
   }
 

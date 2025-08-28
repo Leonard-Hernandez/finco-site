@@ -25,7 +25,10 @@ export class TransactionService {
         filter.transferAccountId ? params = params.set('transferAccountId', filter.transferAccountId) : null;
         filter.category ? params = params.set('category', filter.category) : null;
         filter.type ? params = params.set('type', filter.type) : null;
-
+        filter.startDate ? params = params.set('startDate', filter.startDate.toISOString().split('T')[0]) : null;
+        filter.endDate ? params = params.set('endDate', filter.endDate.toISOString().split('T')[0]) : null;
+        filter.onlyAccountTransactions ? params = params.set('onlyAccountTransactions', filter.onlyAccountTransactions) : null;
+        filter.onlyGoalTransactions ? params = params.set('onlyGoalTransactions', filter.onlyGoalTransactions) : null;
 
         return this.http.get<TransactionResponse>(`${this.API_URL}/users/${this.userId}/transactions`, { params });
     }

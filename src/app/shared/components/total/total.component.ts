@@ -24,7 +24,6 @@ export class TotalComponent {
     this._total().forEach((row) => {
       total += this.exchangeService.convert(row.currency, row.total);
     })
-    console.log(total);
     return total;
   });
     

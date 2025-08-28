@@ -1,5 +1,10 @@
 import { Component, computed, inject, input, output, signal } from '@angular/core';
 
+interface Range {
+  name: string;
+  date: Date;
+}
+
 @Component({
   selector: 'transaction-ranges-buttons',
   imports: [],
@@ -7,16 +12,18 @@ import { Component, computed, inject, input, output, signal } from '@angular/cor
 })
 export class TransactionRangesButtonsComponent {
 
-  transactionsTotals = input.required<number>();
-
-  range = output<number>();
+  range = output<Date>();
 
   ranges = computed(() => {
-    let range = this.transactionsTotals() / 3;
-    return [Math.ceil(range * 3), Math.ceil(range * 2), Math.ceil(range)];
+    return [
+      { name: '1 y', date: new Date(new Date().setDate(new Date().getDate() - 365)) },
+      { name: '90 d', date: new Date(new Date().setDate(new Date().getDate() - 90)) },
+      { name: '30 d', date: new Date(new Date().setDate(new Date().getDate() - 30)) },
+      { name: '7 d', date: new Date(new Date().setDate(new Date().getDate() - 7)) },
+    ]
   })
 
-  onRangeClick(range: number) {
+  onRangeClick(range: Date) {
     this.range.emit(range);
   }
 

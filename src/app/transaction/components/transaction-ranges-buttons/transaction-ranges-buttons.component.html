@@ -1,5 +1,5 @@
 <div class="flex gap-1 justify-between px-10 py-1">
     @for (range of ranges(); track $index) {
-        <button class="text-finco-primary-color py-1 shadow-sm shadow-finco-secondary-color px-3 rounded-2xl" (click)="onRangeClick(range)">{{range}} t</button>
+        <button class="text-finco-primary-color py-1 shadow-sm shadow-finco-secondary-color px-3 rounded-2xl" (click)="onRangeClick(range.date)">{{range.name}}</button>
     }
 </div>

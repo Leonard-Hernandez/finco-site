@@ -32,7 +32,8 @@ export class DashboardPageComponent {
       size: 10,
       sortBy: 'date',
       sortDirection: 'asc',
-    }
+    },
+    onlyAccountTransactions: true,
   });
 
   totals = rxResource<Total[], Error>({
@@ -45,11 +46,6 @@ export class DashboardPageComponent {
     request: () => this.filter(),
     loader: () => this.transactionsService.getTransactions(this.filter()).pipe(
       map((response: TransactionResponse) => {
-        
-        this.totalTransactions.set(response.page.totalElements);
-        if(this.totalTransactions() === 0){
-          this.router.navigate(['/accounts']);
-        }
         return response.content.map((transaction) => {
           transaction.amount = this.exchangeService.convert(transaction.account.currency, transaction.amount);
           return transaction;
@@ -61,7 +57,7 @@ export class DashboardPageComponent {
   transactionChartOptions = computed<TransactionChartOptions>(() => {
     return {
       transactions: this.transactions.value()!,
-      splitBy: 'currency',
+      splitBy: 'defaultCurrency',
       limitSeries: 5
     };
   });
@@ -72,14 +68,16 @@ export class DashboardPageComponent {
     }
   });
 
-  updateFilter(transactions: number) {
+  updateFilter(startDate: Date) {
     this.filter.set({
       pagination: {
         page: 0,
-        size: transactions,
+        size: 500,
         sortBy: 'date',
         sortDirection: 'desc',
-      }
+      },
+      onlyAccountTransactions: true,
+      startDate: startDate,
     });
   }
 }

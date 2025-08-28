@@ -28,7 +28,8 @@ export class AccountsListPageComponent {
       size: 10,
       sortBy: 'date',
       sortDirection: 'asc',
-    }
+    },
+    onlyAccountTransactions: true
   });
 
   transactions = rxResource({
@@ -56,14 +57,16 @@ export class AccountsListPageComponent {
     };
   });
 
-  updateFilter(transactions: number) {
+  updateFilter(transactions: Date) {
     this.filter.set({
       pagination: {
         page: 0,
-        size: transactions,
+        size: 500,
         sortBy: 'date',
         sortDirection: 'desc',
-      }
+      },
+      startDate: transactions,
+      onlyAccountTransactions: true
     });
   }
 

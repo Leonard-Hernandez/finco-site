@@ -25,7 +25,7 @@ export interface TransactionResponse {
 
 export interface TransactionChartOptions {
     transactions: Transaction[];
-    splitBy: 'account' | 'currency' | 'category';
+    splitBy: 'account' | 'currency' | 'category' | 'goal' | 'defaultCurrency';
     limitSeries: 1 | 2 | 3 | 4 | 5;
 }
 
@@ -37,5 +37,9 @@ export interface TransactionFilter {
     category?: string;
     type?: 'DEPOSIT' | 'WITHDRAW' | 'DEPOSIT_GOAL' | 'WITHDRAW_GOAL';
     userId?: number;
+    startDate?: Date;
+    endDate?: Date;
+    onlyAccountTransactions?: boolean;
+    onlyGoalTransactions?: boolean;
 }
 
