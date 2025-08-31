@@ -1,8 +1,9 @@
-import { Component, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, linkedSignal, signal } from '@angular/core';
 import { createChart, IChartApi, LineData, LineSeries } from 'lightweight-charts';
 import { Transaction, TransactionChartOptions } from '../../interface/transaction';
 import { CurrencyPipe } from '@angular/common';
 import { AuthService } from '../../../auth/services/auth.service';
+import { ExchangeRateService } from '../../../shared/services/exchange-rate.service';
 
 @Component({
   selector: 'app-transaction-chart',
@@ -12,8 +13,12 @@ import { AuthService } from '../../../auth/services/auth.service';
 export class TransactionChartComponent {
 
   transactionChartOptions = input.required<TransactionChartOptions>();
+  transactions = computed(() => {
+    return structuredClone(this.transactionChartOptions().transactions);
+  });
   series = signal<string[]>([]);
   defaultCurrency = inject(AuthService).user()?.defaultCurrency;
+  exchangeService = inject(ExchangeRateService);
   transactionsCount = signal<number>(0);
 
   chart!: IChartApi;
@@ -22,15 +27,15 @@ export class TransactionChartComponent {
   chartColors = ['#A8E6CE', '#6FFFB0', '#4CAF50', '#FFD700', '#87CEFA'];
 
   eff = effect(() => {
-    if (this.transactionChartOptions().transactions && this.transactionChartOptions().transactions.length > 0) {
+    if (this.transactions() && this.transactions().length > 0) {
       this.generateChart();
     }
   })
 
-  priceFormat = (value: number) => value.toLocaleString('en-US', { 
-    minimumFractionDigits: 2, 
-    maximumFractionDigits: 2 
-});
+  priceFormat = (value: number) => value.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
 
   generateChart() {
     if (this.chart) {
@@ -91,7 +96,12 @@ export class TransactionChartComponent {
   getSeriesMap(): Map<string, Transaction[]> {
     let seriesMap = new Map<string, Transaction[]>();
 
-    this.transactionChartOptions().transactions.forEach((transaction) => {
+    this.transactions().forEach((transaction) => {
+
+      if (this.transactionChartOptions().convertToDefaultCurrency) {
+        transaction.amount = this.exchangeService.convert(transaction.account.currency, transaction.amount);
+      }
+
       if (transaction.type === 'WITHDRAW' || transaction.type === 'DEPOSIT_GOAL') {
         transaction.amount = transaction.amount * -1;
       }
@@ -107,7 +117,7 @@ export class TransactionChartComponent {
         }
       } else {
         let key = this.getSeriesKey(transaction);
-  
+
         if (seriesMap.has(key)) {
           let transactions: Transaction[] = seriesMap.get(key)!;
           transactions.push(transaction);
@@ -156,7 +166,7 @@ export class TransactionChartComponent {
       return transaction.category;
     } else if (this.transactionChartOptions().splitBy === 'goal') {
       return transaction.goal.name;
-    } 
+    }
 
     return transaction.account.currency;
   }

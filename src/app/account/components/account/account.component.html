@@ -1,0 +1,31 @@
+@if(!isBack()) {
+<button (click)="isBack.set(true)"
+    class="w-full h-30 aspect-ratio-2/1 rounded-xl bg-finco-card-bg-color border-2 border-finco-button-bg-color px-4 py-2">
+    <p class="text-xs text-finco-secondary-color flex justify-between">
+        <span>{{account().type}}</span><span>{{account().currency}}</span></p>
+    <div class="flex justify-between items-center">
+        <h3 class="font-bold text-finco-primary-color">{{account().name}}</h3>
+    </div>
+    <div class="flex justify-between items-center my-1">
+        <p class="text-lg font-bold" [ngClass]="{
+                'text-red-500': account().balance < 0,
+                'text-finco-primary-color': account().balance >= 0
+              }">{{account().balance | currency:'':''}}</p>
+    </div>
+</button>
+} @else {
+<button (click)="isBack.set(false)"
+    class="w-full h-30 aspect-ratio-2/1 rounded-xl bg-finco-card-bg-color border-2 border-finco-button-bg-color px-4 py-2">
+    <div class="flex justify-between items-center py-1">
+        <p class="text-xs text-finco-secondary-color">Deposit fee: {{account().depositFee | percent}}</p>
+        <p class="text-xs text-finco-secondary-color">Withdraw fee: {{account().withdrawFee | percent}}</p>
+    </div>
+    <div class="flex justify-between items-center py-1">
+        <p class="text-xs text-finco-secondary-color">Is default: {{account().isDefault}}</p>
+        <p class="text-xs text-finco-secondary-color">Creation date: {{account().creationDate | date}}</p>
+    </div>
+    <div class="flex justify-between items-center py-1">
+        <p class="text-xs text-finco-secondary-color">Description: {{account().description}}</p>
+    </div>
+</button>
+}

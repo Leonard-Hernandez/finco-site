@@ -1,6 +1,7 @@
-import { Component, effect, input } from '@angular/core';
+import { Component, computed, effect, inject, input } from '@angular/core';
 import { Transaction } from '../../interface/transaction';
 import { Chart, ChartOptions } from 'chart.js/auto';
+import { ExchangeRateService } from '../../../shared/services/exchange-rate.service';
 
 @Component({
   selector: 'app-income-expense-pie-chart',
@@ -10,17 +11,21 @@ import { Chart, ChartOptions } from 'chart.js/auto';
 export class IncomeExpensePieChartComponent {
 
   transactions = input<Transaction[]>();
+  _transactions = computed(() => {
+    return structuredClone(this.transactions());
+  });
+  exchangeService = inject(ExchangeRateService);
 
   incomeChart: Chart | undefined;
   expenseChart: Chart | undefined;
 
   chartEffect = effect(() => {
     if (this.transactions() && this.transactions()!.length > 0) {
-      this.generateCharts(this.transactions()!);
+      this.generateCharts();
     }
   });
 
-  generateCharts(transactions: Transaction[]) {
+  generateCharts() {
     if (this.incomeChart) {
       this.incomeChart.destroy();
     }
@@ -94,13 +99,14 @@ export class IncomeExpensePieChartComponent {
 
   generateData() {
 
-    let incomeTransactions = this.transactions()!.filter((transaction) => transaction.type === 'DEPOSIT');
-    let expenseTransactions = this.transactions()!.filter((transaction) => transaction.type === 'WITHDRAW');
+    let incomeTransactions = this._transactions()!.filter((transaction) => transaction.type === 'DEPOSIT');
+    let expenseTransactions = this._transactions()!.filter((transaction) => transaction.type === 'WITHDRAW');
 
     let incomeMap = new Map<string, number>();
     let expenseMap = new Map<string, number>();
 
     incomeTransactions.forEach((transaction) => {
+      transaction.amount = this.exchangeService.convert(transaction.account.currency, transaction.amount);
       if (incomeMap.has(transaction.category)) {
         incomeMap.set(transaction.category, incomeMap.get(transaction.category)! + transaction.amount);
       } else {
@@ -109,6 +115,7 @@ export class IncomeExpensePieChartComponent {
     });
     
     expenseTransactions.forEach((transaction) => {
+      transaction.amount = this.exchangeService.convert(transaction.account.currency, transaction.amount);
       if (expenseMap.has(transaction.category)) {
         expenseMap.set(transaction.category, expenseMap.get(transaction.category)! + transaction.amount);
       } else {

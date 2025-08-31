@@ -27,6 +27,7 @@ export interface TransactionChartOptions {
     transactions: Transaction[];
     splitBy: 'account' | 'currency' | 'category' | 'goal' | 'defaultCurrency';
     limitSeries: 1 | 2 | 3 | 4 | 5;
+    convertToDefaultCurrency: boolean;
 }
 
 export interface TransactionFilter {

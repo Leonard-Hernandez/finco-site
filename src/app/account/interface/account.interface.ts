@@ -1,11 +1,11 @@
-import Decimal from "decimal.js";
+import { Page, Pagination } from "../../shared/interfaces/pagination.interface";
 
 export interface Account {
     id: number;
     userId: number;
     name: string;
     type: string;
-    balance: Decimal;
+    balance: number;
     currency: string;
     creationDate: Date;
     description: string;
@@ -19,3 +19,16 @@ export interface Total {
     total: number;
     currency: string;
 }
+
+export interface AccountResponse {
+    content: Account[];
+    page: Page;
+}
+
+export interface AccountFilter {
+    pagination: Pagination;
+    currency?: string;
+    type?: string;
+    userId?: number;
+}
+    
