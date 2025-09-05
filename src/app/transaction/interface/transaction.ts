@@ -14,8 +14,8 @@ export interface Transaction {
     description: string;
     category: string;
     goal: Goal;
-    trasnferAccount: Account;
-    exchamgeRate: number;
+    transferAccount: Account;
+    exchangeRate: number;
 }
 
 export interface TransactionResponse {

@@ -77,7 +77,7 @@ export class AccountsListPageComponent {
         sortDirection: 'desc',
       },
       startDate: transactions,
-      onlyAccountTransactions: true
+      //onlyAccountTransactions: true
     });
   }
 
