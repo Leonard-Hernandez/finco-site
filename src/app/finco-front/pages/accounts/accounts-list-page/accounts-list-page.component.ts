@@ -1,19 +1,19 @@
-import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
 import { AccountComponent } from "../../../../account/components/account/account.component";
 import { AccountFilter, AccountResponse } from '../../../../account/interface/account.interface';
 import { AccountService } from '../../../../account/service/account.service';
 import { TransactionChartComponent } from '../../../../transaction/components/transaction-chart/transaction-chart.component';
 import { TransactionRangesButtonsComponent } from '../../../../transaction/components/transaction-ranges-buttons/transaction-ranges-buttons.component';
+import { TransactionComponent } from "../../../../transaction/components/transaction/transaction.component";
 import { TransactionChartOptions, TransactionFilter, TransactionResponse } from '../../../../transaction/interface/transaction';
 import { TransactionService } from '../../../../transaction/services/transaction.service';
 
 @Component({
   selector: 'app-accounts-list-page',
-  imports: [TransactionChartComponent, TransactionRangesButtonsComponent, AccountComponent, CurrencyPipe, DatePipe],
+  imports: [TransactionChartComponent, TransactionRangesButtonsComponent, AccountComponent, TransactionComponent, RouterLink],
   templateUrl: './accounts-list-page.component.html'
 })
 export class AccountsListPageComponent {
@@ -29,7 +29,7 @@ export class AccountsListPageComponent {
       sortBy: 'date',
       sortDirection: 'desc',
     },
-    onlyAccountTransactions: true
+    //onlyAccountTransactions: true
   });
 
   accountFilter = signal<AccountFilter>({

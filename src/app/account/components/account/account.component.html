@@ -1,6 +1,6 @@
 @if(!isBack()) {
 <button (click)="isBack.set(true)"
-    class="w-full h-30 aspect-ratio-2/1 rounded-xl bg-finco-card-bg-color border-2 border-finco-button-bg-color px-4 py-2">
+    class="min-w-85 h-30 aspect-ratio-2/1 rounded-xl bg-finco-card-bg-color border-2 border-finco-button-bg-color px-4 py-2">
     <p class="text-xs text-finco-secondary-color flex justify-between">
         <span>{{account().type}}</span><span>{{account().currency}}</span></p>
     <div class="flex justify-between items-center">
@@ -15,7 +15,7 @@
 </button>
 } @else {
 <button (click)="isBack.set(false)"
-    class="w-full h-30 aspect-ratio-2/1 rounded-xl bg-finco-card-bg-color border-2 border-finco-button-bg-color px-4 py-2">
+    class="min-w-85 h-30 aspect-ratio-2/1 rounded-xl bg-finco-card-bg-color border-2 border-finco-button-bg-color px-4 py-2">
     <div class="flex justify-between items-center py-1">
         <p class="text-xs text-finco-secondary-color">Deposit fee: {{account().depositFee | percent}}</p>
         <p class="text-xs text-finco-secondary-color">Withdraw fee: {{account().withdrawFee | percent}}</p>

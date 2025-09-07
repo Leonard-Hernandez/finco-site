@@ -11,11 +11,11 @@ export const goalsRoutes: Routes = [
         component: GoalsListPageComponent
     },
     {
-        path: ':id',
+        path: 'details/:id',
         component: GoalsDetailsComponent
     },
     {
-        path: ':id/:operation',
+        path: 'operation/:id/:operation',
         component: GoalsOpertionComponent
     },
     {
