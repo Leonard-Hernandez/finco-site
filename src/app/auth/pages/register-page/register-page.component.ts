@@ -7,8 +7,6 @@ import { AccountService } from '../../../account/service/account.service';
 import { FormUtils } from '../../../shared/utils/form-utils';
 import { ErrorModalComponent } from "../../../shared/components/error-modal/error-modal.component";
 import { ResponseError } from '../../../shared/interfaces/response-error.interface';
-import { HttpErrorResponse } from '@angular/common/http';
-import { catchError, of } from 'rxjs';
 
 @Component({
   selector: 'app-register-page',

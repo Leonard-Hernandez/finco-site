@@ -1,18 +1,18 @@
 import { Page, Pagination } from "../../shared/interfaces/pagination.interface";
 
 export interface Account {
-    id: number;
-    userId: number;
+    id?: number;
+    userId?: number;
     name: string;
     type: string;
-    balance: number;
+    balance?: number;
     currency: string;
-    creationDate: Date;
-    description: string;
-    isDefault: boolean;
-    isEnable: boolean;
-    withdrawFee: number;
-    depositFee: number;
+    creationDate?: Date;
+    description?: string;
+    isDefault?: boolean;
+    isEnable?: boolean;
+    withdrawFee?: number;
+    depositFee?: number;
 }
 
 export interface Total {

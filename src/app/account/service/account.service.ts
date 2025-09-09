@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../../environments/environment.local';
 import { AuthService } from '../../auth/services/auth.service';
-import { AccountFilter, AccountResponse, Total } from '../interface/account.interface';
+import { Account, AccountFilter, AccountResponse, Total } from '../interface/account.interface';
 import { Observable, tap } from 'rxjs';
 
 @Injectable({providedIn: 'root'})
@@ -22,6 +22,10 @@ export class AccountService {
         return this.http.get<string[]>(`${this.url}/accounts/currencies`);
     }
 
+    getAccountTypes(): Observable<string[]> {
+        return this.http.get<string[]>(`${this.url}/accounts/types`);
+    }
+
     getAccounts(filter: AccountFilter): Observable<AccountResponse> {
 
         let params = new HttpParams()
@@ -35,5 +39,16 @@ export class AccountService {
 
         return this.http.get<AccountResponse>(`${this.url}/users/${this.userId}/accounts`, { params });
     }
-    
+
+    getAccountById(id: string): Observable<Account> {
+        return this.http.get<Account>(`${this.url}/accounts/${id}`);
+    }
+
+    createAccount(account: Account): Observable<Account> {
+        return this.http.post<Account>(`${this.url}/users/${this.userId}/accounts`, account);
+    }
+
+    updateAccount(account: Account): Observable<Account> {
+        return this.http.put<Account>(`${this.url}/accounts/${account.id}`, account);
+    }
 }

@@ -1,0 +1,208 @@
+<div
+    class="min-h-screen w-full bg-gradient-to-br from-finco-bg-color to-finco-card-bg-color flex items-center justify-center p-6">
+    <div class="w-full max-w-md">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-finco-primary-color mb-2">
+                @if (this.account()) {
+                Edit Account
+                } @else {
+                Create an Account
+                }
+            </h1>
+        </div>
+
+        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-8 shadow-xl border border-white/5">
+            <form class="space-y-4" (ngSubmit)="onSubmit()" [formGroup]="accountForm">
+                <!-- Name Field -->
+                <div class="space-y-2">
+                    <label for="name" class="block text-sm font-medium text-finco-secondary-color">
+                        Name
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-finco-primary-color">
+                                <use xlink:href="/sprite.svg#user" />
+                            </svg>
+                        </div>
+                        <input id="name" type="text" placeholder="Account Name"
+                            class="block w-full pl-10 pr-3 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
+                            formControlName="name" />
+                    </div>
+                    @if (formUtils.isValidField(accountForm, 'name')) {
+                    <div class="text-red-500">
+                        {{ formUtils.getErrorMessage(accountForm, 'name') }}
+                    </div>
+                    }
+                </div>
+
+                <!-- Type Field -->
+                <div class="space-y-2">
+                    <label for="type" class="block text-sm font-medium text-finco-secondary-color">
+                        Type
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-finco-primary-color">
+                                <use xlink:href="/sprite.svg#email" />
+                            </svg>
+                        </div>
+                        <select id="type" placeholder="CASH"
+                            class="block w-full pl-10 pr-3 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
+                            formControlName="type">
+                            @for (type of accountTypes(); track $index) {
+                            <option [value]="type" [selected]="type === 'CASH'"
+                                class="text-finco-secondary-color bg-finco-bg-color">
+                                {{ type }}
+                            </option>
+                            }
+                        </select>
+                    </div>
+                    @if (formUtils.isValidField(accountForm, 'type')) {
+                    <div class="text-red-500">
+                        {{ formUtils.getErrorMessage(accountForm, 'type') }}
+                    </div>
+                    }
+                </div>
+
+                <!-- Description Field -->
+                <div class="space-y-2">
+                    <label for="description" class="block text-sm font-medium text-finco-secondary-color">
+                        Description
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-finco-primary-color">
+                                <use xlink:href="/sprite.svg#lock" />
+                            </svg>
+                        </div>
+                        <input id="description" type="text" placeholder="Account Description"
+                            class="block w-full pl-10 pr-10 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
+                            formControlName="description" />
+                    </div>
+                    @if (formUtils.isValidField(accountForm, 'description')) {
+                    <div class="text-red-500">
+                        {{ formUtils.getErrorMessage(accountForm, 'description') }}
+                    </div>
+                    }
+                </div>
+
+                <!-- Default Currency Field -->
+                <div class="space-y-2">
+                    <label for="defaultCurrency" class="block text-sm font-medium text-finco-secondary-color">
+                        Default Currency
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-finco-primary-color">
+                                <use xlink:href="/sprite.svg#currency" />
+                            </svg>
+                        </div>
+                        <select id="defaultCurrency" placeholder="USD"
+                            class="block w-full pl-10 pr-3 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
+                            formControlName="currency">
+                            @for (currency of currencies(); track $index) {
+                            <option [value]="currency" [selected]="currency === 'USD'"
+                                class="text-finco-secondary-color bg-finco-bg-color">
+                                {{ currency }}
+                            </option>
+                            }
+                        </select>
+                    </div>
+                    @if (formUtils.isValidField(accountForm, 'currency')) {
+                    <div class="text-red-500">
+                        {{ formUtils.getErrorMessage(accountForm, 'currency') }}
+                    </div>
+                    }
+                </div>
+
+
+
+                <!-- Fees Fields -->
+                <div class="space-y-2 flex gap-4">
+                    <div>
+                        <label for="withdrawalFee" class="block text-sm font-medium text-finco-secondary-color">
+                            Withdrawal fee
+                        </label>
+                        <div class="relative">
+                            <div
+                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-finco-primary-color text-lg">
+                                %
+                            </div>
+                            <input id="withdrawalFee" type="number" placeholder="10"
+                                class="block w-full pl-10 pr-10 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
+                                formControlName="withdrawFee" />
+                        </div>
+                        @if (formUtils.isValidField(accountForm, 'withdrawFee')) {
+                        <div class="text-red-500">
+                            {{ formUtils.getErrorMessage(accountForm, 'withdrawFee') }}
+                        </div>
+                        }
+                    </div>
+
+                    <div>
+                        <label for="depositFee" class="block text-sm font-medium text-finco-secondary-color">
+                            Deposit fee
+                        </label>
+                        <div class="relative">
+                            <div
+                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-finco-primary-color text-lg">
+                                %
+                            </div>
+                            <input id="depositFee" type="number" placeholder="10"
+                                class="block w-full pl-10 pr-10 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
+                                formControlName="depositFee" />
+                        </div>
+                        @if (formUtils.isValidField(accountForm, 'depositFee')) {
+                        <div class="text-red-500">
+                            {{ formUtils.getErrorMessage(accountForm, 'depositFee') }}
+                        </div>
+                        }
+                    </div>
+                </div>
+
+                @if (this.account()) {
+                <div class="space-y-2 flex justify-center gap-4">
+                    <div>
+                        <label for="Enable" class="block text-sm font-medium text-finco-secondary-color">
+                            Enable
+                            <input id="Enable" type="checkbox" class="" formControlName="enable" />
+                        </label>
+                        @if (formUtils.isValidField(accountForm, 'enable')) {
+                        <div class="text-red-500">
+                            {{ formUtils.getErrorMessage(accountForm, 'enable') }}
+                        </div>
+                        }
+                    </div>
+
+                    <div>
+                        <label for="default" class="block text-sm font-medium text-finco-secondary-color">
+                            Default
+                            <input id="default" type="checkbox" class="" formControlName="default" />
+                        </label>
+                        @if (formUtils.isValidField(accountForm, 'default')) {
+                        <div class="text-red-500">
+                            {{ formUtils.getErrorMessage(accountForm, 'default') }}
+                        </div>
+                        }
+                    </div>
+                </div>
+                }
+
+                <!-- Submit Button -->
+                <div class="pt-2">
+                    <button type="submit"
+                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-finco-bg-color bg-finco-primary-color hover:bg-finco-primary-color/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-finco-primary-color transition duration-200">
+                        @if (this.account()) {
+                        Edit Account
+                        } @else {
+                        Create an Account
+                        }
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<app-error-modal [_message]="errorMessage()" [_signal]="hasError()" [_details]="errorDetails()" />
