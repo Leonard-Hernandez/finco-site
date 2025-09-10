@@ -54,10 +54,16 @@ export class AccountsListPageComponent {
     request: () => this.accountFilter(),
     loader: () => this.accountService.getAccounts(this.accountFilter()).pipe(
       map((response: AccountResponse) => {
+        if (response.content.length === 0) {
+          this.router.navigate(['/accounts/create']);
+        }
+        if (response.content.length > 0 && this.transactions.value()!.length === 0) {
+          this.router.navigate([`/accounts/operation/${response.content[0].id}/deposit`]);
+        }
         return response.content;
       })
     )
-  });
+  });  
 
   transactionChartOptions = computed<TransactionChartOptions>(() => {
     return {

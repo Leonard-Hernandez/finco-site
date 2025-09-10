@@ -43,6 +43,10 @@ export class DashboardPageComponent {
     request: () => this.filter(),
     loader: () => this.transactionsService.getTransactions(this.filter()).pipe(
       map((response: TransactionResponse) => {
+
+        if (response.content.length === 0) {
+          this.router.navigate(['/accounts']);
+        }
         return response.content;
       })
     )

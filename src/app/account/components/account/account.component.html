@@ -8,8 +8,8 @@
     </div>
     <div class="flex justify-between items-center my-1">
         <p class="text-lg font-bold" [ngClass]="{
-                'text-red-500': account().balance < 0,
-                'text-finco-primary-color': account().balance >= 0
+                'text-red-500': account().balance! < 0,
+                'text-finco-primary-color': account().balance! >= 0
               }">{{account().balance | currency:'':''}}</p>
     </div>
 </button>
