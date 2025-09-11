@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
@@ -54,16 +54,19 @@ export class AccountsListPageComponent {
     request: () => this.accountFilter(),
     loader: () => this.accountService.getAccounts(this.accountFilter()).pipe(
       map((response: AccountResponse) => {
-        if (response.content.length === 0) {
-          this.router.navigate(['/accounts/create']);
-        }
-        if (response.content.length > 0 && this.transactions.value()!.length === 0) {
-          this.router.navigate([`/accounts/operation/${response.content[0].id}/deposit`]);
-        }
         return response.content;
       })
     )
-  });  
+  });
+
+  validateEffect = effect(() => {
+    if (this.accounts.value() && this.accounts.value()!.length === 0) {
+      this.router.navigate(['/accounts/create']);
+    }
+    if (this.accounts.value() && this.accounts.value()!.length > 0 && this.transactions.value()!.length === 0) {
+      this.router.navigate([`/accounts/operation/${this.accounts.value()![0].id}/deposit`]);
+    }
+  });
 
   transactionChartOptions = computed<TransactionChartOptions>(() => {
     return {

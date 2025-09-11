@@ -10,7 +10,7 @@
     <h2 class="text-finco-secondary-color">Accounts</h2>
     <div class="flex gap-4 overflow-x-auto pb-4">
       @for (account of accounts.value(); track $index) {
-        <app-account [account]="account" />
+      <app-account [account]="account" />
       }
     </div>
   </div>
@@ -21,11 +21,12 @@
     </div>
     <div class="flex flex-col gap-2 overflow-y-auto">
       @for (transaction of transactions.value()!; track $index) {
-        <app-transaction [transaction]="transaction" />
+      <app-transaction [transaction]="transaction" />
       }
     </div>
   </div>
 
 </div>
 
-<a class="fixed top-15 right-4 h-10 w-10 rounded-full shadow-sm shadow-finco-secondary-color text-finco-primary-color font-bold text-4xl flex justify-center items-center" routerLink="/accounts/create">+</a>
+<a class="fixed top-15 right-4 h-10 w-10 rounded-full shadow-sm shadow-finco-secondary-color text-finco-primary-color font-bold text-4xl flex justify-center items-center"
+  routerLink="/accounts/create">+</a>

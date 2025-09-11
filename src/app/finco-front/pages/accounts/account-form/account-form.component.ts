@@ -28,7 +28,7 @@ export class AccountFormComponent {
 
   accountService = inject(AccountService);
 
-  accountId: Signal<string> = toSignal(this.route.params.pipe(map(({ id }) => id))) || signal('jose');
+  accountId: Signal<string> = toSignal(this.route.params.pipe(map(({ id }) => id))) || signal('0');
 
   fb = inject(FormBuilder);
   formUtils = FormUtils;

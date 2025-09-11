@@ -1,5 +1,9 @@
-import { Component, inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, effect, inject, signal, Signal } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AccountService } from '../../../../account/service/account.service';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
+import { Account } from '../../../../account/interface/account.interface';
 
 @Component({
   selector: 'app-account-details',
@@ -8,8 +12,27 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class AccountDetailsComponent {
 
+  router = inject(Router)
+
   activatedRoute = inject(ActivatedRoute)
 
-  id = this.activatedRoute.snapshot.params['id'];
+  accountService = inject(AccountService)
+
+  accountId: Signal<string> = toSignal(this.activatedRoute.params.pipe(map(({ id }) => id))) || signal('0');
+
+  account = rxResource({
+    request: () => this.accountId(),
+    loader: () => this.accountService.getAccountById(this.accountId()).pipe(
+          map((response: Account) => {
+            return response;
+          })
+    )
+  })
+
+  validateEffect = effect(() => {
+    if (this.account.error()) {
+      this.router.navigate(['/accounts']);
+    }
+  })
 
 }
