@@ -2,15 +2,15 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { map } from 'rxjs';
-import { Total } from '../../../account/interface/account.interface';
-import { AccountService } from '../../../account/service/account.service';
-import { AuthService } from '../../../auth/services/auth.service';
-import { TotalComponent } from "../../../shared/components/total/total.component";
-import { IncomeExpensePieChartComponent } from "../../../transaction/components/income-expense-pie-chart/income-expense-pie-chart.component";
-import { TransactionChartComponent } from "../../../transaction/components/transaction-chart/transaction-chart.component";
-import { TransactionRangesButtonsComponent } from '../../../transaction/components/transaction-ranges-buttons/transaction-ranges-buttons.component';
-import { TransactionChartOptions, TransactionFilter, TransactionResponse } from '../../../transaction/interface/transaction';
-import { TransactionService } from '../../../transaction/services/transaction.service';
+import { Total } from '@app/account/interface/account.interface';
+import { AccountService } from '@app/account/service/account.service';
+import { AuthService } from '@app/auth/services/auth.service';
+import { TotalComponent } from "@app/shared/components/total/total.component";
+import { IncomeExpensePieChartComponent } from "@app/transaction/components/income-expense-pie-chart/income-expense-pie-chart.component";
+import { TransactionChartComponent } from "@app/transaction/components/transaction-chart/transaction-chart.component";
+import { TransactionRangesButtonsComponent } from "@app/transaction/components/transaction-ranges-buttons/transaction-ranges-buttons.component";
+import { TransactionChartOptions, TransactionFilter, TransactionResponse } from '@app/transaction/interface/transaction';
+import { TransactionService } from '@app/transaction/services/transaction.service';
 
 @Component({
   imports: [TotalComponent, TransactionChartComponent, TransactionRangesButtonsComponent, IncomeExpensePieChartComponent],

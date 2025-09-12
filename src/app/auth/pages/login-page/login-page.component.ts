@@ -1,10 +1,10 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '@app/auth/services/auth.service';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ErrorModalComponent } from "../../../shared/components/error-modal/error-modal.component";
-import { ResponseError } from '../../../shared/interfaces/response-error.interface';
-import { FormUtils } from '../../../shared/utils/form-utils';
+import { ErrorModalComponent } from "@app/shared/components/error-modal/error-modal.component";
+import { ResponseError } from '@app/shared/interfaces/response-error.interface';
+import { FormUtils } from '@app/shared/utils/form-utils';
 
 @Component({
   selector: 'app-login-page',

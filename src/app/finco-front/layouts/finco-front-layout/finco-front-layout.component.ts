@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { FincoHeaderComponent } from "../../../shared/components/finco-header/finco-header.component";
-import { BottomNavbarComponent } from '../../components/bottom-navbar/bottom-navbar.component';
+import { FincoHeaderComponent } from "@app/shared/components/finco-header/finco-header.component";
+import { BottomNavbarComponent } from "@app/finco-front/components/bottom-navbar/bottom-navbar.component";
 
 @Component({
   selector: 'app-finco-front-layout',

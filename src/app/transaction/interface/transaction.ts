@@ -1,7 +1,7 @@
 import Decimal from "decimal.js";
-import { Account } from "../../account/interface/account.interface";
-import { Goal } from "../../goal/interface/goal.interface";
-import { Page, Pagination } from "../../shared/interfaces/pagination.interface";
+import { Account } from "@app/account/interface/account.interface";
+import { Goal } from "@app/goal/interface/goal.interface";
+import { Page, Pagination } from "@app/shared/interfaces/pagination.interface";
 
 export interface Transaction {
     id: number;

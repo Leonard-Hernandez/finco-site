@@ -1,6 +1,6 @@
 import { Component, inject, input, signal } from '@angular/core';
 import { CurrencyPipe, DatePipe, NgClass, PercentPipe } from "@angular/common";
-import { Account } from '../../interface/account.interface';
+import { Account } from '@app/account/interface/account.interface';
 import { Router } from "@angular/router";
 
 @Component({

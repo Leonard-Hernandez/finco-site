@@ -1,11 +1,11 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
-import { UserRegister } from '../../interfaces/user-register.interface';
+import { AuthService } from '@app/auth/services/auth.service';
+import { UserRegister } from '@app/auth/interfaces/user-register.interface';
 import { Router } from '@angular/router';
-import { AccountService } from '../../../account/service/account.service';
-import { FormUtils } from '../../../shared/utils/form-utils';
-import { ErrorModalComponent } from "../../../shared/components/error-modal/error-modal.component";
+import { AccountService } from '@app/account/service/account.service';
+import { FormUtils } from '@app/shared/utils/form-utils';
+import { ErrorModalComponent } from "@app/shared/components/error-modal/error-modal.component";
 import { ResponseError } from '../../../shared/interfaces/response-error.interface';
 
 @Component({

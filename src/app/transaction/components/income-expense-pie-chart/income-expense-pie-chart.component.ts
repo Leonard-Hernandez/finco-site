@@ -1,7 +1,7 @@
 import { Component, computed, effect, inject, input } from '@angular/core';
-import { Transaction } from '../../interface/transaction';
+import { Transaction } from '@app/transaction/interface/transaction';
 import { Chart, ChartOptions } from 'chart.js/auto';
-import { ExchangeRateService } from '../../../shared/services/exchange-rate.service';
+import { ExchangeRateService } from '@app/shared/services/exchange-rate.service';
 
 @Component({
   selector: 'app-income-expense-pie-chart',

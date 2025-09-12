@@ -1,4 +1,4 @@
-import { GoalAccountBalance } from "./goalAccountBalance.interface";
+import { GoalAccountBalance } from "@app/goal/interface/goalAccountBalance.interface";
 
 export class Goal {
     id!: number;

@@ -1,8 +1,8 @@
 import { Component, computed, inject, input } from '@angular/core';
-import { Total } from '../../../account/interface/account.interface';
+import { Total } from '@app/account/interface/account.interface';
 import { CurrencyPipe, NgClass } from '@angular/common';
-import { ExchangeRateService } from '../../services/exchange-rate.service';
-import { AuthService } from '../../../auth/services/auth.service';
+import { ExchangeRateService } from '@app/shared/services/exchange-rate.service';
+import { AuthService } from '@app/auth/services/auth.service';
 
 @Component({
   selector: 'app-total',

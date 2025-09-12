@@ -1,5 +1,5 @@
 import Decimal from "decimal.js";
-import { Account } from "../../account/interface/account.interface";
+import { Account } from "@app/account/interface/account.interface";
 
 export class GoalAccountBalance {
     id!: number;

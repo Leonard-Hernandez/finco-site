@@ -1,4 +1,4 @@
-import { Page, Pagination } from "../../shared/interfaces/pagination.interface";
+import { Page, Pagination } from "@app/shared/interfaces/pagination.interface";
 
 export interface Account {
     id?: number;

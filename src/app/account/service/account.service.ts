@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { environment } from '../../../environments/environment.local';
-import { AuthService } from '../../auth/services/auth.service';
-import { Account, AccountFilter, AccountResponse, Total } from '../interface/account.interface';
+import { environment } from '@src/environments/environment.local';
+import { AuthService } from '@app/auth/services/auth.service';
+import { Account, AccountFilter, AccountResponse, Total } from '@app/account/interface/account.interface';
 import { Observable, tap } from 'rxjs';
 
 @Injectable({providedIn: 'root'})

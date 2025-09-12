@@ -1,9 +1,9 @@
 import { Component, effect, inject, signal, Signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AccountService } from '../../../../account/service/account.service';
+import { AccountService } from '@app/account/service/account.service';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
-import { Account } from '../../../../account/interface/account.interface';
+import { Account } from '@app/account/interface/account.interface';
 
 @Component({
   selector: 'app-account-details',
