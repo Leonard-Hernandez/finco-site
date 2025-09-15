@@ -1,16 +1,16 @@
 import { Component, effect, inject, Signal, signal } from '@angular/core';
-import { AccountService } from '../../../../account/service/account.service';
-import { Account } from '../../../../account/interface/account.interface';
+import { AccountService } from '@app/account/service/account.service';
+import { Account } from '@app/account/interface/account.interface';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FormUtils } from '../../../../shared/utils/form-utils';
+import { FormUtils } from '@app/shared/utils/form-utils';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs';
-import { ResponseError } from '../../../../shared/interfaces/response-error.interface';
-import { ErrorModalComponent } from "../../../../shared/components/error-modal/error-modal.component";
+import { ResponseError } from '@app/shared/interfaces/response-error.interface';
+import { ErrorModalComponent } from "@app/shared/components/error-modal/error-modal.component";
 
 @Component({
-  imports: [ReactiveFormsModule, ErrorModalComponent],
+  imports: [ErrorModalComponent, ReactiveFormsModule],
   templateUrl: './account-form.component.html'
 })
 export class AccountFormComponent {

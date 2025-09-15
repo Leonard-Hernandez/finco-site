@@ -2,14 +2,14 @@ import { Component, computed, effect, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
-import { AccountComponent } from "../../../../account/components/account/account.component";
-import { AccountFilter, AccountResponse } from '../../../../account/interface/account.interface';
-import { AccountService } from '../../../../account/service/account.service';
-import { TransactionChartComponent } from '../../../../transaction/components/transaction-chart/transaction-chart.component';
-import { TransactionRangesButtonsComponent } from '../../../../transaction/components/transaction-ranges-buttons/transaction-ranges-buttons.component';
-import { TransactionComponent } from "../../../../transaction/components/transaction/transaction.component";
-import { TransactionChartOptions, TransactionFilter, TransactionResponse } from '../../../../transaction/interface/transaction';
-import { TransactionService } from '../../../../transaction/services/transaction.service';
+import { AccountComponent } from "@app/account/components/account/account.component";
+import { AccountFilter, AccountResponse } from '@app/account/interface/account.interface';
+import { AccountService } from '@app/account/service/account.service';
+import { TransactionChartComponent } from '@app/transaction/components/transaction-chart/transaction-chart.component';
+import { TransactionRangesButtonsComponent } from '@app/transaction/components/transaction-ranges-buttons/transaction-ranges-buttons.component';
+import { TransactionComponent } from "@app/transaction/components/transaction/transaction.component";
+import { TransactionChartOptions, TransactionFilter, TransactionResponse } from '@app/transaction/interface/transaction';
+import { TransactionService } from '@app/transaction/services/transaction.service';
 
 @Component({
   selector: 'app-accounts-list-page',
