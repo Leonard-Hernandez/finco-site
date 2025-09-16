@@ -89,7 +89,7 @@ export class AccountFormComponent {
       this.accountService.updateAccount(accountUpdate).subscribe(
         {
           next: (success) => {
-            this.router.navigate(['/accounts']);
+            this.router.navigate(['/accounts/details/' + this.account()!.id]);
           },
           error: (error) => {
             this.hasError.set(true);

@@ -1,11 +1,56 @@
-<div class="flex flex-col gap-4">
-    <p>{{ account.value()?.name }}</p>
-    <p>{{ account.value()?.type }}</p>
-    <p>{{ account.value()?.currency }}</p>
-    <p>{{ account.value()?.description }}</p>
-    <p>{{ account.value()?.withdrawFee }}</p>
-    <p>{{ account.value()?.depositFee }}</p>
-    <p>{{ account.value()?.balance }}</p>
-    <p>{{ account.value()?.isEnable }}</p>
-    <p>{{ account.value()?.isDefault }}</p>
+<div
+    class="flex flex-col gap-2 justify-center items-center bg-gradient-to-br from-finco-bg-color to-finco-card-bg-color min-h-screen max-h-screen min-w-screen max-w-screen pt-17">
+    
+    <div class="flex flex-col gap-2 min-w-85 font-bold">
+        <app-transaction-chart [transactionChartOptions]="transactionChartOptions()" />
+        <transaction-ranges-buttons (range)="updateTransactionFilter($event)" />
+    </div>
+    
+    <div>
+        <h2 class="text-finco-secondary-color">Account Details</h2>
+        <div class="min-w-90 rounded-xl bg-finco-card-bg-color border-2 border-finco-button-bg-color px-4 py-2">
+            <p class="text-xs text-finco-secondary-color flex justify-between">
+                <span>{{account().type}}</span><span>{{account().currency}}</span>
+            </p>
+            <div class="flex justify-between items-center">
+                <h3 class="font-bold text-finco-primary-color">{{account().name}}</h3>
+            </div>
+            <div class="flex justify-between items-center my-1">
+                <p class="text-lg font-bold" [ngClass]="{
+                'text-red-500': account().balance! < 0,
+                'text-finco-primary-color': account().balance! >= 0
+              }">{{account().balance | currency:'':''}}</p>
+            </div>
+            <div class="flex justify-between items-center my-1 text-finco-secondary-color">
+                <p class="text-lg font-bold">{{account().description}}</p>
+            </div>
+            <div class="flex justify-between items-center my-1 text-finco-secondary-color text-sm">
+                <p class="text-xs font-bold">Withdraw Fee</p>
+                <p class="text-xs font-bold">{{account().withdrawFee | percent}}<p>
+                <p class="text-xs font-bold">Deposit Fee</p>
+                <p class="text-xs font-bold">{{account().depositFee | percent}}</p>
+            </div>
+        </div>
+    </div>
+    
+
+    <div class="w-95 h-full flex-2 flex flex-col p-3 gap-2 overflow-y-auto rounded-xl z-1">
+        <div>
+            <h2 class="text-finco-secondary-color">Transactions</h2>
+        </div>
+        <div class="flex flex-col gap-2 overflow-y-auto">
+            @for (transaction of transactions(); track $index) {
+            <app-transaction [transaction]="transaction" />
+            }
+        </div>
+    </div>
 </div>
+
+<a class="fixed top-15 right-4 h-10 w-10 rounded-full shadow-sm shadow-finco-secondary-color text-finco-primary-color font-bold text-4xl flex justify-center items-center"
+    routerLink="/accounts/edit/{{account().id}}">
+    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <svg class="h-5 w-5 text-finco-primary-color">
+            <use xlink:href="/sprite.svg#editIcon" />
+        </svg>
+    </div>
+</a>

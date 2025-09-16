@@ -1,14 +1,14 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
 import { AccountComponent } from "@app/account/components/account/account.component";
-import { AccountFilter, AccountResponse } from '@app/account/interface/account.interface';
+import { Account, AccountFilter, AccountResponse } from '@app/account/interface/account.interface';
 import { AccountService } from '@app/account/service/account.service';
 import { TransactionChartComponent } from '@app/transaction/components/transaction-chart/transaction-chart.component';
 import { TransactionRangesButtonsComponent } from '@app/transaction/components/transaction-ranges-buttons/transaction-ranges-buttons.component';
 import { TransactionComponent } from "@app/transaction/components/transaction/transaction.component";
-import { TransactionChartOptions, TransactionFilter, TransactionResponse } from '@app/transaction/interface/transaction';
+import { Transaction, TransactionChartOptions, TransactionFilter, TransactionResponse } from '@app/transaction/interface/transaction';
 import { TransactionService } from '@app/transaction/services/transaction.service';
 
 @Component({
@@ -16,11 +16,14 @@ import { TransactionService } from '@app/transaction/services/transaction.servic
   imports: [TransactionChartComponent, TransactionRangesButtonsComponent, AccountComponent, TransactionComponent, RouterLink],
   templateUrl: './accounts-list-page.component.html'
 })
-export class AccountsListPageComponent {
+export class AccountsListPageComponent implements OnInit{
 
   accountService = inject(AccountService);
   transactionsService = inject(TransactionService);
   router = inject(Router);
+
+  transactions = signal<Transaction[]>([]);
+  accounts = signal<Account[]>([]);
 
   transactionFilter = signal<TransactionFilter>({
     pagination: {
@@ -29,7 +32,7 @@ export class AccountsListPageComponent {
       sortBy: 'date',
       sortDirection: 'desc',
     },
-    //onlyAccountTransactions: true
+    onlyAccountTransactions: true
   });
 
   accountFilter = signal<AccountFilter>({
@@ -41,43 +44,40 @@ export class AccountsListPageComponent {
     }
   });
 
-  transactions = rxResource({
-    request: () => this.transactionFilter(),
-    loader: () => this.transactionsService.getTransactions(this.transactionFilter()).pipe(
-      map((response: TransactionResponse) => {
-        return response.content;
-      })
-    )
-  });
-
-  accounts = rxResource({
-    request: () => this.accountFilter(),
-    loader: () => this.accountService.getAccounts(this.accountFilter()).pipe(
-      map((response: AccountResponse) => {
-        return response.content;
-      })
-    )
-  });
-
-  validateEffect = effect(() => {
-    if (this.accounts.value() && this.accounts.value()!.length === 0) {
-      this.router.navigate(['/accounts/create']);
-    }
-    if (this.accounts.value() && this.accounts.value()!.length > 0 && this.transactions.value()!.length === 0) {
-      this.router.navigate([`/accounts/operation/${this.accounts.value()![0].id}/deposit`]);
-    }
-  });
-
   transactionChartOptions = computed<TransactionChartOptions>(() => {
     return {
-      transactions: this.transactions.value()!,
+      transactions: this.transactions(),
       splitBy: 'account',
       limitSeries: 5,
       convertToDefaultCurrency: true
     };
   });
 
-  updateTransactionFilter(transactions: Date) {
+  ngOnInit(): void {
+
+  }
+
+  transactionsResource = rxResource({
+    request: () => this.transactionFilter(),
+    loader: () => this.transactionsService.getTransactions(this.transactionFilter()).pipe(
+      map((response: TransactionResponse) => {
+        this.transactions.set(response.content);
+        return response.content;
+      })
+    )
+  });
+
+  accountsResource = rxResource({
+    request: () => this.accountFilter(),
+    loader: () => this.accountService.getAccounts(this.accountFilter()).pipe(
+      map((response: AccountResponse) => {
+        this.accounts.set(response.content);
+        return response.content;
+      })
+    )
+  });
+
+  updateTransactionFilter(startDate: Date) {
     this.transactionFilter.set({
       pagination: {
         page: 0,
@@ -85,8 +85,8 @@ export class AccountsListPageComponent {
         sortBy: 'date',
         sortDirection: 'desc',
       },
-      startDate: transactions,
-      //onlyAccountTransactions: true
+      startDate: startDate,
+      onlyAccountTransactions: true
     });
   }
 

@@ -18,10 +18,11 @@ import { TransactionService } from '@app/transaction/services/transaction.servic
 })
 export class DashboardPageComponent {
 
-  name = inject(AuthService).user()?.name;
   accountService = inject(AccountService);
   transactionsService = inject(TransactionService);
   router = inject(Router);
+  
+  name = inject(AuthService).user()?.name;
 
   filter = signal<TransactionFilter>({
     pagination: {
@@ -43,10 +44,6 @@ export class DashboardPageComponent {
     request: () => this.filter(),
     loader: () => this.transactionsService.getTransactions(this.filter()).pipe(
       map((response: TransactionResponse) => {
-
-        if (response.content.length === 0) {
-          this.router.navigate(['/accounts']);
-        }
         return response.content;
       })
     )
