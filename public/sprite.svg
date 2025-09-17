@@ -27,6 +27,8 @@
     <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.064 7 9.542 7 .847 0 1.669-.105 2.454-.303z" />
   </symbol>
 
+
+  <!-- Currency Icon -->
   <symbol viewBox="0 0 48 48" id="currency" fill="currentColor">
     <g data-name="Layer 2">
     <g data-name="invisible box" fill="none">
@@ -37,17 +39,31 @@
     </g>
   </symbol>
 
+  <!-- Money Bag Icon -->
   <symbol viewBox="0 0 24 24" fill="currentColor" id="moneyBag">
     <path d="M2 14c0-3.771 0-5.657 1.172-6.828C4.343 6 6.229 6 10 6h4c3.771 0 5.657 0 6.828 1.172C22 8.343 22 10.229 22 14c0 3.771 0 5.657-1.172 6.828C19.657 22 17.771 22 14 22h-4c-3.771 0-5.657 0-6.828-1.172C2 19.657 2 17.771 2 14Z" stroke="#1C274C" stroke-width="1.5"/>
     <path opacity=".5" d="M16 6c0-1.886 0-2.828-.586-3.414C14.828 2 13.886 2 12 2c-1.886 0-2.828 0-3.414.586C8 3.172 8 4.114 8 6" stroke="#1C274C" stroke-width="1.5"/>
     <path opacity=".5" d="M12 17.333c1.105 0 2-.746 2-1.666 0-.92-.895-1.667-2-1.667s-2-.746-2-1.667c0-.92.895-1.666 2-1.666m0 6.666c-1.105 0-2-.746-2-1.666m2 1.666V18m0-8v.667m0 0c1.105 0 2 .746 2 1.666" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
   </symbol>
 
+  <!-- Edit Icon -->
   <symbol viewBox="0 0 24 24" id="editIcon" xmlns="http://www.w3.org/2000/svg">
     <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
     <path d="M20 16v4a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h4"/>
     <path d="M12.5 15.8 22 6.2 17.8 2l-9.5 9.5L8 16l4.5-.2z"/>
     </g>
   </symbol>
+
+   <symbol fill="none" stroke="currentColor" viewBox="0 0 24 24" id="minusIcon">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M20 12H4" />
+   </symbol>
+
+   <symbol fill="none" stroke="currentColor" viewBox="0 0 24 24" id="transferIcon">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+   </symbol>
+
+   <symbol fill="none" stroke="currentColor" viewBox="0 0 24 24" id="plusIcon">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+   </symbol>
     
 </svg>

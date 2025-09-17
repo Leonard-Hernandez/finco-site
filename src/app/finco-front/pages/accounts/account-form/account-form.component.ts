@@ -73,8 +73,8 @@ export class AccountFormComponent {
       type: this.accountForm.value.type!,
       currency: this.accountForm.value.currency!,
       description: this.accountForm.value.description!,
-      withdrawFee: this.accountForm.value.withdrawFee!,
-      depositFee: this.accountForm.value.depositFee!,
+      withdrawFee: this.accountForm.value.withdrawFee! / 100,
+      depositFee: this.accountForm.value.depositFee! / 100,
       balance: 0,
     };
 
@@ -132,8 +132,8 @@ export class AccountFormComponent {
         type: this.account()!.type,
         currency: this.account()!.currency,
         description: this.account()!.description,
-        withdrawFee: this.account()!.withdrawFee,
-        depositFee: this.account()!.depositFee,
+        withdrawFee: this.account()!.withdrawFee! * 100,
+        depositFee: this.account()!.depositFee! * 100,
         enable: this.account()!.isEnable,
         default: this.account()!.isDefault
       }

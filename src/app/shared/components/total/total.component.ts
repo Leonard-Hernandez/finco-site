@@ -34,7 +34,7 @@ export class TotalComponent {
       return [{total: 0, currency: '***'}];
     }
 
-    return [...this._total()].sort((a, b) => this.exchangeService.convert(b.currency, b.total) - this.exchangeService.convert(a.currency, a.total) );
+    return [...this._total()].sort((a, b) => this.exchangeService.convert(b.currency, b.total) - this.exchangeService.convert(a.currency, a.total) ).slice(0, 4);
   }); 
 
 }

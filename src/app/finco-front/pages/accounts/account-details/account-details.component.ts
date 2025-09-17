@@ -13,7 +13,7 @@ import { TransactionComponent } from "@src/app/transaction/components/transactio
 
 @Component({
   selector: 'app-account-details',
-  imports: [NgClass, CurrencyPipe, PercentPipe,  TransactionChartComponent, TransactionRangesButtonsComponent, TransactionComponent, RouterLink],
+  imports: [CurrencyPipe, PercentPipe,  TransactionChartComponent, TransactionRangesButtonsComponent, TransactionComponent, RouterLink],
   templateUrl: './account-details.component.html'
 })
 export class AccountDetailsComponent {
