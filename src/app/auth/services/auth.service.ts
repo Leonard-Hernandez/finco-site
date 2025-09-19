@@ -90,7 +90,7 @@ export class AuthService {
 
   private handleAuthError(error: HttpErrorResponse) {
     this.logout();
-    console.log(error);
+    this.router.navigate(['/auth/login']);
     return throwError(() => error);
   }
 
