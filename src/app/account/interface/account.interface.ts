@@ -31,4 +31,17 @@ export interface AccountFilter {
     type?: string;
     userId?: number;
 }
+
+export interface TransactionData {
+    amount: number;
+    category?: string;
+    description?: string;
+}
+
+export interface TransferData extends TransactionData {
+    transferAccountId: number;
+    exchangeRate?: number;
+}
+
+
     
