@@ -1,4 +1,4 @@
-import { Component, effect, inject, Injector, OnInit, signal, Signal } from '@angular/core';
+import { Component, computed, effect, inject, Injector, OnInit, signal, Signal } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -13,10 +13,10 @@ type operationType = 'deposit' | 'withdraw' | 'transfer';
 
 @Component({
   selector: 'app-account-opertion',
-  imports: [ReactiveFormsModule, ErrorModalComponent],
+  imports: [ReactiveFormsModule],
   templateUrl: './account-opertion.component.html'
 })
-export class AccountOpertionComponent implements OnInit{
+export class AccountOpertionComponent {
 
   router = inject(Router)
   fb = inject(FormBuilder);
@@ -31,8 +31,10 @@ export class AccountOpertionComponent implements OnInit{
   operation: Signal<string> = toSignal(this.activatedRoute.params.pipe(map((params) => params['operation'])));
 
   account: Signal<Account> = signal({} as Account);
-  toAccountId: Signal<number | null> = signal(null);
-  toAccount: Signal<Account> = signal({} as Account);
+
+  toAccountId = signal(0);
+  toAccount = signal({} as Account);
+  balance = signal(0);
 
   accounts = signal<Account[]>([]);
 
@@ -43,10 +45,6 @@ export class AccountOpertionComponent implements OnInit{
     transferAccountId: [0, [Validators.min(1)]],
     exchangeRate: [0],    
   });
-
-  ngOnInit(): void {
-    
-  }
 
   categories = toSignal(this.transactionService.GetCategoriesByUser().pipe(
     map((response: string[]) => {
@@ -93,7 +91,27 @@ export class AccountOpertionComponent implements OnInit{
         }
         this.accounts.set(response.content);
       })
+
+      this.transactionForm.get('transferAccountId')?.valueChanges.subscribe(value => {
+        this.toAccountId.set(value ?? 0);
+      });
+
+      this.transactionForm.get('amount')?.valueChanges.subscribe(value => {
+        this.balance.set(value ?? 0);
+      });
     }
+  })
+
+  transferAccountEffect = effect(() => {
+    if (this.toAccountId() !== 0) {
+      var toAccount = this.accounts().find(account => account.id == this.toAccountId())
+      this.toAccount.set(toAccount ?? {} as Account);
+    }
+  })
+
+  calculateBalance = computed(() => {
+    var balance = (this.balance() - (this.balance() * (this.account()?.withdrawFee ?? 0)));
+    return balance - (balance * (this.toAccount()?.depositFee ?? 0));
   })
 
 }
