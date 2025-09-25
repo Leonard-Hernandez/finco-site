@@ -35,6 +35,7 @@ export class AccountOpertionComponent {
   toAccountId = signal(0);
   toAccount = signal({} as Account);
   balance = signal(0);
+  exchangeRate = signal(0);
 
   accounts = signal<Account[]>([]);
 
@@ -75,6 +76,10 @@ export class AccountOpertionComponent {
       this.router.navigate(['/accounts']);
     }
 
+    this.transactionForm.get('amount')?.valueChanges.subscribe(value => {
+      this.balance.set(value ?? 0);
+    });
+
     if (this.operation() === 'transfer') {
       const filter: AccountFilter = {
         pagination: {
@@ -96,8 +101,8 @@ export class AccountOpertionComponent {
         this.toAccountId.set(value ?? 0);
       });
 
-      this.transactionForm.get('amount')?.valueChanges.subscribe(value => {
-        this.balance.set(value ?? 0);
+      this.transactionForm.get('exchangeRate')?.valueChanges.subscribe(value => {
+        this.exchangeRate.set(value ?? 0);
       });
     }
   })
@@ -110,8 +115,25 @@ export class AccountOpertionComponent {
   })
 
   calculateBalance = computed(() => {
-    var balance = (this.balance() - (this.balance() * (this.account()?.withdrawFee ?? 0)));
-    return balance - (balance * (this.toAccount()?.depositFee ?? 0));
+
+    if (this.operation() === 'deposit') {
+      return this.balance() - (this.balance() * (this.account()?.depositFee ?? 0));
+    }
+
+    if (this.operation() === 'withdraw') {
+      return this.balance() + (this.balance() * (this.account()?.withdrawFee ?? 0));
+    }
+
+    if (this.operation() === 'transfer') {
+      var resume = this.balance();
+      resume = resume - (resume * (this.account()?.withdrawFee ?? 0));
+      if (this.exchangeRate() > 0) {
+        resume = resume * this.exchangeRate();
+      }
+      return resume - (resume * (this.toAccount()?.depositFee ?? 0));
+    }
+
+    return this.balance();
   })
 
 }
