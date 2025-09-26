@@ -2,12 +2,13 @@ import { Component, computed, effect, inject, Injector, OnInit, signal, Signal }
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Account, AccountFilter, AccountResponse, TransactionData } from '@src/app/account/interface/account.interface';
+import { Account, AccountFilter, AccountResponse, TransactionData, TransferData } from '@src/app/account/interface/account.interface';
 import { AccountService } from '@src/app/account/service/account.service';
 import { FormUtils } from '@src/app/shared/utils/form-utils';
 import { TransactionService } from '@src/app/transaction/services/transaction.service';
 import { map, of } from 'rxjs';
 import { ErrorModalComponent } from "../../../../shared/components/error-modal/error-modal.component";
+import { ResponseError } from '@src/app/shared/interfaces/response-error.interface';
 
 type operationType = 'deposit' | 'withdraw' | 'transfer';
 
@@ -47,8 +48,8 @@ export class AccountOpertionComponent {
     amount: [0, [Validators.required, Validators.min(0)]],
     category: ['', []],
     description: ['', [Validators.maxLength(255)]],
-    transferAccountId: [0, [Validators.min(1)]],
-    exchangeRate: [0],    
+    transferAccountId: [0, []],
+    exchangeRate: [0],
   });
 
   categories = toSignal(this.transactionService.GetCategoriesByUser().pipe(
@@ -89,11 +90,66 @@ export class AccountOpertionComponent {
     }
 
     if (this.operation() == 'deposit') {
-
-      this.accountService.depositAccount(this.account().id!, transactionData);
-      
+      this.accountService.depositAccount(this.account().id!, transactionData).subscribe({
+        next: (success) => {
+          this.router.navigate([`/accounts/details/${this.account().id}`]);
+        },
+        error: (error) => {
+          this.hasError.set(true);
+          const errorResponse = error.error as ResponseError;
+          this.errorMessage.set(errorResponse.error);
+          this.errorDetails.set(errorResponse.message);
+          setTimeout(() => {
+            this.hasError.set(false);
+          }, 3000);
+        }
+      });
     }
-    
+
+    if (this.operation() == 'withdraw') {
+      this.accountService.withdrawAccount(this.account().id!, transactionData).subscribe({
+        next: (success) => {
+          this.router.navigate([`/accounts/details/${this.account().id}`]);
+        },
+        error: (error) => {
+          this.hasError.set(true);
+          const errorResponse = error.error as ResponseError;
+          this.errorMessage.set(errorResponse.error);
+          this.errorDetails.set(errorResponse.message);
+          setTimeout(() => {
+            this.hasError.set(false);
+          }, 3000);
+        }
+      });
+    }
+
+    if (this.operation() == 'transfer') {
+      var transferData: TransferData = {
+        ... transactionData, 
+        transferAccountId: this.transactionForm.value.transferAccountId!
+      }
+
+      if (this.transactionForm.value.exchangeRate) {
+        transferData.exchangeRate = this.transactionForm.value.exchangeRate!  
+      }
+
+
+      this.accountService.transferAccount(this.account().id!, transferData).subscribe({
+        next: (success) => {
+          this.router.navigate([`/accounts/details/${this.account().id}`]);
+        },
+        error: (error) => {
+          this.hasError.set(true);
+          const errorResponse = error.error as ResponseError;
+          this.errorMessage.set(errorResponse.error);
+          this.errorDetails.set(errorResponse.message);
+          setTimeout(() => {
+            this.hasError.set(false);
+          }, 3000);
+        }
+      });
+    }
+
   }
 
   validateEffect = effect(() => {
@@ -116,7 +172,7 @@ export class AccountOpertionComponent {
           sortBy: 'name',
           sortDirection: 'asc',
         }
-      } 
+      }
 
       this.accountService.getAccounts(filter).subscribe((response: AccountResponse) => {
         if (response.content.length === 0) {

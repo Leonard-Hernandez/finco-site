@@ -52,15 +52,15 @@ export class AccountService {
         return this.http.put<Account>(`${this.url}/accounts/${account.id}`, account);
     }
 
-    depositAccount(accountId: string, data: TransactionData){
+    depositAccount(accountId: number, data: TransactionData){
         return this.http.post<Account>(`${this.url}/accounts/${accountId}/deposit`, data);
     }
 
-    withdrawAccount(accountId: string, data: TransactionData){
+    withdrawAccount(accountId: number, data: TransactionData){
         return this.http.post<Account>(`${this.url}/accounts/${accountId}/withdraw`, data);
     }
 
-    transferAccount(accountId: string, data: TransferData){
+    transferAccount(accountId: number, data: TransferData){
         return this.http.post<Account>(`${this.url}/accounts/${accountId}/transfer`, data);
     }
 }
