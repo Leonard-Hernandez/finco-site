@@ -2,7 +2,7 @@ import { Component, computed, effect, inject, Injector, OnInit, signal, Signal }
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Account, AccountFilter, AccountResponse } from '@src/app/account/interface/account.interface';
+import { Account, AccountFilter, AccountResponse, TransactionData } from '@src/app/account/interface/account.interface';
 import { AccountService } from '@src/app/account/service/account.service';
 import { FormUtils } from '@src/app/shared/utils/form-utils';
 import { TransactionService } from '@src/app/transaction/services/transaction.service';
@@ -13,10 +13,14 @@ type operationType = 'deposit' | 'withdraw' | 'transfer';
 
 @Component({
   selector: 'app-account-opertion',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, ErrorModalComponent],
   templateUrl: './account-opertion.component.html'
 })
 export class AccountOpertionComponent {
+
+  hasError = signal<boolean>(false);
+  errorMessage = signal<string>('');
+  errorDetails = signal<string>('');
 
   router = inject(Router)
   fb = inject(FormBuilder);
@@ -65,6 +69,30 @@ export class AccountOpertionComponent {
 
 
   onSubmit() {
+
+    this.transactionForm.markAllAsTouched;
+
+    if (!this.transactionForm.valid) {
+      return;
+    }
+
+    const transactionData: TransactionData = {
+      amount: this.transactionForm.value.amount!,
+    }
+
+    if (this.transactionForm.value.category != null) {
+      transactionData.category = this.transactionForm.value.category!;
+    }
+
+    if (this.transactionForm.value.description != null) {
+      transactionData.description = this.transactionForm.value.description!;
+    }
+
+    if (this.operation() == 'deposit') {
+
+      this.accountService.depositAccount(this.account().id!, transactionData);
+      
+    }
     
   }
 

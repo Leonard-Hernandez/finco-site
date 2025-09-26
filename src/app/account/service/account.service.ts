@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '@src/environments/environment.local';
 import { AuthService } from '@app/auth/services/auth.service';
-import { Account, AccountFilter, AccountResponse, Total } from '@app/account/interface/account.interface';
+import { Account, AccountFilter, AccountResponse, Total, TransactionData, TransferData } from '@app/account/interface/account.interface';
 import { Observable, tap } from 'rxjs';
 
 @Injectable({providedIn: 'root'})
@@ -50,5 +50,17 @@ export class AccountService {
 
     updateAccount(account: Account): Observable<Account> {
         return this.http.put<Account>(`${this.url}/accounts/${account.id}`, account);
+    }
+
+    depositAccount(accountId: string, data: TransactionData){
+        return this.http.post<Account>(`${this.url}/accounts/${accountId}/deposit`, data);
+    }
+
+    withdrawAccount(accountId: string, data: TransactionData){
+        return this.http.post<Account>(`${this.url}/accounts/${accountId}/withdraw`, data);
+    }
+
+    transferAccount(accountId: string, data: TransferData){
+        return this.http.post<Account>(`${this.url}/accounts/${accountId}/transfer`, data);
     }
 }
