@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '@src/environments/environment.local';
 import { AuthService } from '@app/auth/services/auth.service';
 import { Account, AccountFilter, AccountResponse, Total, TransactionData, TransferData } from '@app/account/interface/account.interface';
-import { Observable, tap } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Injectable({providedIn: 'root'})
 export class AccountService {

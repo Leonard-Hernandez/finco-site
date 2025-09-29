@@ -1,0 +1,29 @@
+<button
+  (click)="router.navigate(['/goals/details/', goal().id])"
+  class="min-w-85 h-30 aspect-ratio-2/1 rounded-xl bg-finco-card-bg-color border-2 border-finco-button-bg-color px-4 py-2"
+>
+  <p class="text-xs text-finco-secondary-color flex justify-between">
+    <span>C.D: {{ goal().creationDate | date : "medium" }}</span>
+    <span>D.L: {{ goal().deadLine | date : "short" }}</span>
+  </p>
+  <div class="flex justify-between items-center">
+    <h3 class="font-bold text-finco-primary-color">
+      {{ goal().name }}
+    </h3>
+    <p class="font-bold text-finco-primary-color">
+        total: {{total() | currency : "" : "" }} {{exchageService.defaultCurrency()}}
+    </p>
+  </div>
+  <div class="flex justify-between items-center my-1">
+    @for (resume of resume(); track $index) {
+        <p
+          class="text-sm font-bold text-finco-secondary-color"
+        >
+          {{ resume[1]| currency : "" : "" }} {{resume[0]}}
+        </p>
+    }
+  </div>
+  <p class="text-finco-primary-color text-sm text text-left">
+    {{goal().description}}
+  </p>
+</button>

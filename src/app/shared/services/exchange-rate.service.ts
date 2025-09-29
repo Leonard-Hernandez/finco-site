@@ -1,6 +1,6 @@
 import { effect, inject, Injectable, signal } from "@angular/core";
-import { AuthService } from "../../auth/services/auth.service";
-import { environment } from "../../../environments/environment.local";
+import { AuthService } from "@app/auth/services/auth.service";
+import { environment } from "@src/environments/environment.local";
 
 @Injectable({
     providedIn: 'root'

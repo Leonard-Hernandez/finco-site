@@ -1,7 +1,6 @@
 import { Component, computed, effect, inject, input, linkedSignal, signal } from '@angular/core';
 import { createChart, IChartApi, LineData, LineSeries } from 'lightweight-charts';
 import { Transaction, TransactionChartOptions } from '../../interface/transaction';
-import { CurrencyPipe } from '@angular/common';
 import { AuthService } from '@app/auth/services/auth.service';
 import { ExchangeRateService } from '@app/shared/services/exchange-rate.service';
 

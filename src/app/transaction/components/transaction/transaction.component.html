@@ -1,46 +1,68 @@
 <div
-        class="w-full h-30 aspect-ratio-2/1 rounded-xl bg-finco-card-bg-color border-2 border-finco-button-bg-color px-4 py-2">
-        <div class="flex justify-between items-center text-sm text-finco-primary-color">
-          @if (transaction().type === 'WITHDRAW' || transaction().type === 'WITHDRAW_GOAL') {
-          <p class="text-red-500">{{transaction().type}}</p>
-          } @else if (transaction().type === 'DEPOSIT' || transaction().type === 'DEPOSIT_GOAL') {
-          <p class="text-green-500">{{transaction().type}}</p>
-          }
-          <p>{{transaction().date | date:'medium'}}</p>
-        </div>
-        <div class="flex justify-between items-center text-sm text-finco-primary-color">
-          <p>{{transaction().account.name}}</p>
-          @if (transaction().transferAccount) {
-          @if (transaction().type === 'WITHDRAW') {
-          <p class="text-red-500 text-xs">TO</p>
-          } @else {
-          <p class="text-green-500 text-xs">FROM</p>
-          }
-          <p>{{transaction().transferAccount.name}}</p>
-          } @else if (transaction().goal) {
-          @if (transaction().type === 'DEPOSIT_GOAL') {
-          <p class="text-red-500 text-xs">TO</p>
-          } @else {
-          <p class="text-green-500 text-xs">FROM</p>
-          }
-          <p>{{transaction().goal.name}}</p>
-          }
-        </div>
-        <div class="flex justify-between items-center text-sm text-finco-primary-color">
-          <p>amount:</p>
-          <p>{{transaction().amount | currency:'':''}} {{transaction().account.currency}}</p>
-        </div>
-        <div class="flex justify-between items-center text-sm text-finco-primary-color">
-          <p>fee: {{transaction().fee | currency:'':''}} {{transaction().account.currency}}</p>
-          @if (transaction().transferAccount && transaction().account.currency !== transaction().transferAccount.currency &&
-          transaction().type === 'WITHDRAW') {
-          <p>Ex rate
-            ({{transaction().account.currency}}/{{transaction().transferAccount.currency}}):{{transaction().exchangeRate}}</p>
-          }
-        </div>
-        <div class="flex justify-between items-center text-sm text-finco-primary-color">
-          <p>{{transaction().category}}</p>
-          <p>{{transaction().description}}</p>
-        </div>
-
-      </div>
+  class="w-full h-30 aspect-ratio-2/1 rounded-xl bg-finco-card-bg-color border-2 border-finco-button-bg-color px-4 py-2"
+>
+  <div
+    class="flex justify-between items-center text-sm text-finco-primary-color"
+  >
+    @if (transaction().type === 'WITHDRAW' || transaction().type ===
+    'WITHDRAW_GOAL') {
+    <p class="text-red-500">{{ transaction().type }}</p>
+    } @else if (transaction().type === 'DEPOSIT' || transaction().type ===
+    'DEPOSIT_GOAL') {
+    <p class="text-green-500">{{ transaction().type }}</p>
+    }
+    <p>{{ transaction().date | date : "medium" }}</p>
+  </div>
+  <div
+    class="flex justify-between items-center text-sm text-finco-primary-color"
+  >
+    <p>{{ transaction().account.name }}</p>
+    @if (transaction().transferAccount) { @if (transaction().type ===
+    'WITHDRAW') {
+    <p class="text-red-500 text-xs">TO</p>
+    } @else {
+    <p class="text-green-500 text-xs">FROM</p>
+    }
+    <p>{{ transaction().transferAccount.name }}</p>
+    } @else if (transaction().goal) { @if (transaction().type ===
+    'DEPOSIT_GOAL') {
+    <p class="text-red-500 text-xs">TO</p>
+    } @else {
+    <p class="text-green-500 text-xs">FROM</p>
+    }
+    <p>{{ transaction().goal.name }}</p>
+    }
+  </div>
+  <div
+    class="flex justify-between items-center text-sm text-finco-primary-color"
+  >
+    <p>amount:</p>
+    <p>
+      {{ transaction().amount | currency : "" : "" }}
+      {{ transaction().account.currency }}
+    </p>
+  </div>
+  <div
+    class="flex justify-between items-center text-sm text-finco-primary-color"
+  >
+    <p>
+      fee: {{ transaction().fee | currency : "" : "" }}
+      {{ transaction().account.currency }}
+    </p>
+    @if (transaction().transferAccount && transaction().account.currency !==
+    transaction().transferAccount.currency && transaction().type === 'WITHDRAW')
+    {
+    <p>
+      Ex rate ({{ transaction().account.currency }}/{{
+        transaction().transferAccount.currency
+      }}):{{ transaction().exchangeRate }}
+    </p>
+    }
+  </div>
+  <div
+    class="flex justify-between items-center text-sm text-finco-primary-color"
+  >
+    <p>{{ transaction().category }}</p>
+    <p>{{ transaction().description }}</p>
+  </div>
+</div>
