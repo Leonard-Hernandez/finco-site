@@ -1,1 +1,94 @@
-<p>goals-details works!</p>
+<div
+  class="flex flex-col gap-2 justify-center items-center bg-gradient-to-br from-finco-bg-color to-finco-card-bg-color min-h-screen max-h-screen min-w-screen max-w-screen pt-17 pb-13"
+>
+  <div class="flex flex-col gap-2 min-w-85 font-bold">
+    <app-transaction-chart
+      [transactionChartOptions]="transactionChartOptions()"
+    />
+    <transaction-ranges-buttons (range)="updateTransactionFilter($event)" />
+  </div>
+
+  <section class="goal-details min-w-90 rounded-xl bg-finco-card-bg-color border border-gray-200 p-3">
+    <header class="flex justify-between text-finco-secondary-color text-sm">
+      <p>C.D: {{ goal().creationDate | date : "medium" }}</p>
+      <p>D.F: {{ goal().deadLine | date : "short" }}</p>
+    </header>
+    <div class="flex justify-between items-center text-lg font-bold text-finco-primary-color">
+      <p>{{ goal().name }}</p>
+      <p>Total {{ total() | currency : "" : "" }} {{exchangeService.defaultCurrency()!}}</p>
+    </div>
+    <!-- Action Buttons -->
+    <div class="grid grid-cols-2 gap-2 mt-1">
+      <!-- Withdraw Button -->
+      <button
+        (click)="
+          router.navigate([
+            '/goals/operation/' + goal().id + '/withdraw'
+          ])
+        "
+        class="flex flex-col items-center justify-center p-1.5 rounded-lg"
+      >
+        <div
+          class="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center"
+        >
+          <svg class="w-5 h-5 text-red-500">
+            <use xlink:href="/sprite.svg#minusIcon" />
+          </svg>
+        </div>
+      </button>
+      <!-- Deposit Button -->
+      <button
+        (click)="
+          router.navigate([
+            '/goals/operation/' + goal().id + '/deposit'
+          ])
+        "
+        class="flex flex-col items-center justify-center p-1.5 rounded-lg hover:bg-finco-button-bg-color/10 transition-colors"
+      >
+        <div
+          class="w-10 h-10 rounded-full bg-finco-button-bg-color/10 flex items-center justify-center"
+        >
+          <svg class="w-5 h-5 text-finco-primary-color">
+            <use xlink:href="/sprite.svg#plusIcon" />
+          </svg>
+        </div>
+      </button>
+    </div>
+    @if (goal().goalAccountBalances) {
+      <div>
+        <h2 class="text-finco-secondary-color">Accounts</h2>
+      </div>
+      <div class="flex justify-between items-center text-sm font-bold text-finco-secondary-color">
+      @for (goalAccountBalance of goal().goalAccountBalances; track $index) {
+          <p>{{ goalAccountBalance.account.name }}: {{ goalAccountBalance.balance | currency : "" : "" }} {{goalAccountBalance.account.currency}}</p>
+        }
+      </div>
+    }
+  </section>
+
+  <div
+    class="w-95 h-full flex-2 flex flex-col p-3 gap-2 overflow-y-auto rounded-xl z-1"
+  >
+    <div>
+      <h2 class="text-finco-secondary-color">Transactions</h2>
+    </div>
+    <div class="flex flex-col gap-2 overflow-y-auto">
+      @for (transaction of transactions(); track $index) {
+      <app-transaction [transaction]="transaction" />
+      }
+    </div>
+  </div>
+</div>
+
+<a
+  class="fixed top-15 right-4 h-10 w-10 rounded-full shadow-sm shadow-finco-secondary-color text-finco-primary-color font-bold text-4xl flex justify-center items-center"
+  routerLink="/goals/edit/{{ goal().id }}"
+>
+  <div
+    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+  >
+    <svg class="h-5 w-5 text-finco-primary-color">
+      <use xlink:href="/sprite.svg#editIcon" />
+    </svg>
+  </div>
+</a>
