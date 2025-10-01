@@ -10,10 +10,11 @@ import { TransactionComponent } from "@app/transaction/components/transaction/tr
 import { TransactionChartComponent } from "@app/transaction/components/transaction-chart/transaction-chart.component";
 import { TransactionRangesButtonsComponent } from "@app/transaction/components/transaction-ranges-buttons/transaction-ranges-buttons.component";
 import { GoalComponent } from "@app/goal/components/goal/goal.component";
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-goals-list-page',
-  imports: [TransactionComponent, TransactionChartComponent, TransactionRangesButtonsComponent, GoalComponent],
+  imports: [TransactionComponent, TransactionChartComponent, TransactionRangesButtonsComponent, GoalComponent, RouterLink],
   templateUrl: './goals-list-page.component.html'
 })
 export class GoalsListPageComponent {

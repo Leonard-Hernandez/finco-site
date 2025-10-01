@@ -9,7 +9,7 @@ export interface Goal {
     deadLine: Date;
     description?: string;
     creationDate?: Date;
-    isEnable?: boolean;
+    enable?: boolean;
     goalAccountBalances?: GoalAccountBalance[];
 }
 

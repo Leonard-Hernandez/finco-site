@@ -44,7 +44,6 @@ export class GoalsDetailsComponent {
       }
     }
     )
-    console.log(resume)
     return resume;
   })
 
@@ -52,10 +51,8 @@ export class GoalsDetailsComponent {
     let total = 0
 
     this.resume().forEach((value, key) => {
-      console.log(key, value)
       total += this.exchangeService.convert(key, value);
     })
-    console.log(total)
 
     return total;
 

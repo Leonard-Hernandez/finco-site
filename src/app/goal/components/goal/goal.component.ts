@@ -34,7 +34,6 @@ export class GoalComponent {
     let total = 0
 
     this.resume().forEach((value, key) => {
-      console.log(key, value)
       total += this.exchageService.convert(key, value);
     })
 

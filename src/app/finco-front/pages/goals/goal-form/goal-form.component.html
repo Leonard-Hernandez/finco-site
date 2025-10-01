@@ -1,0 +1,139 @@
+<div
+    class="min-h-screen w-full bg-gradient-to-br from-finco-bg-color to-finco-card-bg-color flex items-center justify-center p-6">
+    <div class="w-full max-w-md">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-finco-primary-color mb-2">
+                @if (this.goal()) {
+                Edit Goal
+                } @else {
+                Create an Goal
+                }
+            </h1>
+        </div>
+
+        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-8 shadow-xl border border-white/5">
+            <form class="space-y-4" (ngSubmit)="onSubmit()" [formGroup]="goalForm">
+                <!-- Name Field -->
+                <div class="space-y-2">
+                    <label for="name" class="block text-sm font-medium text-finco-secondary-color">
+                        Name
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-finco-primary-color">
+                                <use xlink:href="/sprite.svg#user" />
+                            </svg>
+                        </div>
+                        <input id="name" type="text" placeholder="Account Name"
+                            class="block w-full pl-10 pr-3 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
+                            formControlName="name" />
+                    </div>
+                    @if (formUtils.isValidField(goalForm, 'name')) {
+                    <div class="text-red-500">
+                        {{ formUtils.getErrorMessage(goalForm, 'name') }}
+                    </div>
+                    }
+                </div>
+
+                <!-- Target Amount Field -->
+                <div class="space-y-2">
+                    <label for="targetAmount" class="block text-sm font-medium text-finco-secondary-color">
+                        Target Amount
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-finco-primary-color">
+                                <use xlink:href="/sprite.svg#currency" />
+                            </svg>
+                        </div>
+                        <input id="targetAmount" placeholder="100" type="number"
+                            class="block w-full pl-10 pr-3 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
+                            formControlName="targetAmount" />
+                    </div>
+                    @if (formUtils.isValidField(goalForm, 'targetAmount')) {
+                    <div class="text-red-500">
+                        {{ formUtils.getErrorMessage(goalForm, 'targetAmount') }}
+                    </div>
+                    }
+                </div>
+
+                <!-- DeadLine Field -->
+                <div class="space-y-2">
+                    <label for="deadLine" class="block text-sm font-medium text-finco-secondary-color">
+                        DeadLine
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-finco-primary-color">
+                                <use xlink:href="/sprite.svg#calendarIcon" />
+                            </svg>
+                        </div>
+                        <input id="deadLine" type="date"
+                            class="block w-full pl-10 pr-3 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
+                            formControlName="deadLine" />
+                    </div>
+                    @if (formUtils.isValidField(goalForm, 'deadLine')) {
+                    <div class="text-red-500">
+                        {{ formUtils.getErrorMessage(goalForm, 'deadLine') }}
+                    </div>
+                    }
+                </div>
+
+                <!-- Description Field -->
+                <div class="space-y-2">
+                    <label for="description" class="block text-sm font-medium text-finco-secondary-color">
+                        Description
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-finco-primary-color">
+                                <use xlink:href="/sprite.svg#editIcon" />
+                            </svg>
+                        </div>
+                        <input id="description" type="text" placeholder="Account Description"
+                            class="block w-full pl-10 pr-10 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
+                            formControlName="description" />
+                    </div>
+                    @if (formUtils.isValidField(goalForm, 'description')) {
+                    <div class="text-red-500">
+                        {{ formUtils.getErrorMessage(goalForm, 'description') }}
+                    </div>
+                    }
+                </div>
+
+                @if (this.goal()) {
+                <div class="space-y-2 flex justify-center gap-4">
+                    <div>
+                        <label for="Enable" class="block text-sm font-medium text-finco-secondary-color">
+                            Enable
+                            <input id="Enable" type="checkbox" class="" formControlName="enable" />
+                        </label>
+                        @if (formUtils.isValidField(goalForm, 'enable')) {
+                        <div class="text-red-500">
+                            {{ formUtils.getErrorMessage(goalForm, 'enable') }}
+                        </div>
+                        }
+                    </div>
+
+                    
+                </div>
+                }
+
+                <!-- Submit Button -->
+                <div class="pt-2">
+                    <button type="submit"
+                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-finco-bg-color bg-finco-primary-color hover:bg-finco-primary-color/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-finco-primary-color transition duration-200">
+                        @if (this.goal()) {
+                        Edit Goal
+                        } @else {
+                        Create an Goal
+                        }
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<app-error-modal [_message]="errorMessage()" [_signal]="hasError()" [_details]="errorDetails()" />
