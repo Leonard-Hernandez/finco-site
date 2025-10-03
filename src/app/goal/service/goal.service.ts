@@ -40,11 +40,11 @@ export class GoalService
         return this.http.put<Goal>(`${this.url}/goals/${goal.id}`, goal);
     }
 
-    depositAccount(goalId: number, data: GoalTransactionData):  Observable<Goal>{
+    depositGoal(goalId: number, data: GoalTransactionData):  Observable<Goal>{
         return this.http.post<Goal>(`${this.url}/goals/${goalId}/deposit`, data);
     }
 
-    withdrawAccount(goalId: number, data: GoalTransactionData):  Observable<Goal>{
+    withdrawGoal(goalId: number, data: GoalTransactionData):  Observable<Goal>{
         return this.http.post<Goal>(`${this.url}/goals/${goalId}/withdraw`, data);
     }
 }

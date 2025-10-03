@@ -6,7 +6,7 @@ import { Account, AccountFilter, AccountResponse, TransactionData, TransferData 
 import { AccountService } from '@src/app/account/service/account.service';
 import { FormUtils } from '@src/app/shared/utils/form-utils';
 import { TransactionService } from '@src/app/transaction/services/transaction.service';
-import { map, of } from 'rxjs';
+import { map } from 'rxjs';
 import { ErrorModalComponent } from "../../../../shared/components/error-modal/error-modal.component";
 import { ResponseError } from '@src/app/shared/interfaces/response-error.interface';
 

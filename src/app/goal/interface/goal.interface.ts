@@ -25,7 +25,7 @@ export interface GoalFilter {
 }
 
 export interface GoalTransactionData {
-    account: Account,
+    accountId: number,
     amount: number,
     description?: string,
     category?: string

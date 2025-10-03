@@ -1,1 +1,178 @@
-<p>goals-opertion works!</p>
+<div
+  class="min-h-screen w-full bg-gradient-to-br from-finco-bg-color to-finco-card-bg-color flex items-center justify-center p-4"
+>
+  <div class="w-full max-w-md">
+    <div class="text-center mb-8">
+      <div class="flex justify-center mb-4">
+      </div>
+      <h1 class="text-3xl font-bold text-finco-primary-color mb-2">
+        {{
+          operation() === "deposit"
+            ? "Deposit"
+            : operation() === "withdraw"
+            ? "Withdraw"
+            : "Transfer"
+        }}
+        {{goal()!.name}}
+      </h1>
+    </div>
+
+    <div
+      class="bg-white/10 backdrop-blur-md rounded-2xl p-8 shadow-xl border border-white/5"
+    >
+      <form
+        class="space-y-6"
+        (ngSubmit)="onSubmit()"
+        [formGroup]="transactionForm"
+      >
+        <!-- amount Field -->
+        <div class="space-y-2">
+          <label
+            for="amount"
+            class="block text-sm font-medium text-finco-secondary-color"
+          >
+            Amount
+          </label>
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <svg class="h-5 w-5 text-finco-primary-color">
+                <use xlink:href="/sprite.svg#user" />
+              </svg>
+            </div>
+            <input
+              id="amount"
+              type="number"
+              placeholder="1000"
+              class="block w-full pl-10 pr-3 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
+              formControlName="amount"
+            />
+          </div>
+          @if (formUtils.isValidField(transactionForm, 'amount')) {
+          <div class="text-red-500">
+            {{ formUtils.getErrorMessage(transactionForm, "amount") }}
+          </div>
+          }
+        </div>
+
+        <!-- category Field -->
+        <div class="space-y-2">
+          <label
+            for="category"
+            class="block text-sm font-medium text-finco-secondary-color"
+          >
+            Category
+          </label>
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <svg class="h-5 w-5 text-finco-primary-color">
+                <use xlink:href="/sprite.svg#email" />
+              </svg>
+            </div>
+            @if (categories() && categories()!.length > 0) {
+            <datalist id="category">
+              <option value="">banana</option>
+              <option value="">cambur</option>
+              @for (item of categories()!; track $index) {
+              <option value="{{ item }}"></option>
+              }
+            </datalist>
+            }
+            <input
+              id="category"
+              type="text"
+              placeholder="Groceries"
+              list="category"
+              class="block w-full pl-10 pr-3 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              formControlName="category"
+            />
+          </div>
+
+          @if (formUtils.isValidField(transactionForm, 'category')) {
+          <div class="text-red-500">
+            {{ formUtils.getErrorMessage(transactionForm, "category") }}
+          </div>
+          }
+        </div>
+
+        <div class="space-y-2">
+          <label
+            for="description"
+            class="block text-sm font-medium text-finco-secondary-color"
+          >
+            Description
+          </label>
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <svg class="h-5 w-5 text-finco-primary-color">
+                <use xlink:href="/sprite.svg#lock" />
+              </svg>
+            </div>
+            <input
+              id="description"
+              type="text"
+              placeholder="description"
+              class="block w-full pl-10 pr-10 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
+              formControlName="description"
+            />
+          </div>
+          @if (formUtils.isValidField(transactionForm, 'description')) {
+          <div class="text-red-500">
+            {{ formUtils.getErrorMessage(transactionForm, "description") }}
+          </div>
+          }
+        </div>
+
+        <div class="space-y-2">
+          <label
+            for="transferAccountId"
+            class="block text-sm font-medium text-finco-secondary-color"
+          >
+            Transfer to
+          </label>
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <svg class="h-5 w-5 text-finco-primary-color">
+                <use xlink:href="/sprite.svg#currency" />
+              </svg>
+            </div>
+            <select
+              id="transferAccountId"
+              placeholder="Select account"
+              class="block w-full pl-10 pr-3 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
+              formControlName="accountId"
+            >
+              @for (account of accounts(); track $index) {
+              <option
+                [value]="account.id"
+                class="text-finco-secondary-color bg-finco-bg-color"
+              >
+                {{ account.name }}: {{account.balance}}{{account.currency}}
+              </option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="pt-2">
+          <button
+            type="submit"
+            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-finco-bg-color bg-finco-primary-color hover:bg-finco-primary-color/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-finco-primary-color transition duration-200"
+          >
+            {{ operation() }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<app-error-modal [_message]="errorMessage()" [_signal]="hasError()" [_details]="errorDetails()" />
