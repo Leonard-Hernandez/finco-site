@@ -1,29 +1,31 @@
 <button
   (click)="router.navigate(['/goals/details/', goal().id])"
-  class="min-w-85 h-30 aspect-ratio-2/1 rounded-xl bg-finco-card-bg-color border-2 border-finco-button-bg-color px-4 py-2"
+  class="min-w-85 max-w-85 aspect-ratio-2/1 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 border-2 border-finco-button-bg-color p-4 flex flex-col justify-between"
 >
-  <p class="text-xs text-finco-secondary-color flex justify-between">
-    <span>C.D: {{ goal().creationDate | date : "medium" }}</span>
-    <span>D.L: {{ goal().deadLine | date : "short" }}</span>
-  </p>
-  <div class="flex justify-between items-center">
-    <h3 class="font-bold text-finco-primary-color">
-      {{ goal().name }}
-    </h3>
-    <p class="font-bold text-finco-primary-color">
-        total: {{total() | currency : "" : "" }} {{exchageService.defaultCurrency()}}
+  <div class="mt-2">
+    <div class="flex justify-between items-center">
+      <h3 class="font-bold text-lg text-finco-primary-color mb-1 line-clamp-1">
+        {{ goal().name }}
+      </h3>
+      <div class="bg-finco-primary-color/10 px-2 py-1 rounded-full">
+        <p class="text-xs font-medium text-finco-primary-color">
+          {{ total() | currency : "" : "" }}
+          {{ exchageService.defaultCurrency() }}
+        </p>
+      </div>
+    </div>
+    <p class="text-finco-secondary-color text-sm line-clamp-2 text-left">
+      {{ goal().description || "Sin descripción" }}
     </p>
   </div>
-  <div class="flex justify-between items-center my-1">
+
+  <div class="mt-2 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
     @for (resume of resume(); track $index) {
-        <p
-          class="text-sm font-bold text-finco-secondary-color"
-        >
-          {{ resume[1]| currency : "" : "" }} {{resume[0]}}
-        </p>
+    <div class="px-2 py-1 rounded-full whitespace-nowrap bg-finco-primary-color/10">
+      <span class="text-xs font-medium text-finco-secondary-color">
+        {{ resume[1] | currency : "" : "" }} {{ resume[0] }}
+      </span>
+    </div>
     }
   </div>
-  <p class="text-finco-primary-color text-sm text text-left">
-    {{goal().description}}
-  </p>
 </button>

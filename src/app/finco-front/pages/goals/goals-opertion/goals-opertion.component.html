@@ -3,8 +3,7 @@
 >
   <div class="w-full max-w-md">
     <div class="text-center mb-8">
-      <div class="flex justify-center mb-4">
-      </div>
+      <div class="flex justify-center mb-4"></div>
       <h1 class="text-3xl font-bold text-finco-primary-color mb-2">
         {{
           operation() === "deposit"
@@ -13,7 +12,7 @@
             ? "Withdraw"
             : "Transfer"
         }}
-        {{goal()!.name}}
+        {{ goal()!.name }}
       </h1>
     </div>
 
@@ -133,7 +132,7 @@
             for="transferAccountId"
             class="block text-sm font-medium text-finco-secondary-color"
           >
-            Transfer to
+            {{ operation() === "deposit" ? "Deposit" : "Withdraw" }} to
           </label>
           <div class="relative">
             <div
@@ -149,14 +148,25 @@
               class="block w-full pl-10 pr-3 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
               formControlName="accountId"
             >
-              @for (account of accounts(); track $index) {
+              @if (operation() === "deposit") { @for (account of accounts();
+              track $index) {
               <option
                 [value]="account.id"
                 class="text-finco-secondary-color bg-finco-bg-color"
               >
-                {{ account.name }}: {{account.balance}}{{account.currency}}
+                {{ account.name }}: {{ account.balance }}{{ account.currency }}
               </option>
-              }
+              } } @if (operation() === "withdraw") { @for (goalAccountBalance of
+              goal().goalAccountBalances; track $index) {
+              <option
+                [value]="goalAccountBalance.account.id"
+                class="text-finco-secondary-color bg-finco-bg-color"
+              >
+                {{ goalAccountBalance.account.name }}:
+                {{ goalAccountBalance.balance }}
+                {{ goalAccountBalance.account.currency }}
+              </option>
+              } }
             </select>
           </div>
         </div>
@@ -175,4 +185,8 @@
   </div>
 </div>
 
-<app-error-modal [_message]="errorMessage()" [_signal]="hasError()" [_details]="errorDetails()" />
+<app-error-modal
+  [_message]="errorMessage()"
+  [_signal]="hasError()"
+  [_details]="errorDetails()"
+/>

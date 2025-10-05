@@ -8,10 +8,18 @@
     <transaction-ranges-buttons (range)="updateTransactionFilter($event)" />
   </div>
 
-  <section class="goal-details min-w-90 rounded-xl bg-finco-card-bg-color border border-gray-200 p-3">
-    <header class="flex justify-between text-finco-secondary-color text-sm">
-      <p>C.D: {{ goal().creationDate | date : "medium" }}</p>
-      <p>D.F: {{ goal().deadLine | date : "short" }}</p>
+  <section class="goal-details min-w-90 max-w-90 rounded-xl bg-finco-card-bg-color border border-gray-200 p-3">
+      <header
+      class="flex justify-between items-start text-xs text-finco-secondary-color"
+    >
+      <p class="flex items-center">
+        <span class="material-icons-outlined text-sm mr-1">event_available</span>
+        {{ goal().creationDate | date : "mediumDate" }}
+      </p>
+      <p class="flex items-center">
+        <span class="material-icons-outlined text-sm mr-1">event_busy</span>
+        {{ goal().deadLine | date : "mediumDate" }}
+      </p>
     </header>
     <div class="flex justify-between items-center text-lg font-bold text-finco-primary-color">
       <p>{{ goal().name }}</p>
@@ -58,9 +66,13 @@
       <div>
         <h2 class="text-finco-secondary-color">Accounts</h2>
       </div>
-      <div class="flex justify-between items-center text-sm font-bold text-finco-secondary-color">
+      <div class="mt-2 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
       @for (goalAccountBalance of goal().goalAccountBalances; track $index) {
-          <p>{{ goalAccountBalance.account.name }}: {{ goalAccountBalance.balance | currency : "" : "" }} {{goalAccountBalance.account.currency}}</p>
+        <div class="px-2 py-1 rounded-full whitespace-nowrap bg-finco-primary-color/10">
+          <span class="text-xs font-medium text-finco-secondary-color">
+            {{ goalAccountBalance.account.name }}: {{ goalAccountBalance.balance | currency : "" : "" }} {{goalAccountBalance.account.currency}}
+          </span>
+        </div>
         }
       </div>
     }

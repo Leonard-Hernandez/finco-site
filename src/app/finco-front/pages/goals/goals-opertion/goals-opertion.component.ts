@@ -37,7 +37,6 @@ export class GoalsOpertionComponent {
   goal: Signal<Goal> = signal({} as Goal);
 
   accountId = signal(0);
-  account = signal({} as Account);
 
   operation: Signal<string> = toSignal(this.activatedRoute.params.pipe(map((params) => params['operation'])));
   accounts = signal<Account[]>([]);
@@ -140,32 +139,22 @@ export class GoalsOpertionComponent {
       this.router.navigate(['/accounts']);
     }
 
-    const filter: AccountFilter = {
-      pagination: {
-        page: 0,
-        size: 50,
-        sortBy: 'name',
-        sortDirection: 'asc',
+    if (this.operation() == 'deposit') {
+      const filter: AccountFilter = {
+        pagination: {
+          page: 0,
+          size: 50,
+          sortBy: 'name',
+          sortDirection: 'asc',
+        }
       }
-    }
 
-    this.accountService.getAccounts(filter).subscribe((response: AccountResponse) => {
-      if (response.content.length === 0) {
-        this.router.navigate(['/accounts/create']);
-      }
-      this.accounts.set(response.content);
-    })
-
-    this.transactionForm.get('transferAccountId')?.valueChanges.subscribe(value => {
-      this.accountId.set(value ?? 0);
-    });
-  }
-  )
-
-  transferAccountEffect = effect(() => {
-    if (this.accountId() !== 0) {
-      var toAccount = this.accounts().find(account => account.id == this.accountId())
-      this.account.set(toAccount ?? {} as Account);
+      this.accountService.getAccounts(filter).subscribe((response: AccountResponse) => {
+        if (response.content.length === 0) {
+          this.router.navigate(['/accounts/create']);
+        }
+        this.accounts.set(response.content);
+      })
     }
   })
 
