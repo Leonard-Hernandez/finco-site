@@ -70,16 +70,10 @@ export class AccountDetailsComponent {
   });
 
   updateTransactionFilter(startDate: Date) {
-    this.transactionFilter.set({
-      pagination: {
-        page: 0,
-        size: 500,
-        sortBy: 'date',
-        sortDirection: 'desc',
-      },
-      startDate: startDate,
-      accountId: Number(this.accountId()),
-    });
+    this.transactionFilter.update((filter) => ({
+      ...filter,
+      startDate
+    }));
   }
 
   validateEffect = effect(() => {

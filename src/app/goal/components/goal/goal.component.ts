@@ -1,12 +1,12 @@
 import { Component, computed, inject, input } from '@angular/core';
 import { Router } from '@angular/router';
 import { Goal } from '@app/goal/interface/goal.interface';
-import { CurrencyPipe, DatePipe } from '@angular/common';
+import { CurrencyPipe } from '@angular/common';
 import { ExchangeRateService } from '@src/app/shared/services/exchange-rate.service';
 
 @Component({
   selector: 'app-goal',
-  imports: [DatePipe, CurrencyPipe],
+  imports: [CurrencyPipe],
   templateUrl: './goal.component.html'
 })
 export class GoalComponent {

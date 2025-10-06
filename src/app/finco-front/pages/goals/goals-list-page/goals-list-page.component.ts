@@ -54,10 +54,6 @@ export class GoalsListPageComponent {
     };
   });
 
-  ngOnInit(): void {
-
-  }
-
   transactionsResource = rxResource({
     request: () => this.transactionFilter(),
     loader: () => this.transactionsService.getTransactions(this.transactionFilter()).pipe(
@@ -79,16 +75,10 @@ export class GoalsListPageComponent {
   });
 
   updateTransactionFilter(startDate: Date) {
-    this.transactionFilter.set({
-      pagination: {
-        page: 0,
-        size: 500,
-        sortBy: 'date',
-        sortDirection: 'desc',
-      },
-      startDate: startDate,
-      onlyAccountTransactions: true
-    });
+    this.transactionFilter.update((filter) => ({
+      ...filter,
+      startDate
+    }))
   }
 
 

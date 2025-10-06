@@ -1,1 +1,27 @@
-<p>transactions-stats works!</p>
+<div
+  class="flex flex-col py-15 justify-between items-center min-h-screen max-h-screen min-w-screen max-w-screen bg-gradient-to-br from-finco-bg-color to-finco-card-bg-color"
+>
+  <div class="flex flex-col gap-2 min-w-85 font-bold">
+    <app-transaction-chart
+      [transactionChartOptions]="transactionChartOptions()"
+    />
+    <transaction-ranges-buttons (range)="updateTransactionFilter($event)" />
+  </div>
+
+  <div class="w-full px-4">
+    
+  </div>
+
+  <div
+    class="w-95 h-full flex-2 flex flex-col p-3 gap-2 overflow-y-auto rounded-xl z-1"
+  >
+    <div>
+      <h2 class="text-finco-secondary-color">Transactions</h2>
+    </div>
+    <div class="flex flex-col gap-2 overflow-y-auto">
+      @for (transaction of transactions(); track $index) {
+      <app-transaction [transaction]="transaction" />
+      }
+    </div>
+  </div>
+</div>
