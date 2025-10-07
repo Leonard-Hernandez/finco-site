@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { TransactionChartComponent } from "../../../../transaction/components/transaction-chart/transaction-chart.component";
-import { TransactionRangesButtonsComponent } from "../../../../transaction/components/transaction-ranges-buttons/transaction-ranges-buttons.component";
-import { TransactionComponent } from "../../../../transaction/components/transaction/transaction.component";
+import { TransactionChartComponent } from "@app/transaction/components/transaction-chart/transaction-chart.component";
+import { TransactionRangesButtonsComponent } from "@app/transaction/components/transaction-ranges-buttons/transaction-ranges-buttons.component";
+import { TransactionComponent } from "@app/transaction/components/transaction/transaction.component";
 import { TransactionService } from '@src/app/transaction/services/transaction.service';
 import { Router } from '@angular/router';
 import { Transaction, TransactionChartOptions, TransactionFilter, TransactionResponse } from '@src/app/transaction/interface/transaction';

@@ -4,7 +4,7 @@ import { AccountService } from '@app/account/service/account.service';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { Account } from '@app/account/interface/account.interface';
-import { CurrencyPipe, NgClass, PercentPipe } from '@angular/common';
+import { CurrencyPipe, PercentPipe } from '@angular/common';
 import { TransactionChartComponent } from "@src/app/transaction/components/transaction-chart/transaction-chart.component";
 import { Transaction, TransactionChartOptions, TransactionFilter, TransactionResponse } from '@src/app/transaction/interface/transaction';
 import { TransactionService } from '@src/app/transaction/services/transaction.service';
