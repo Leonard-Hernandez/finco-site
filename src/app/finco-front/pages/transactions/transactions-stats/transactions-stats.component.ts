@@ -7,13 +7,16 @@ import { Router } from '@angular/router';
 import { Transaction, TransactionChartOptions, TransactionFilter, TransactionResponse } from '@src/app/transaction/interface/transaction';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
+import { IncomeExpensePieChartComponent } from '@src/app/transaction/components/income-expense-pie-chart/income-expense-pie-chart.component';
 
 @Component({
   selector: 'app-transactions-stats',
-  imports: [TransactionChartComponent, TransactionRangesButtonsComponent, TransactionComponent],
+  imports: [TransactionChartComponent, TransactionRangesButtonsComponent, TransactionComponent, IncomeExpensePieChartComponent],
   templateUrl: './transactions-stats.component.html'
 })
 export class TransactionsStatsComponent {
+
+  chart = signal<Boolean>(true);
 
   transactionsService = inject(TransactionService);
   router = inject(Router);
@@ -54,5 +57,9 @@ export class TransactionsStatsComponent {
       ...filter,
       startDate
     }));
+  }
+
+  updateChart() {
+    this.chart.update((chart) => !chart);
   }
 }
