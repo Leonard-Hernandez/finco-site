@@ -1,14 +1,18 @@
-import { Component, computed, effect, inject, input } from '@angular/core';
+import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { Transaction } from '@app/transaction/interface/transaction';
-import { Chart, ChartOptions } from 'chart.js/auto';
+import { Chart } from 'chart.js/auto';
 import { ExchangeRateService } from '@app/shared/services/exchange-rate.service';
+import { ViewChild, AfterViewInit, ElementRef } from '@angular/core';
 
 @Component({
   selector: 'app-income-expense-pie-chart',
   imports: [],
   templateUrl: './income-expense-pie-chart.component.html'
 })
-export class IncomeExpensePieChartComponent {
+export class IncomeExpensePieChartComponent implements AfterViewInit {
+
+  @ViewChild('incomeChart') incomeChartCanvas!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('expenseChart') expenseChartCanvas!: ElementRef<HTMLCanvasElement>;
 
   transactions = input<Transaction[]>();
   _transactions = computed(() => {
@@ -25,6 +29,10 @@ export class IncomeExpensePieChartComponent {
     }
   });
 
+  ngAfterViewInit(): void {
+    this.generateCharts();
+  }
+
   generateCharts() {
     if (this.incomeChart) {
       this.incomeChart.destroy();
@@ -35,7 +43,7 @@ export class IncomeExpensePieChartComponent {
     
     let { incomeData, expenseData } = this.generateData();
 
-    this.incomeChart = new Chart(document.getElementById('incomeChart')! as HTMLCanvasElement, {
+    this.incomeChart = new Chart(this.incomeChartCanvas.nativeElement, {
       type: 'pie',
       data: {
         labels: incomeData.map((data) => data.label),
@@ -65,7 +73,7 @@ export class IncomeExpensePieChartComponent {
       },
     });
 
-    this.expenseChart = new Chart(document.getElementById('expenseChart')! as HTMLCanvasElement, {
+    this.expenseChart = new Chart(this.expenseChartCanvas.nativeElement, {
       type: 'pie',
       data: {
         labels: expenseData.map((data) => data.label),
@@ -98,7 +106,6 @@ export class IncomeExpensePieChartComponent {
   }
 
   generateData() {
-
     let incomeTransactions = this._transactions()!.filter((transaction) => transaction.type === 'DEPOSIT');
     let expenseTransactions = this._transactions()!.filter((transaction) => transaction.type === 'WITHDRAW');
 
