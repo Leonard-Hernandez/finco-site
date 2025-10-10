@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
@@ -28,7 +28,7 @@ export class AccountsListPageComponent implements OnInit{
   transactionFilter = signal<TransactionFilter>({
     pagination: {
       page: 0,
-      size: 10,
+      size: 1000,
       sortBy: 'date',
       sortDirection: 'desc',
     },

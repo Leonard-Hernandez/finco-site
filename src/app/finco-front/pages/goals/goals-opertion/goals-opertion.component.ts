@@ -57,7 +57,7 @@ export class GoalsOpertionComponent {
     }
   }
 
-  categories = toSignal(this.transactionService.GetCategoriesByUser().pipe(
+  categories = toSignal(this.transactionService.getCategoriesByUser().pipe(
     map((response: string[]) => {
       return response;
     })

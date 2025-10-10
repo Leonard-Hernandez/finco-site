@@ -73,8 +73,6 @@
             </div>
             @if (categories() && categories()!.length > 0) {
             <datalist id="category">
-              <option value="">banana</option>
-              <option value="">cambur</option>
               @for (item of categories()!; track $index) {
               <option value="{{ item }}"></option>
               }

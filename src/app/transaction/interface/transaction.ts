@@ -1,7 +1,8 @@
-import Decimal from "decimal.js";
 import { Account } from "@app/account/interface/account.interface";
 import { Goal } from "@app/goal/interface/goal.interface";
 import { Page, Pagination } from "@app/shared/interfaces/pagination.interface";
+
+export type TransactionType = 'DEPOSIT' | 'WITHDRAW' | 'DEPOSIT_GOAL' | 'WITHDRAW_GOAL';
 
 export interface Transaction {
     id: number;
@@ -36,7 +37,7 @@ export interface TransactionFilter {
     goalId?: number;
     transferAccountId?: number;
     category?: string;
-    type?: 'DEPOSIT' | 'WITHDRAW' | 'DEPOSIT_GOAL' | 'WITHDRAW_GOAL';
+    type?: TransactionType;
     userId?: number;
     startDate?: Date;
     endDate?: Date;

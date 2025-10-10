@@ -33,7 +33,7 @@ export class TransactionService {
         return this.http.get<TransactionResponse>(`${this.API_URL}/users/${this.userId}/transactions`, { params });
     }
 
-    GetCategoriesByUser(): Observable<string[]> {
+    getCategoriesByUser(): Observable<string[]> {
         return this.http.get<string[]>(`${this.API_URL}/transactions/categories/${this.userId}`);
     }
 
