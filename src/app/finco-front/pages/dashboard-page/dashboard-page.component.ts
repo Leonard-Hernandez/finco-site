@@ -21,13 +21,13 @@ export class DashboardPageComponent {
   accountService = inject(AccountService);
   transactionsService = inject(TransactionService);
   router = inject(Router);
-  
+
   name = inject(AuthService).user()?.name;
 
   filter = signal<TransactionFilter>({
     pagination: {
       page: 0,
-      size: 10,
+      size: 1000,
       sortBy: 'date',
       sortDirection: 'desc',
     },
@@ -44,6 +44,7 @@ export class DashboardPageComponent {
     request: () => this.filter(),
     loader: () => this.transactionsService.getTransactions(this.filter()).pipe(
       map((response: TransactionResponse) => {
+        console.log(response.content);
         return response.content;
       })
     )
@@ -59,15 +60,6 @@ export class DashboardPageComponent {
   });
 
   updateFilter(startDate: Date) {
-    this.filter.set({
-      pagination: {
-        page: 0,
-        size: 500,
-        sortBy: 'date',
-        sortDirection: 'desc',
-      },
-      onlyAccountTransactions: true,
-      startDate: startDate,
-    });
+    this.filter.update((filter) => ({ ...filter, startDate: startDate }));
   }
 }

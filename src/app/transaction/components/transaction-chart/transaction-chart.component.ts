@@ -13,7 +13,11 @@ export class TransactionChartComponent {
 
   transactionChartOptions = input.required<TransactionChartOptions>();
   transactions = computed(() => {
-    return structuredClone(this.transactionChartOptions().transactions);
+    if (!this.transactionChartOptions().transactions) {
+      return [];
+    }
+    console.log(this.transactionChartOptions().transactions);
+    return [...this.transactionChartOptions().transactions];
   });
   series = signal<string[]>([]);
   defaultCurrency = inject(AuthService).user()?.defaultCurrency;
@@ -27,6 +31,7 @@ export class TransactionChartComponent {
 
   eff = effect(() => {
     if (this.transactions() && this.transactions().length > 0) {
+      console.log(this.transactions());
       this.generateChart();
     }
   })
