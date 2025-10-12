@@ -44,7 +44,6 @@ export class DashboardPageComponent {
     request: () => this.filter(),
     loader: () => this.transactionsService.getTransactions(this.filter()).pipe(
       map((response: TransactionResponse) => {
-        console.log(response.content);
         return response.content;
       })
     )

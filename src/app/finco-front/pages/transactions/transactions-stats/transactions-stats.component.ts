@@ -12,16 +12,17 @@ import { Account, AccountFilter, AccountResponse } from '@src/app/account/interf
 import { AccountService } from '@src/app/account/service/account.service';
 import { Goal, GoalFilter, GoalResponse } from '@src/app/goal/interface/goal.interface';
 import { GoalService } from '@src/app/goal/service/goal.service';
+import { ToggleSwitchComponent } from "../../../../shared/components/toggle-switch/toggle-switch.component";
 
 @Component({
   selector: 'app-transactions-stats',
-  imports: [TransactionChartComponent, TransactionRangesButtonsComponent, TransactionComponent, IncomeExpensePieChartComponent],
+  imports: [TransactionChartComponent, TransactionRangesButtonsComponent, TransactionComponent, IncomeExpensePieChartComponent, ToggleSwitchComponent],
   templateUrl: './transactions-stats.component.html'
 })
 export class TransactionsStatsComponent {
 
-  chart = signal<Boolean>(true);
-  goal = signal<Boolean>(false);
+  chart = signal<boolean>(true);
+  goal = signal<boolean>(false);
 
   accounts = signal<Account[]>([]);
   goals = signal<Goal[]>([]);

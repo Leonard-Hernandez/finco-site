@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, linkedSignal, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { createChart, IChartApi, LineData, LineSeries } from 'lightweight-charts';
 import { Transaction, TransactionChartOptions } from '../../interface/transaction';
 import { AuthService } from '@app/auth/services/auth.service';
@@ -12,14 +12,8 @@ import { ExchangeRateService } from '@app/shared/services/exchange-rate.service'
 export class TransactionChartComponent {
 
   transactionChartOptions = input.required<TransactionChartOptions>();
-  transactions = computed(() => {
-    if (!this.transactionChartOptions().transactions) {
-      return [];
-    }
-    console.log(this.transactionChartOptions().transactions);
-    return [...this.transactionChartOptions().transactions];
-  });
   series = signal<string[]>([]);
+
   defaultCurrency = inject(AuthService).user()?.defaultCurrency;
   exchangeService = inject(ExchangeRateService);
   transactionsCount = signal<number>(0);
@@ -29,9 +23,12 @@ export class TransactionChartComponent {
   classColors = ['text-finco-primary-color', 'text-finco-secondary-color', 'text-finco-button-bg-color', 'text-finco-gold-color', 'text-finco-light-blue-color'];
   chartColors = ['#A8E6CE', '#6FFFB0', '#4CAF50', '#FFD700', '#87CEFA'];
 
+  transactions = computed(() => {
+    return structuredClone(this.transactionChartOptions().transactions);
+  });
+
   eff = effect(() => {
     if (this.transactions() && this.transactions().length > 0) {
-      console.log(this.transactions());
       this.generateChart();
     }
   })

@@ -11,6 +11,8 @@ import { ViewChild, AfterViewInit, ElementRef } from '@angular/core';
 })
 export class IncomeExpensePieChartComponent implements AfterViewInit {
 
+  viewInit = signal<boolean>(false);
+
   @ViewChild('incomeChart') incomeChartCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('expenseChart') expenseChartCanvas!: ElementRef<HTMLCanvasElement>;
 
@@ -24,13 +26,13 @@ export class IncomeExpensePieChartComponent implements AfterViewInit {
   expenseChart: Chart | undefined;
 
   chartEffect = effect(() => {
-    if (this.transactions() && this.transactions()!.length > 0) {
+    if (this.transactions() && this.transactions()!.length > 0 && this.viewInit()) {
       this.generateCharts();
     }
   });
 
   ngAfterViewInit(): void {
-    this.generateCharts();
+    this.viewInit.set(true);
   }
 
   generateCharts() {
@@ -40,7 +42,7 @@ export class IncomeExpensePieChartComponent implements AfterViewInit {
     if (this.expenseChart) {
       this.expenseChart.destroy();
     }
-    
+
     let { incomeData, expenseData } = this.generateData();
 
     this.incomeChart = new Chart(this.incomeChartCanvas.nativeElement, {
@@ -67,7 +69,7 @@ export class IncomeExpensePieChartComponent implements AfterViewInit {
               boxWidth: 10,
               color: '#6FFFB0',
             },
-          
+
           },
         },
       },
@@ -120,7 +122,7 @@ export class IncomeExpensePieChartComponent implements AfterViewInit {
         incomeMap.set(transaction.category, transaction.amount);
       }
     });
-    
+
     expenseTransactions.forEach((transaction) => {
       transaction.amount = this.exchangeService.convert(transaction.account.currency, transaction.amount);
       if (expenseMap.has(transaction.category)) {
@@ -132,18 +134,18 @@ export class IncomeExpensePieChartComponent implements AfterViewInit {
 
     let incomeData: { label: string; value: number }[] = [];
     let expenseData: { label: string; value: number }[] = [];
-    
+
     incomeMap.forEach((value, key) => {
       incomeData.push({ label: key, value });
     });
-    
+
     expenseMap.forEach((value, key) => {
       expenseData.push({ label: key, value });
     });
 
     incomeData.sort((a, b) => b.value - a.value);
     expenseData.sort((a, b) => a.value - b.value);
-    
+
     return { incomeData: incomeData.slice(0, 5), expenseData: expenseData.slice(0, 5) };
   }
 

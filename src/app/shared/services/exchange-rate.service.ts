@@ -21,7 +21,7 @@ export class ExchangeRateService {
 
     convert(fromCurrency: string, amount: number): number {
 
-        if (fromCurrency === this.defaultCurrency()) {
+        if (fromCurrency === this.defaultCurrency() || this.exchangeRate() === null) {
             return amount;
         }
 
