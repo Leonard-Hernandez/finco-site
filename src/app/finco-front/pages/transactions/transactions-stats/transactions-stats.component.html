@@ -12,189 +12,54 @@
     <transaction-ranges-buttons (range)="updateTransactionFilter($event)" />
   </div>
 
-  <div class="w-full px-4">
-
-    <app-toggle-switch
-      label="Chart"
-      [checked]="chart()"
-      (changed)="updateChart()"
-    />
-
-    <app-toggle-switch
-      label="Goal"
-      [checked]="goal()"
-      (changed)="updateGoal()"
-    />
-
-    <!-- category Field -->
-    <div class="space-y-2">
-      <label
-        for="transferAccountId"
-        class="block text-sm font-medium text-finco-secondary-color"
-      >
-        Category
-      </label>
-      <div class="relative">
-        <div
-          class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-        >
-          <svg class="h-5 w-5 text-finco-primary-color">
-            <use xlink:href="/sprite.svg#currency" />
-          </svg>
-        </div>
-        <select
-          id="transferAccountId"
-          placeholder="Select account"
-          class="block w-full pl-10 pr-3 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
-          (change)="updateCategory($event)"
-        >
-          <option value="0">All categories</option>
-          @for (category of categories()!; track $index) {
-          <option
-            [value]="category"
-            class="text-finco-secondary-color bg-finco-bg-color"
-          >
-            {{ category }}
-          </option>
-          }
-        </select>
-      </div>
+  <div class="w-full px-4 pt-5 gap-2">
+    <div class="flex gap-2 justify-around">
+      <app-toggle-switch
+        label="Chart"
+        [checked]="chart()"
+        (changed)="updateChart()"
+      />
+  
+      <app-toggle-switch
+        label="Goal"
+        [checked]="goal()"
+        (changed)="updateGoal()"
+      />
     </div>
 
-    <div class="space-y-2">
-      <label
-        for="transferAccountId"
-        class="block text-sm font-medium text-finco-secondary-color"
-      >
-        Account
-      </label>
-      <div class="relative">
-        <div
-          class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-        >
-          <svg class="h-5 w-5 text-finco-primary-color">
-            <use xlink:href="/sprite.svg#currency" />
-          </svg>
-        </div>
-        <select
-          id="transferAccountId"
-          placeholder="Select account"
-          class="block w-full pl-10 pr-3 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
-          (change)="updateAccountId($event)"
-        >
-          <option value="0">All accounts</option>
-          @for (account of accounts(); track $index) {
-          <option
-            [value]="account.id"
-            class="text-finco-secondary-color bg-finco-bg-color"
-          >
-            {{ account.name }}
-          </option>
-          }
-        </select>
-      </div>
-    </div>
+    <div class="flex flex-wrap gap-2">
+      <app-select-input
+        label="Category"
+        [values]="categories()!"
+        (value)="updateCategory($event)"
+      />
 
-    @if(goal()) {
-      <div class="space-y-2">
-        <label
-          for="transferAccountId"
-          class="block text-sm font-medium text-finco-secondary-color"
-        >
-          Goal
-        </label>
-        <div class="relative">
-          <div
-            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-          >
-            <svg class="h-5 w-5 text-finco-primary-color">
-              <use xlink:href="/sprite.svg#currency" />
-            </svg>
-          </div>
-          <select
-            id="transferAccountId"
-            placeholder="Select account"
-            class="block w-full pl-10 pr-3 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
-            (change)="updateGoalId($event)"
-          >
-            <option value="0">All goals</option>
-            @for (goal of goals(); track $index) {
-            <option
-              [value]="goal.id"
-              class="text-finco-secondary-color bg-finco-bg-color"
-            >
-              {{ goal.name }}
-            </option>
-            }
-          </select>
-        </div>
-      </div>
-    } @else {
-      <div class="space-y-2">
-        <label
-          for="transferAccountId"
-          class="block text-sm font-medium text-finco-secondary-color"
-        >
-          Account transfer
-        </label>
-        <div class="relative">
-          <div
-            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-          >
-            <svg class="h-5 w-5 text-finco-primary-color">
-              <use xlink:href="/sprite.svg#currency" />
-            </svg>
-          </div>
-          <select
-            id="transferAccountId"
-            placeholder="Select account"
-            class="block w-full pl-10 pr-3 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
-            (change)="updateTransferAccountId($event)"
-          >
-            <option value="0">All accounts</option>
-            @for (account of accounts(); track $index) {
-            <option
-              [value]="account.id"
-              class="text-finco-secondary-color bg-finco-bg-color"
-            >
-              {{ account.name }}
-            </option>
-            }
-          </select>
-        </div>
-      </div>
-    }
-  </div>
+      <app-select-input
+        label="Account"
+        [values]="accounts()!"
+        (value)="updateAccountId($event)"
+      />
 
-  <div class="space-y-2">
-    <label
-      for="transferAccountId"
-      class="block text-sm font-medium text-finco-secondary-color"
-    >
-      Operation
-    </label>
-    <div class="relative">
-      <div
-        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-      >
-        <svg class="h-5 w-5 text-finco-primary-color">
-          <use xlink:href="/sprite.svg#currency" />
-        </svg>
-      </div>
-      <select
-        id="transferAccountId"
-        placeholder="Select account"
-        class="block w-full pl-10 pr-3 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
-        (change)="updateOperation($event)"
-      >
-        <option value="0">All operations</option>
-        <option value="DEPOSIT">Deposit</option>
-        <option value="WITHDRAW">Withdraw</option>
-      </select>
+      @if(goal()) {
+      <app-select-input
+        label="Goal"
+        [values]="goals()!"
+        (value)="updateGoalId($event)"
+      />
+      } @else {
+      <app-select-input
+        label="Account transfer"
+        [values]="accounts()!"
+        (value)="updateTransferAccountId($event)"
+      />
+      }
+      <app-select-input
+        label="Operation"
+        [values]="operations()!"
+        (value)="updateOperation($event)"
+      />
     </div>
   </div>
-
-
 
   <div
     class="w-95 h-full flex-2 flex flex-col p-3 gap-2 overflow-y-auto rounded-xl z-1"

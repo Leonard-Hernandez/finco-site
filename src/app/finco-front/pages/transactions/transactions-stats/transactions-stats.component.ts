@@ -12,20 +12,23 @@ import { Account, AccountFilter, AccountResponse } from '@src/app/account/interf
 import { AccountService } from '@src/app/account/service/account.service';
 import { Goal, GoalFilter, GoalResponse } from '@src/app/goal/interface/goal.interface';
 import { GoalService } from '@src/app/goal/service/goal.service';
-import { ToggleSwitchComponent } from "../../../../shared/components/toggle-switch/toggle-switch.component";
+import { ToggleSwitchComponent } from "@app/shared/components/toggle-switch/toggle-switch.component";
+import { selectInput, SelectInputComponent } from "@app/shared/components/select-input/select-input.component";
 
 @Component({
   selector: 'app-transactions-stats',
-  imports: [TransactionChartComponent, TransactionRangesButtonsComponent, TransactionComponent, IncomeExpensePieChartComponent, ToggleSwitchComponent],
+  imports: [TransactionChartComponent, TransactionRangesButtonsComponent, TransactionComponent, IncomeExpensePieChartComponent, ToggleSwitchComponent, SelectInputComponent],
   templateUrl: './transactions-stats.component.html'
 })
 export class TransactionsStatsComponent {
 
+  operations = signal<selectInput[]>([
+    { value: 'DEPOSIT', label: 'Deposit' },
+    { value: 'WITHDRAW', label: 'Withdraw' },
+  ]);
+
   chart = signal<boolean>(true);
   goal = signal<boolean>(false);
-
-  accounts = signal<Account[]>([]);
-  goals = signal<Goal[]>([]);
 
   goalsService = inject(GoalService);
   accountsService = inject(AccountService);
@@ -72,7 +75,10 @@ export class TransactionsStatsComponent {
 
   categories = toSignal(this.transactionsService.getCategoriesByUser().pipe(
     map((response: string[]) => {
-      return response;
+      return response.map((category) => ({
+        value: category,
+        label: category
+      }));
     })
   ))
 
@@ -86,25 +92,24 @@ export class TransactionsStatsComponent {
     )
   });
 
-  accountResource = rxResource({
-    request: () => this.accountFilter(),
-    loader: () => this.accountsService.getAccounts(this.accountFilter()).pipe(
-      map((response: AccountResponse) => {
-        this.accounts.set(response.content);
-        return response.content;
-      })
-    )
-  });
+  accounts = toSignal(this.accountsService.getAccounts(this.accountFilter()).pipe(
+    map((response: AccountResponse) => {
+      return response.content.map((account) => ({
+        value: account.id?.toString() || '',
+        label: account.name
+      }));
+    })
+  ));
 
-  goalResource = rxResource({
-    request: () => this.goalFilter(),
-    loader: () => this.goalsService.getGoals(this.goalFilter()).pipe(
-      map((response: GoalResponse) => {
-        this.goals.set(response.content);
-        return response.content;
+  goals = toSignal(this.goalsService.getGoals(this.goalFilter()).pipe(
+    map((response: GoalResponse) => {
+      return response.content.map((goal) => ({
+        value: goal.id?.toString() || '',
+        label: goal.name
+      }));
       })
     )
-  });
+  );
 
   updateTransactionFilter(startDate: Date) {
     this.transactionFilter.update((filter) => ({
@@ -136,38 +141,34 @@ export class TransactionsStatsComponent {
     }
   }
 
-  updateAccountId(event: Event) {
-    const select = event.target as HTMLSelectElement;
-    const accountId = select.value ? parseInt(select.value, 10) : 0;
+  updateAccountId(value: string) {
+    const accountId = value ? parseInt(value, 10) : 0;
     this.transactionFilter.update(filter => ({
       ...filter,
       accountId: accountId || undefined
     }));
   }
 
-  updateGoalId(event: Event) {
-    const select = event.target as HTMLSelectElement;
-    const goalId = select.value ? parseInt(select.value, 10) : 0;
+  updateGoalId(value: string) {
+    const goalId = value ? parseInt(value, 10) : 0;
     this.transactionFilter.update(filter => ({
       ...filter,
       goalId: goalId || undefined
     }));
   }
 
-  updateTransferAccountId(event: Event) {
-    const select = event.target as HTMLSelectElement;
-    const accountId = select.value ? parseInt(select.value, 10) : 0;
+  updateTransferAccountId(value: string) {
+    const accountId = value ? parseInt(value, 10) : 0;
     this.transactionFilter.update(filter => ({
       ...filter,
       transferAccountId: accountId || undefined
     }));
   }
 
-  updateCategory(event: Event) {
-    const select = event.target as HTMLSelectElement;
-    const category = select.value ? select.value : '';
+  updateCategory(value: string) {
+    const category = value ? value : '';
 
-    if (category === '0') {
+    if (category === '') {
       this.transactionFilter.update(filter => ({
         ...filter,
         category: undefined
@@ -180,10 +181,9 @@ export class TransactionsStatsComponent {
     }
   }
 
-  updateOperation(event: Event) {
-    const select = event.target as HTMLSelectElement;
-    let operation = select.value ? select.value : '';
-    if (operation === '0') {
+  updateOperation(value: string) {
+    let operation = value ? value : '';
+    if (operation === '') {
       this.transactionFilter.update(filter => ({
         ...filter,
         type: undefined
