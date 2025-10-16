@@ -1,4 +1,5 @@
-import { Component, computed, inject, input, output, signal } from '@angular/core';
+import { Component, computed, input, output } from '@angular/core';
+import { Transaction } from '@app/transaction/interface/transaction';
 
 interface Range {
   name: string;
@@ -12,6 +13,13 @@ interface Range {
 })
 export class TransactionRangesButtonsComponent {
 
+  lastTransaction = input<Transaction | null>();
+
+  lastTransactionDate = computed<Date | undefined>(() => {
+    const dateString = this.lastTransaction()?.date;
+    return dateString ? new Date(dateString) : new Date();
+  });
+
   range = output<Date>();
 
   ranges = computed(() => {
@@ -22,6 +30,12 @@ export class TransactionRangesButtonsComponent {
       { name: '7 d', date: new Date(new Date().setDate(new Date().getDate() - 7)) },
     ]
   })
+
+  shouldDisable(rangeDate: Date): boolean {
+    const lastDate = this.lastTransactionDate();
+
+    return !!lastDate && rangeDate.getTime() > lastDate.getTime();
+  }
 
   onRangeClick(range: Date) {
     this.range.emit(range);

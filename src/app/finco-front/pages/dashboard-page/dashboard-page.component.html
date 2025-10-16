@@ -11,13 +11,12 @@
       [transactionChartOptions]="transactionChartOptions()"
     />
     <transaction-ranges-buttons
+      [lastTransaction]="lastTransaction()"
       (range)="updateFilter($event)"
     />
   </div>
 
-  <div
-    class="min-w-80 flex-2 justify-center items-center"
-  >
-    <app-income-expense-pie-chart [transactions]="transactions.value()!"/>
+  <div class="min-w-80 flex-2 justify-center items-center">
+    <app-income-expense-pie-chart [transactions]="transactions.value()!" />
   </div>
 </div>

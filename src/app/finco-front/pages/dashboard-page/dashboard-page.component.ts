@@ -1,5 +1,5 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { map } from 'rxjs';
 import { Total } from '@app/account/interface/account.interface';
@@ -18,11 +18,11 @@ import { TransactionService } from '@app/transaction/services/transaction.servic
 })
 export class DashboardPageComponent {
 
+  name = inject(AuthService).user()?.name;
+
   accountService = inject(AccountService);
   transactionsService = inject(TransactionService);
   router = inject(Router);
-
-  name = inject(AuthService).user()?.name;
 
   filter = signal<TransactionFilter>({
     pagination: {
@@ -33,6 +33,17 @@ export class DashboardPageComponent {
     },
     onlyAccountTransactions: true,
   });
+
+  lastTransaction = toSignal(this.transactionsService.getLastestTransaction(this.filter()).pipe(
+    map((response: TransactionResponse) => {
+      if (response && response.content.length > 0) {
+        return response.content[0]
+      } else {
+        this.router.navigateByUrl("accounts/create")
+        return null;
+      }
+    })
+  ))
 
   totals = rxResource<Total[], Error>({
     loader: () => {

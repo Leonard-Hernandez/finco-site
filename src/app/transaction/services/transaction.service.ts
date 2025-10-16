@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '@src/environments/environment.local';
 import { AuthService } from '@app/auth/services/auth.service';
-import { Transaction, TransactionFilter, TransactionResponse } from '@app/transaction/interface/transaction';
+import { TransactionFilter, TransactionResponse } from '@app/transaction/interface/transaction';
 import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
@@ -31,6 +31,27 @@ export class TransactionService {
         filter.onlyGoalTransactions ? params = params.set('onlyGoalTransactions', filter.onlyGoalTransactions) : null;
 
         return this.http.get<TransactionResponse>(`${this.API_URL}/users/${this.userId}/transactions`, { params });
+    }
+
+    getLastestTransaction(filter: TransactionFilter): Observable<TransactionResponse> {
+
+        let params = new HttpParams()
+            .set('page', 0)
+            .set('size', 1)
+            .set('sortBy', 'date')
+            .set('sortDirection', 'desc');
+        filter.accountId ? params = params.set('accountId', filter.accountId) : null;
+        filter.goalId ? params = params.set('goalId', filter.goalId) : null;
+        filter.transferAccountId ? params = params.set('transferAccountId', filter.transferAccountId) : null;
+        filter.category ? params = params.set('category', filter.category) : null;
+        filter.type ? params = params.set('type', filter.type) : null;
+        filter.startDate ? params = params.set('startDate', filter.startDate.toISOString().split('T')[0]) : null;
+        filter.endDate ? params = params.set('endDate', filter.endDate.toISOString().split('T')[0]) : null;
+        filter.onlyAccountTransactions ? params = params.set('onlyAccountTransactions', filter.onlyAccountTransactions) : null;
+        filter.onlyGoalTransactions ? params = params.set('onlyGoalTransactions', filter.onlyGoalTransactions) : null;
+
+        return this.http.get<TransactionResponse>(`${this.API_URL}/users/${this.userId}/transactions`, { params });
+
     }
 
     getCategoriesByUser(): Observable<string[]> {

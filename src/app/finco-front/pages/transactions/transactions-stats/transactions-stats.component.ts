@@ -8,9 +8,9 @@ import { Transaction, TransactionChartOptions, TransactionFilter, TransactionRes
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { IncomeExpensePieChartComponent } from '@src/app/transaction/components/income-expense-pie-chart/income-expense-pie-chart.component';
-import { Account, AccountFilter, AccountResponse } from '@src/app/account/interface/account.interface';
+import { AccountFilter, AccountResponse } from '@src/app/account/interface/account.interface';
 import { AccountService } from '@src/app/account/service/account.service';
-import { Goal, GoalFilter, GoalResponse } from '@src/app/goal/interface/goal.interface';
+import { GoalFilter, GoalResponse } from '@src/app/goal/interface/goal.interface';
 import { GoalService } from '@src/app/goal/service/goal.service';
 import { ToggleSwitchComponent } from "@app/shared/components/toggle-switch/toggle-switch.component";
 import { selectInput, SelectInputComponent } from "@app/shared/components/select-input/select-input.component";

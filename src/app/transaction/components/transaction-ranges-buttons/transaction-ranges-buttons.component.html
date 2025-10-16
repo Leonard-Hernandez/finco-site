@@ -1,5 +1,15 @@
 <div class="flex gap-1 justify-between px-10 py-1">
-    @for (range of ranges(); track $index) {
-        <button class="text-finco-primary-color py-1 shadow-sm shadow-finco-secondary-color px-3 rounded-2xl" (click)="onRangeClick(range.date)">{{range.name}}</button>
-    }
+  @for (range of ranges(); track $index) {
+  <button
+    [disabled]="shouldDisable(range.date)"
+    [class.opacity-50]="shouldDisable(range.date)"
+    [class.cursor-not-allowed]="shouldDisable(range.date)"
+    [class.text-finco-primary-color]="!shouldDisable(range.date)"
+    [class.text-gray-500]="shouldDisable(range.date)"
+    class="text-finco-primary-color py-1 shadow-sm shadow-finco-secondary-color px-3 rounded-2xl"
+    (click)="onRangeClick(range.date)"
+  >
+    {{ range.name }}
+  </button>
+  }
 </div>
