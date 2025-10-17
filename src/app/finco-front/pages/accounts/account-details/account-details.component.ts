@@ -13,14 +13,14 @@ import { TransactionComponent } from "@src/app/transaction/components/transactio
 
 @Component({
   selector: 'app-account-details',
-  imports: [CurrencyPipe, PercentPipe,  TransactionChartComponent, TransactionRangesButtonsComponent, TransactionComponent, RouterLink],
+  imports: [CurrencyPipe, PercentPipe, TransactionChartComponent, TransactionRangesButtonsComponent, TransactionComponent, RouterLink],
   templateUrl: './account-details.component.html'
 })
 export class AccountDetailsComponent {
 
   router = inject(Router)
 
-  account: Signal<Account> = signal({} as Account);
+  account = signal<Account>({} as Account);
   transactions = signal<Transaction[]>([]);
 
   activatedRoute = inject(ActivatedRoute)
@@ -31,32 +31,42 @@ export class AccountDetailsComponent {
   accountId: Signal<string> = toSignal(this.activatedRoute.params.pipe(map(({ id }) => id))) || signal('0');
 
   transactionFilter = signal<TransactionFilter>({
-      pagination: {
-        page: 0,
-        size: 10,
-        sortBy: 'date',
-        sortDirection: 'desc',
-      },
-      accountId: Number(this.accountId()),
-    });
+    pagination: {
+      page: 0,
+      size: 10,
+      sortBy: 'date',
+      sortDirection: 'desc',
+    },
+    accountId: Number(this.accountId()),
+  });
+
+  lastTransaction = toSignal(this.transactionService.getLastestTransaction(this.transactionFilter()).pipe(
+    map((response: TransactionResponse) => {
+      if (response && response.content.length > 0) {
+        return response.content[0]
+      }
+      return null;
+
+    })
+  ))
 
   accountResource = rxResource({
     request: () => this.accountId(),
     loader: () => this.accountService.getAccountById(this.accountId()).pipe(
-          map((response: Account) => {
-            this.account = signal(response);
-            return response;
-          })
+      map((response: Account) => {
+        this.account.set(response);
+        return response;
+      })
     )
   })
 
   transactionsResource = rxResource({
     request: () => this.transactionFilter(),
     loader: () => this.transactionService.getTransactions(this.transactionFilter()).pipe(
-          map((response: TransactionResponse) => {
-            this.transactions.set(response.content);
-            return response.content;
-          })
+      map((response: TransactionResponse) => {
+        this.transactions.set(response.content);
+        return response.content;
+      })
     )
   })
 
@@ -76,9 +86,13 @@ export class AccountDetailsComponent {
     }));
   }
 
-  validateEffect = effect(() => {
-    if (this.accountResource.error()) {
+  redirectEffect = effect(() => {
+    if (!this.account()) {
       this.router.navigate(['/accounts']);
+    }
+
+    if (this.lastTransaction == null) {
+       this.router.navigateByUrl("accounts/" + this.account().id + "/deposit")
     }
   })
 

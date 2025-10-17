@@ -1,5 +1,5 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
+import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
 import { AccountComponent } from "@app/account/components/account/account.component";
@@ -34,6 +34,15 @@ export class AccountsListPageComponent implements OnInit{
     },
     onlyAccountTransactions: true
   });
+
+  lastTransaction = toSignal(this.transactionsService.getLastestTransaction(this.transactionFilter()).pipe(
+    map((response: TransactionResponse) => {
+      if (response && response.content.length > 0) {
+        return response.content[0]
+      }
+      return null;
+    })
+  ))
 
   accountFilter = signal<AccountFilter>({
     pagination: {
@@ -71,6 +80,7 @@ export class AccountsListPageComponent implements OnInit{
     request: () => this.accountFilter(),
     loader: () => this.accountService.getAccounts(this.accountFilter()).pipe(
       map((response: AccountResponse) => {
+        console.log(response)
         this.accounts.set(response.content);
         return response.content;
       })
@@ -83,4 +93,14 @@ export class AccountsListPageComponent implements OnInit{
       startDate
     }));
   }
+
+  redirectEffect = effect(() => {
+    if (this.accounts().length == 0) {
+      this.router.navigateByUrl("accounts/create");
+    }
+
+    if (this.lastTransaction == null) {
+      this.router.navigateByUrl("accounts/"+ this.accounts()[0] + "/deposit");
+    }
+  })
 }

@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Goal, GoalFilter, GoalResponse } from '@src/app/goal/interface/goal.interface';
 import { GoalService } from '@src/app/goal/service/goal.service';
@@ -36,6 +36,19 @@ export class GoalsListPageComponent {
     onlyGoalTransactions: true
   });
 
+  lastTransaction = toSignal(this.transactionsService.getLastestTransaction(this.transactionFilter()).pipe(
+    map((response: TransactionResponse) => {
+      if (response && response.content.length > 0) {
+        return response.content[0]
+      } else {
+        if (this.goals() && this.goals().length >0) {
+          this.router.navigateByUrl("goals/operation/" + this.goals()[0].id +"/deposit")
+        }
+        return null;
+      }
+    })
+  ))
+
   goalFilter = signal<GoalFilter>({
     pagination: {
       page: 0,
@@ -68,6 +81,9 @@ export class GoalsListPageComponent {
     request: () => this.goalFilter(),
     loader: () => this.goalService.getGoals(this.goalFilter()).pipe(
       map((response: GoalResponse) => {
+        if (response.content.length=0) {
+          this.router.navigateByUrl("goals/create")
+        }
         this.goals.set(response.content);
         return response.content;
       })

@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { computed, inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '@src/environments/environment.local';
 import { AuthService } from '@app/auth/services/auth.service';
@@ -10,12 +10,14 @@ export class AccountService {
 
     url: string = environment.url
 
-    userId = inject(AuthService).user()?.id;
+    authService = inject(AuthService);
+
+    userId = computed(() => this.authService.user()?.id);
 
     http = inject(HttpClient)
 
     getTotals(): Observable<Total[]> {
-        return this.http.get<Total[]>(`${this.url}/users/${this.userId}/total-balance`);
+        return this.http.get<Total[]>(`${this.url}/users/${this.userId()}/total-balance`);
     }
 
     getCurrencies(): Observable<string[]> {
@@ -36,8 +38,8 @@ export class AccountService {
         filter.currency ? params = params.set('currency', filter.currency) : null;
         filter.type ? params = params.set('type', filter.type) : null;
         filter.userId ? params = params.set('userId', filter.userId) : null;
-
-        return this.http.get<AccountResponse>(`${this.url}/users/${this.userId}/accounts`, { params });
+        debugger
+        return this.http.get<AccountResponse>(`${this.url}/users/${this.userId()}/accounts`, { params });
     }
 
     getAccountById(id: string): Observable<Account> {
@@ -45,7 +47,7 @@ export class AccountService {
     }
 
     createAccount(account: Account): Observable<Account> {
-        return this.http.post<Account>(`${this.url}/users/${this.userId}/accounts`, account);
+        return this.http.post<Account>(`${this.url}/users/${this.userId()}/accounts`, account);
     }
 
     updateAccount(account: Account): Observable<Account> {

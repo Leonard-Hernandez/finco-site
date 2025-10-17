@@ -5,7 +5,7 @@
     <app-transaction-chart
       [transactionChartOptions]="transactionChartOptions()"
     />
-    <transaction-ranges-buttons (range)="updateTransactionFilter($event)" />
+    <transaction-ranges-buttons [lastTransaction]="lastTransaction()" (range)="updateTransactionFilter($event)" />
   </div>
 
   <div class="w-full px-4">
