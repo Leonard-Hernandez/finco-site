@@ -16,7 +16,7 @@ import { TransactionService } from '@app/transaction/services/transaction.servic
   imports: [TransactionChartComponent, TransactionRangesButtonsComponent, AccountComponent, TransactionComponent, RouterLink],
   templateUrl: './accounts-list-page.component.html'
 })
-export class AccountsListPageComponent implements OnInit{
+export class AccountsListPageComponent implements OnInit {
 
   accountService = inject(AccountService);
   transactionsService = inject(TransactionService);
@@ -80,7 +80,6 @@ export class AccountsListPageComponent implements OnInit{
     request: () => this.accountFilter(),
     loader: () => this.accountService.getAccounts(this.accountFilter()).pipe(
       map((response: AccountResponse) => {
-        console.log(response)
         this.accounts.set(response.content);
         return response.content;
       })
@@ -94,13 +93,13 @@ export class AccountsListPageComponent implements OnInit{
     }));
   }
 
-  redirectEffect = effect(() => {
-    if (this.accounts().length == 0) {
-      this.router.navigateByUrl("accounts/create");
-    }
+  // redirectEffect = effect(() => {
+  //   if (this.accounts().length === 0) {
+  //     this.router.navigateByUrl('accounts/create');
+  //   }
+  //   if (this.lastTransaction() === null) {
+  //     this.router.navigateByUrl('accounts/operation/' + this.accounts()[0].id + '/deposit');
+  //   }
+  // })
 
-    if (this.lastTransaction == null) {
-      this.router.navigateByUrl("accounts/"+ this.accounts()[0] + "/deposit");
-    }
-  })
 }

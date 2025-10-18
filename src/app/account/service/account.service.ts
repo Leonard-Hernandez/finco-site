@@ -38,7 +38,6 @@ export class AccountService {
         filter.currency ? params = params.set('currency', filter.currency) : null;
         filter.type ? params = params.set('type', filter.type) : null;
         filter.userId ? params = params.set('userId', filter.userId) : null;
-        debugger
         return this.http.get<AccountResponse>(`${this.url}/users/${this.userId()}/accounts`, { params });
     }
 
