@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { map } from 'rxjs';
@@ -38,18 +38,12 @@ export class DashboardPageComponent {
     map((response: TransactionResponse) => {
       if (response && response.content.length > 0) {
         return response.content[0]
-      } else {
-        this.router.navigateByUrl("accounts/create")
-        return null;
       }
+      return null;
     })
   ))
 
-  totals = rxResource<Total[], Error>({
-    loader: () => {
-      return this.accountService.getTotals();
-    },
-  });
+  totals = toSignal(this.accountService.getTotals());
 
   transactions = rxResource({
     request: () => this.filter(),
@@ -72,4 +66,16 @@ export class DashboardPageComponent {
   updateFilter(startDate: Date) {
     this.filter.update((filter) => ({ ...filter, startDate: startDate }));
   }
+
+  redirectEffect = effect(() => {
+    const transaction = this.lastTransaction();
+    if (transaction === undefined) return;
+
+    if (transaction === null) {
+      setTimeout(() => {
+        this.router.navigate(['/accounts']);
+      }, 100);
+    }
+  })
+
 }

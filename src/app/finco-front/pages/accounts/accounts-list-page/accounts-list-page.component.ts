@@ -1,9 +1,9 @@
-import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
 import { AccountComponent } from "@app/account/components/account/account.component";
-import { Account, AccountFilter, AccountResponse } from '@app/account/interface/account.interface';
+import { AccountFilter, AccountResponse } from '@app/account/interface/account.interface';
 import { AccountService } from '@app/account/service/account.service';
 import { TransactionChartComponent } from '@app/transaction/components/transaction-chart/transaction-chart.component';
 import { TransactionRangesButtonsComponent } from '@app/transaction/components/transaction-ranges-buttons/transaction-ranges-buttons.component';
@@ -16,14 +16,13 @@ import { TransactionService } from '@app/transaction/services/transaction.servic
   imports: [TransactionChartComponent, TransactionRangesButtonsComponent, AccountComponent, TransactionComponent, RouterLink],
   templateUrl: './accounts-list-page.component.html'
 })
-export class AccountsListPageComponent implements OnInit {
+export class AccountsListPageComponent {
 
   accountService = inject(AccountService);
   transactionsService = inject(TransactionService);
   router = inject(Router);
 
   transactions = signal<Transaction[]>([]);
-  accounts = signal<Account[]>([]);
 
   transactionFilter = signal<TransactionFilter>({
     pagination: {
@@ -37,12 +36,9 @@ export class AccountsListPageComponent implements OnInit {
 
   lastTransaction = toSignal(this.transactionsService.getLastestTransaction(this.transactionFilter()).pipe(
     map((response: TransactionResponse) => {
-      if (response && response.content.length > 0) {
-        return response.content[0]
-      }
-      return null;
+      return response.content[0];
     })
-  ))
+  ));
 
   accountFilter = signal<AccountFilter>({
     pagination: {
@@ -62,10 +58,6 @@ export class AccountsListPageComponent implements OnInit {
     };
   });
 
-  ngOnInit(): void {
-
-  }
-
   transactionsResource = rxResource({
     request: () => this.transactionFilter(),
     loader: () => this.transactionsService.getTransactions(this.transactionFilter()).pipe(
@@ -76,15 +68,11 @@ export class AccountsListPageComponent implements OnInit {
     )
   });
 
-  accountsResource = rxResource({
-    request: () => this.accountFilter(),
-    loader: () => this.accountService.getAccounts(this.accountFilter()).pipe(
-      map((response: AccountResponse) => {
-        this.accounts.set(response.content);
-        return response.content;
-      })
-    )
-  });
+  accounts = toSignal(this.accountService.getAccounts(this.accountFilter()).pipe(
+    map((response: AccountResponse) => {
+      return response.content;
+    })
+  ));
 
   updateTransactionFilter(startDate: Date) {
     this.transactionFilter.update((filter) => ({
@@ -93,13 +81,17 @@ export class AccountsListPageComponent implements OnInit {
     }));
   }
 
-  // redirectEffect = effect(() => {
-  //   if (this.accounts().length === 0) {
-  //     this.router.navigateByUrl('accounts/create');
-  //   }
-  //   if (this.lastTransaction() === null) {
-  //     this.router.navigateByUrl('accounts/operation/' + this.accounts()[0].id + '/deposit');
-  //   }
-  // })
+  redirectEffect = effect(() => {
+
+    setTimeout(() => {
+      if (!this.lastTransaction() && this.accounts()!.length > 0) {
+        this.router.navigateByUrl('accounts/operation/' + this.accounts()![0].id + '/deposit');
+      }
+      if (this.accounts()!.length === 0) {
+        this.router.navigateByUrl('accounts/create');
+      }
+    }, 100);
+
+  })
 
 }
