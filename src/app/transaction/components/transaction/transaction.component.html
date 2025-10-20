@@ -6,10 +6,10 @@
   >
     @if (transaction().type === 'WITHDRAW' || transaction().type ===
     'WITHDRAW_GOAL') {
-    <p class="text-red-500">{{ transaction().type }}</p>
+    <p class="text-red-500">{{ transaction().type.replace('_', ' ') }}</p>
     } @else if (transaction().type === 'DEPOSIT' || transaction().type ===
     'DEPOSIT_GOAL') {
-    <p class="text-green-500">{{ transaction().type }}</p>
+    <p class="text-green-500">{{ transaction().type.replace('_', ' ') }}</p>
     }
     <p>{{ transaction().date | date : "medium" }}</p>
   </div>

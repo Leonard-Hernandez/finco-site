@@ -5,18 +5,21 @@ import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { Account } from '@app/account/interface/account.interface';
 import { CurrencyPipe, PercentPipe } from '@angular/common';
-import { TransactionChartComponent } from "@src/app/transaction/components/transaction-chart/transaction-chart.component";
-import { Transaction, TransactionChartOptions, TransactionFilter, TransactionResponse } from '@src/app/transaction/interface/transaction';
-import { TransactionService } from '@src/app/transaction/services/transaction.service';
-import { TransactionRangesButtonsComponent } from "@src/app/transaction/components/transaction-ranges-buttons/transaction-ranges-buttons.component";
-import { TransactionComponent } from "@src/app/transaction/components/transaction/transaction.component";
+import { TransactionChartComponent } from "@app/transaction/components/transaction-chart/transaction-chart.component";
+import { Transaction, TransactionChartOptions, TransactionFilter, TransactionResponse } from '@app/transaction/interface/transaction';
+import { TransactionService } from '@app/transaction/services/transaction.service';
+import { TransactionRangesButtonsComponent } from "@app/transaction/components/transaction-ranges-buttons/transaction-ranges-buttons.component";
+import { TransactionComponent } from "@app/transaction/components/transaction/transaction.component";
+import { LoadingPageComponent } from "@app/shared/components/loading-page/loading-page.component";
 
 @Component({
   selector: 'app-account-details',
-  imports: [CurrencyPipe, PercentPipe, TransactionChartComponent, TransactionRangesButtonsComponent, TransactionComponent, RouterLink],
+  imports: [CurrencyPipe, PercentPipe, TransactionChartComponent, TransactionRangesButtonsComponent, TransactionComponent, RouterLink, LoadingPageComponent],
   templateUrl: './account-details.component.html'
 })
 export class AccountDetailsComponent {
+
+  loading = signal<boolean>(true);
 
   router = inject(Router)
 
@@ -42,11 +45,7 @@ export class AccountDetailsComponent {
 
   lastTransaction = toSignal(this.transactionService.getLastestTransaction(this.transactionFilter()).pipe(
     map((response: TransactionResponse) => {
-      if (response && response.content.length > 0) {
-        return response.content[0]
-      }
-      return null;
-
+      return response.content[0]
     })
   ))
 
@@ -87,13 +86,18 @@ export class AccountDetailsComponent {
   }
 
   redirectEffect = effect(() => {
-    if (!this.account()) {
-      this.router.navigate(['/accounts']);
-    }
 
-    if (this.lastTransaction == null) {
-       this.router.navigateByUrl("accounts/" + this.account().id + "/deposit")
-    }
+    setTimeout(() => {
+      if (this.accountResource.error()) {
+        this.router.navigate(['/accounts']);
+      }
+      if (!this.lastTransaction() && this.account()) {
+        this.router.navigateByUrl("accounts/operation/" + this.account().id + "/deposit")
+      }
+    }, 100);
+
+    this.loading.set(false);
+
   })
 
 }

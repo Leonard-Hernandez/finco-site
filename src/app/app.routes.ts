@@ -12,5 +12,9 @@ export const routes: Routes = [
         path: '',
         canMatch:[AuthenticatedGuard],
         loadChildren: () => import ('./finco-front/finco-front.routes'),
+    },
+    {
+        path: '**',
+        redirectTo: ''
     }
 ];

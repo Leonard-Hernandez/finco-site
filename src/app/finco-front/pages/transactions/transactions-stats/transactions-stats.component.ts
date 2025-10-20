@@ -36,6 +36,7 @@ export class TransactionsStatsComponent {
   router = inject(Router);
 
   transactions = signal<Transaction[]>([]);
+  lastTransaction = signal<Transaction | null>(null);
 
   transactionFilter = signal<TransactionFilter>({
     pagination: {
@@ -81,6 +82,16 @@ export class TransactionsStatsComponent {
       }));
     })
   ))
+
+  lastTransactionResource = rxResource({
+    request: () => this.transactionFilter(),
+    loader: () => this.transactionsService.getLastestTransaction(this.transactionFilter()).pipe(
+      map((response: TransactionResponse) => {
+        this.lastTransaction.set(response.content[0]);
+        return response.content[0];
+      })
+    )
+  });
 
   transactionsResource = rxResource({
     request: () => this.transactionFilter(),

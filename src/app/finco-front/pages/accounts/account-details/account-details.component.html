@@ -1,3 +1,6 @@
+@if (loading()) {
+  <app-loading-page />
+} @else {
 <div
   class="flex flex-col gap-2 justify-center items-center bg-gradient-to-br from-finco-bg-color to-finco-card-bg-color min-h-screen max-h-screen min-w-screen max-w-screen pt-17 pb-13"
 >
@@ -132,3 +135,5 @@
     </svg>
   </div>
 </a>
+
+}

@@ -45,7 +45,7 @@ export class AccountOpertionComponent {
   accounts = signal<Account[]>([]);
 
   transactionForm = this.fb.group({
-    amount: [0, [Validators.required, Validators.min(0)]],
+    amount: [[Validators.required, Validators.min(0)]],
     category: ['', []],
     description: ['', [Validators.maxLength(255)]],
     transferAccountId: [0, []],

@@ -2,7 +2,6 @@ import { Component, computed, effect, inject, OnInit, signal } from '@angular/co
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { map } from 'rxjs';
-import { Total } from '@app/account/interface/account.interface';
 import { AccountService } from '@app/account/service/account.service';
 import { AuthService } from '@app/auth/services/auth.service';
 import { TotalComponent } from "@app/shared/components/total/total.component";
@@ -11,12 +10,15 @@ import { TransactionChartComponent } from "@app/transaction/components/transacti
 import { TransactionRangesButtonsComponent } from "@app/transaction/components/transaction-ranges-buttons/transaction-ranges-buttons.component";
 import { TransactionChartOptions, TransactionFilter, TransactionResponse } from '@app/transaction/interface/transaction';
 import { TransactionService } from '@app/transaction/services/transaction.service';
+import { LoadingPageComponent } from "@app/shared/components/loading-page/loading-page.component";
 
 @Component({
-  imports: [TotalComponent, TransactionChartComponent, TransactionRangesButtonsComponent, IncomeExpensePieChartComponent],
+  imports: [TotalComponent, TransactionChartComponent, TransactionRangesButtonsComponent, IncomeExpensePieChartComponent, LoadingPageComponent],
   templateUrl: './dashboard-page.component.html'
 })
 export class DashboardPageComponent {
+
+  loading = signal<boolean>(true);
 
   name = inject(AuthService).user()?.name;
 
@@ -76,6 +78,8 @@ export class DashboardPageComponent {
         this.router.navigate(['/accounts']);
       }, 100);
     }
+
+    this.loading.set(false);
   })
 
 }

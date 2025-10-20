@@ -1,7 +1,7 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { Goal, GoalFilter, GoalResponse } from '@src/app/goal/interface/goal.interface';
+import { GoalFilter, GoalResponse } from '@src/app/goal/interface/goal.interface';
 import { GoalService } from '@src/app/goal/service/goal.service';
 import { Transaction, TransactionChartOptions, TransactionFilter, TransactionResponse } from '@src/app/transaction/interface/transaction';
 import { TransactionService } from '@src/app/transaction/services/transaction.service';
@@ -11,20 +11,22 @@ import { TransactionChartComponent } from "@app/transaction/components/transacti
 import { TransactionRangesButtonsComponent } from "@app/transaction/components/transaction-ranges-buttons/transaction-ranges-buttons.component";
 import { GoalComponent } from "@app/goal/components/goal/goal.component";
 import { RouterLink } from "@angular/router";
+import { LoadingPageComponent } from "@app/shared/components/loading-page/loading-page.component";
 
 @Component({
   selector: 'app-goals-list-page',
-  imports: [TransactionComponent, TransactionChartComponent, TransactionRangesButtonsComponent, GoalComponent, RouterLink],
+  imports: [TransactionComponent, TransactionChartComponent, TransactionRangesButtonsComponent, GoalComponent, RouterLink, LoadingPageComponent],
   templateUrl: './goals-list-page.component.html'
 })
 export class GoalsListPageComponent {
+
+  loading = signal<boolean>(true);
 
   goalService = inject(GoalService);
   transactionsService = inject(TransactionService);
   router = inject(Router);
 
   transactions = signal<Transaction[]>([]);
-  goals = signal<Goal[]>([]);
 
   transactionFilter = signal<TransactionFilter>({
     pagination: {
@@ -38,14 +40,7 @@ export class GoalsListPageComponent {
 
   lastTransaction = toSignal(this.transactionsService.getLastestTransaction(this.transactionFilter()).pipe(
     map((response: TransactionResponse) => {
-      if (response && response.content.length > 0) {
-        return response.content[0]
-      } else {
-        if (this.goals() && this.goals().length >0) {
-          this.router.navigateByUrl("goals/operation/" + this.goals()[0].id +"/deposit")
-        }
-        return null;
-      }
+      return response.content[0];
     })
   ))
 
@@ -77,18 +72,12 @@ export class GoalsListPageComponent {
     )
   });
 
-  goalResource = rxResource({
-    request: () => this.goalFilter(),
-    loader: () => this.goalService.getGoals(this.goalFilter()).pipe(
-      map((response: GoalResponse) => {
-        if (response.content.length=0) {
-          this.router.navigateByUrl("goals/create")
-        }
-        this.goals.set(response.content);
-        return response.content;
-      })
-    )
-  });
+  goals = toSignal(this.goalService.getGoals(this.goalFilter()).pipe(
+    map((response: GoalResponse) => {
+      return response.content;
+    })
+  )
+  );
 
   updateTransactionFilter(startDate: Date) {
     this.transactionFilter.update((filter) => ({
@@ -96,6 +85,21 @@ export class GoalsListPageComponent {
       startDate
     }))
   }
+
+  redirectEffect = effect(() => {
+    setTimeout(() => {
+      if (this.goals() == undefined) {
+        return
+      }
+      if (!this.lastTransaction() && this.goals()!.length > 0) {
+        this.router.navigateByUrl('goals/operation/' + this.goals()![0].id + '/deposit');
+      }
+      if (this.goals()!.length === 0) {
+        this.router.navigateByUrl('goals/create');
+      }
+    }, 100);
+    this.loading.set(false);
+  })
 
 
 }

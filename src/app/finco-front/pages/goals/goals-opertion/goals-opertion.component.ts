@@ -43,7 +43,7 @@ export class GoalsOpertionComponent {
 
   transactionForm = this.fb.group({
     accountId: [0, [Validators.required, Validators.min(0)]],
-    amount: [0, [Validators.required, Validators.min(0)]],
+    amount: [[Validators.required, Validators.min(0)]],
     category: ['', []],
     description: ['', [Validators.maxLength(255)]],
   });
@@ -72,7 +72,6 @@ export class GoalsOpertionComponent {
       })
     )
   })
-
 
   onSubmit() {
 
@@ -133,10 +132,10 @@ export class GoalsOpertionComponent {
 
   validateEffect = effect(() => {
     if (this.goalResource.error()) {
-      this.router.navigate(['/accounts']);
+      this.router.navigate(['/goals']);
     }
     if (this.operation() !== 'deposit' && this.operation() !== 'withdraw') {
-      this.router.navigate(['/accounts']);
+      this.router.navigate(['/goals']);
     }
 
     if (this.operation() == 'deposit') {

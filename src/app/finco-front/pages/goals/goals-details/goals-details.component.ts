@@ -11,6 +11,7 @@ import { TransactionRangesButtonsComponent } from "@app/transaction/components/t
 import { TransactionComponent } from "@app/transaction/components/transaction/transaction.component";
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { ExchangeRateService } from '@src/app/shared/services/exchange-rate.service';
+import { LoadingPageComponent } from "@app/shared/components/loading-page/loading-page.component";
 
 @Component({
   selector: 'app-goals-details',
@@ -21,10 +22,15 @@ import { ExchangeRateService } from '@src/app/shared/services/exchange-rate.serv
     TransactionComponent,
     RouterLink,
     CurrencyPipe,
-    DatePipe],
+    DatePipe,
+    LoadingPageComponent
+],
   templateUrl: './goals-details.component.html',
 })
 export class GoalsDetailsComponent {
+
+  loading = signal<boolean>(true);
+
   router = inject(Router);
   goal = signal({} as Goal);
   transactions = signal<Transaction[]>([]);
@@ -61,12 +67,18 @@ export class GoalsDetailsComponent {
   transactionFilter = signal<TransactionFilter>({
     pagination: {
       page: 0,
-      size: 10,
+      size: 1000,
       sortBy: 'date',
       sortDirection: 'desc',
     },
     goalId: Number(this.goalId()),
   });
+
+  lastTransaction = toSignal(this.transactionService.getLastestTransaction(this.transactionFilter()).pipe(
+    map((response: TransactionResponse) => {
+      return response.content[0]
+    })
+  ))
 
   goalResource = rxResource({
     request: () => this.goalId(),
@@ -104,10 +116,19 @@ export class GoalsDetailsComponent {
     }));
   }
 
-  validateEffect = effect(() => {
-    if (this.goalResource.error()) {
-      this.router.navigate(['/goals']);
-    }
+  redirectEffect = effect(() => {
+
+    setTimeout(() => {
+      if (this.goalResource.error()) {
+        this.router.navigate(['/goals']);
+      }
+      if (!this.lastTransaction() && this.goal()) {
+        this.router.navigateByUrl("goals/operation/" + this.goal().id + "/deposit")
+      }
+    }, 100);
+
+    this.loading.set(false);
+
   })
 
 }

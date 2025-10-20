@@ -10,13 +10,16 @@ import { TransactionRangesButtonsComponent } from '@app/transaction/components/t
 import { TransactionComponent } from "@app/transaction/components/transaction/transaction.component";
 import { Transaction, TransactionChartOptions, TransactionFilter, TransactionResponse } from '@app/transaction/interface/transaction';
 import { TransactionService } from '@app/transaction/services/transaction.service';
+import { LoadingPageComponent } from "@app/shared/components/loading-page/loading-page.component";
 
 @Component({
   selector: 'app-accounts-list-page',
-  imports: [TransactionChartComponent, TransactionRangesButtonsComponent, AccountComponent, TransactionComponent, RouterLink],
+  imports: [TransactionChartComponent, TransactionRangesButtonsComponent, AccountComponent, TransactionComponent, RouterLink, LoadingPageComponent],
   templateUrl: './accounts-list-page.component.html'
 })
 export class AccountsListPageComponent {
+
+  loading = signal<boolean>(true);
 
   accountService = inject(AccountService);
   transactionsService = inject(TransactionService);
@@ -84,6 +87,10 @@ export class AccountsListPageComponent {
   redirectEffect = effect(() => {
 
     setTimeout(() => {
+      if (this.accounts() == undefined) {
+        return
+      }
+
       if (!this.lastTransaction() && this.accounts()!.length > 0) {
         this.router.navigateByUrl('accounts/operation/' + this.accounts()![0].id + '/deposit');
       }
@@ -91,7 +98,9 @@ export class AccountsListPageComponent {
         this.router.navigateByUrl('accounts/create');
       }
     }, 100);
-
+    this.loading.set(false);
   })
+
+  
 
 }
