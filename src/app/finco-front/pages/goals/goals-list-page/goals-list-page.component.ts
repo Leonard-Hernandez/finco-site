@@ -87,17 +87,22 @@ export class GoalsListPageComponent {
   }
 
   redirectEffect = effect(() => {
+
+    if (this.goals() == undefined) {
+      return;
+    }
+
     setTimeout(() => {
-      if (this.goals() == undefined) {
-        return
-      }
-      if (!this.lastTransaction() && this.goals()!.length > 0) {
+      if (this.lastTransaction() === undefined && this.goals()!.length > 0) {
         this.router.navigateByUrl('goals/operation/' + this.goals()![0].id + '/deposit');
-      }
-      if (this.goals()!.length === 0) {
-        this.router.navigateByUrl('goals/create');
+        return;
       }
     }, 100);
+    if (this.goals()!.length === 0) {
+      this.router.navigateByUrl('goals/create');
+      return;
+    }
+
     this.loading.set(false);
   })
 

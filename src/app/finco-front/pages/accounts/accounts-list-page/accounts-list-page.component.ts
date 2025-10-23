@@ -86,21 +86,25 @@ export class AccountsListPageComponent {
 
   redirectEffect = effect(() => {
 
-    setTimeout(() => {
-      if (this.accounts() == undefined) {
-        return
-      }
+    if (this.accounts() == undefined) {
+      return
+    }
 
-      if (!this.lastTransaction() && this.accounts()!.length > 0) {
+    setTimeout(() => {
+      if (this.lastTransaction() === undefined && this.accounts()!.length > 0) {
         this.router.navigateByUrl('accounts/operation/' + this.accounts()![0].id + '/deposit');
-      }
-      if (this.accounts()!.length === 0) {
-        this.router.navigateByUrl('accounts/create');
+        return;
       }
     }, 100);
+    
+    if (this.accounts()!.length === 0) {
+      this.router.navigateByUrl('accounts/create');
+      return;
+    }
+
     this.loading.set(false);
   })
 
-  
+
 
 }

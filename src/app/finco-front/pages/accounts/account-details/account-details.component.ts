@@ -87,14 +87,22 @@ export class AccountDetailsComponent {
 
   redirectEffect = effect(() => {
 
-    setTimeout(() => {
-      if (this.accountResource.error()) {
-        this.router.navigate(['/accounts']);
-      }
-      if (!this.lastTransaction() && this.account()) {
-        this.router.navigateByUrl("accounts/operation/" + this.account().id + "/deposit")
-      }
-    }, 100);
+    if (this.account() === undefined) {
+      return;
+    }
+
+    if (this.lastTransaction() === undefined) {
+      return;
+    }
+
+    if (this.accountResource.error()) {
+      this.router.navigate(['/accounts']);
+      return;
+    }
+    if (!this.lastTransaction() && this.account()) {
+      this.router.navigateByUrl("accounts/operation/" + this.account().id + "/deposit")
+      return;
+    }
 
     this.loading.set(false);
 

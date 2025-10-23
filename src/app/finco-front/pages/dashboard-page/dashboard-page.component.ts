@@ -74,9 +74,8 @@ export class DashboardPageComponent {
     if (transaction === undefined) return;
 
     if (transaction === null) {
-      setTimeout(() => {
-        this.router.navigate(['/accounts']);
-      }, 100);
+      this.router.navigate(['/accounts']);
+      return;
     }
 
     this.loading.set(false);
