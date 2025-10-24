@@ -38,12 +38,9 @@ export class DashboardPageComponent {
 
   lastTransaction = toSignal(this.transactionsService.getLastestTransaction(this.filter()).pipe(
     map((response: TransactionResponse) => {
-      if (response && response.content.length > 0) {
-        return response.content[0]
-      }
-      return null;
+      return response.content[0]
     })
-  ))
+  ), { initialValue: null })
 
   totals = toSignal(this.accountService.getTotals());
 
@@ -71,9 +68,9 @@ export class DashboardPageComponent {
 
   redirectEffect = effect(() => {
     const transaction = this.lastTransaction();
-    if (transaction === undefined) return;
+    if (transaction === null) return;
 
-    if (transaction === null) {
+    if (transaction === undefined) {
       this.router.navigate(['/accounts']);
       return;
     }

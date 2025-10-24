@@ -19,14 +19,14 @@
       <div class="flex justify-between items-center mb-2">
         <div>
           <h3 class="text-sm font-semibold text-finco-primary-color">
-            {{ account().name }}
+            {{ account()!.name }}
           </h3>
-          <p class="text-xs text-finco-secondary-color">{{ account().type }}</p>
+          <p class="text-xs text-finco-secondary-color">{{ account()!.type }}</p>
         </div>
         <span
           class="text-xs px-2 py-1 rounded-full bg-finco-button-bg-color/10 text-finco-primary-color"
         >
-          {{ account().currency }}
+          {{ account()!.currency }}
         </span>
       </div>
 
@@ -35,10 +35,10 @@
         <p class="text-xs text-finco-secondary-color">Balance</p>
         <p
           class="text-xl font-bold"
-          [class.text-red-500]="account().balance! < 0"
-          [class.text-finco-primary-color]="account().balance! >= 0"
+          [class.text-red-500]="account()!.balance! < 0"
+          [class.text-finco-primary-color]="account()!.balance! >= 0"
         >
-          {{ account().balance | currency : "" : "" }}
+          {{ account()!.balance | currency : "" : "" }}
         </p>
       </div>
 
@@ -48,7 +48,7 @@
         <button
           (click)="
             router.navigate([
-              '/accounts/operation/' + account().id + '/withdraw'
+              '/accounts/operation/' + account()!.id + '/withdraw'
             ])
           "
           class="flex flex-col items-center justify-center p-1.5 rounded-lg"
@@ -65,7 +65,7 @@
         <button
           (click)="
             router.navigate([
-              '/accounts/operation/' + account().id + '/transfer'
+              '/accounts/operation/' + account()!.id + '/transfer'
             ])
           "
           class="flex flex-col items-center justify-center p-1.5 rounded-lg hover:bg-finco-button-bg-color/10 transition-colors"
@@ -82,7 +82,7 @@
         <button
           (click)="
             router.navigate([
-              '/accounts/operation/' + account().id + '/deposit'
+              '/accounts/operation/' + account()!.id + '/deposit'
             ])
           "
           class="flex flex-col items-center justify-center p-1.5 rounded-lg hover:bg-finco-button-bg-color/10 transition-colors"
@@ -101,10 +101,10 @@
         class="flex justify-between items-center my-1 text-finco-secondary-color text-sm"
       >
         <p class="text-xs font-bold">Withdraw Fee</p>
-        <p class="text-xs font-bold">{{ account().withdrawFee | percent }}</p>
+        <p class="text-xs font-bold">{{ account()!.withdrawFee | percent }}</p>
         <p></p>
         <p class="text-xs font-bold">Deposit Fee</p>
-        <p class="text-xs font-bold">{{ account().depositFee | percent }}</p>
+        <p class="text-xs font-bold">{{ account()!.depositFee | percent }}</p>
       </div>
     </div>
   </section>
@@ -125,7 +125,7 @@
 
 <a
   class="fixed top-15 right-4 h-10 w-10 rounded-full shadow-sm shadow-finco-secondary-color text-finco-primary-color font-bold text-4xl flex justify-center items-center"
-  routerLink="/accounts/edit/{{ account().id }}"
+  routerLink="/accounts/edit/{{ account()!.id }}"
 >
   <div
     class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"

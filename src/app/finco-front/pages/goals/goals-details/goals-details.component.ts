@@ -24,7 +24,7 @@ import { LoadingPageComponent } from "@app/shared/components/loading-page/loadin
     CurrencyPipe,
     DatePipe,
     LoadingPageComponent
-],
+  ],
   templateUrl: './goals-details.component.html',
 })
 export class GoalsDetailsComponent {
@@ -32,7 +32,7 @@ export class GoalsDetailsComponent {
   loading = signal<boolean>(true);
 
   router = inject(Router);
-  goal = signal({} as Goal);
+  goal = signal<Goal | null>(null);
   transactions = signal<Transaction[]>([]);
   activatedRoute = inject(ActivatedRoute);
   exchangeService = inject(ExchangeRateService);
@@ -42,7 +42,7 @@ export class GoalsDetailsComponent {
 
   resume = computed(() => {
     let resume: Map<string, number> = new Map<string, number>();
-    this.goal().goalAccountBalances?.forEach((goalAccountBalance) => {
+    this.goal()?.goalAccountBalances?.forEach((goalAccountBalance) => {
       if (resume.has(goalAccountBalance.account.currency)) {
         resume.set(goalAccountBalance.account.currency, resume.get(goalAccountBalance.account.currency)! + goalAccountBalance.balance);
       } else {
@@ -78,7 +78,7 @@ export class GoalsDetailsComponent {
     map((response: TransactionResponse) => {
       return response.content[0]
     })
-  ))
+  ), { initialValue: null })
 
   goalResource = rxResource({
     request: () => this.goalId(),
@@ -118,14 +118,23 @@ export class GoalsDetailsComponent {
 
   redirectEffect = effect(() => {
 
-    setTimeout(() => {
-      if (this.goalResource.error()) {
-        this.router.navigate(['/goals']);
-      }
-      if (!this.lastTransaction() && this.goal()) {
-        this.router.navigateByUrl("goals/operation/" + this.goal().id + "/deposit")
-      }
-    }, 100);
+    if (this.goal() === null) {
+      return;
+    }
+
+    if (this.lastTransaction() === null) {
+      return;
+    }
+
+    if (this.goalResource.error()) {
+      this.router.navigate(['/goals']);
+      return;
+    }
+
+    if (this.lastTransaction() === undefined && this.goal() !== null) {
+      this.router.navigateByUrl("goals/operation/" + this.goal()!.id + "/deposit")
+      return
+    }
 
     this.loading.set(false);
 

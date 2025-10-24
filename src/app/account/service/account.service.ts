@@ -8,24 +8,24 @@ import { Observable } from 'rxjs';
 @Injectable({providedIn: 'root'})
 export class AccountService {
 
-    url: string = environment.url
+    private readonly API_URL: string = environment.url
 
-    authService = inject(AuthService);
+    private authService = inject(AuthService);
 
-    userId = computed(() => this.authService.user()?.id);
+    private userId = computed(() => this.authService.user()?.id);
 
-    http = inject(HttpClient)
+    private http = inject(HttpClient)
 
     getTotals(): Observable<Total[]> {
-        return this.http.get<Total[]>(`${this.url}/users/${this.userId()}/total-balance`);
+        return this.http.get<Total[]>(`${this.API_URL}/users/${this.userId()}/total-balance`);
     }
 
     getCurrencies(): Observable<string[]> {
-        return this.http.get<string[]>(`${this.url}/accounts/currencies`);
+        return this.http.get<string[]>(`${this.API_URL}/accounts/currencies`);
     }
 
     getAccountTypes(): Observable<string[]> {
-        return this.http.get<string[]>(`${this.url}/accounts/types`);
+        return this.http.get<string[]>(`${this.API_URL}/accounts/types`);
     }
 
     getAccounts(filter: AccountFilter): Observable<AccountResponse> {
@@ -38,30 +38,30 @@ export class AccountService {
         filter.currency ? params = params.set('currency', filter.currency) : null;
         filter.type ? params = params.set('type', filter.type) : null;
         filter.userId ? params = params.set('userId', filter.userId) : null;
-        return this.http.get<AccountResponse>(`${this.url}/users/${this.userId()}/accounts`, { params });
+        return this.http.get<AccountResponse>(`${this.API_URL}/users/${this.userId()}/accounts`, { params });
     }
 
     getAccountById(id: string): Observable<Account> {
-        return this.http.get<Account>(`${this.url}/accounts/${id}`);
+        return this.http.get<Account>(`${this.API_URL}/accounts/${id}`);
     }
 
     createAccount(account: Account): Observable<Account> {
-        return this.http.post<Account>(`${this.url}/users/${this.userId()}/accounts`, account);
+        return this.http.post<Account>(`${this.API_URL}/users/${this.userId()}/accounts`, account);
     }
 
     updateAccount(account: Account): Observable<Account> {
-        return this.http.put<Account>(`${this.url}/accounts/${account.id}`, account);
+        return this.http.put<Account>(`${this.API_URL}/accounts/${account.id}`, account);
     }
 
     depositAccount(accountId: number, data: TransactionData){
-        return this.http.post<Account>(`${this.url}/accounts/${accountId}/deposit`, data);
+        return this.http.post<Account>(`${this.API_URL}/accounts/${accountId}/deposit`, data);
     }
 
     withdrawAccount(accountId: number, data: TransactionData){
-        return this.http.post<Account>(`${this.url}/accounts/${accountId}/withdraw`, data);
+        return this.http.post<Account>(`${this.API_URL}/accounts/${accountId}/withdraw`, data);
     }
 
     transferAccount(accountId: number, data: TransferData){
-        return this.http.post<Account>(`${this.url}/accounts/${accountId}/transfer`, data);
+        return this.http.post<Account>(`${this.API_URL}/accounts/${accountId}/transfer`, data);
     }
 }

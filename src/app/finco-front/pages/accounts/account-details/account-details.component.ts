@@ -23,7 +23,7 @@ export class AccountDetailsComponent {
 
   router = inject(Router)
 
-  account = signal<Account>({} as Account);
+  account = signal<Account | null>(null);
   transactions = signal<Transaction[]>([]);
 
   activatedRoute = inject(ActivatedRoute)
@@ -45,9 +45,9 @@ export class AccountDetailsComponent {
 
   lastTransaction = toSignal(this.transactionService.getLastestTransaction(this.transactionFilter()).pipe(
     map((response: TransactionResponse) => {
-      return response.content[0]
+      return response.content[0];
     })
-  ))
+  ), { initialValue: null })
 
   accountResource = rxResource({
     request: () => this.accountId(),
@@ -86,12 +86,11 @@ export class AccountDetailsComponent {
   }
 
   redirectEffect = effect(() => {
-
-    if (this.account() === undefined) {
+    if (this.account() === null) {
       return;
     }
 
-    if (this.lastTransaction() === undefined) {
+    if (this.lastTransaction() === null) {
       return;
     }
 
@@ -99,8 +98,9 @@ export class AccountDetailsComponent {
       this.router.navigate(['/accounts']);
       return;
     }
-    if (!this.lastTransaction() && this.account()) {
-      this.router.navigateByUrl("accounts/operation/" + this.account().id + "/deposit")
+    
+    if (this.lastTransaction() === undefined && this.account() !== undefined) {
+      this.router.navigateByUrl("accounts/operation/" + this.account()!.id + "/deposit")
       return;
     }
 

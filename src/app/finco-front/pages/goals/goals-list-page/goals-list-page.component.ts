@@ -42,7 +42,7 @@ export class GoalsListPageComponent {
     map((response: TransactionResponse) => {
       return response.content[0];
     })
-  ))
+  ), { initialValue: null })
 
   goalFilter = signal<GoalFilter>({
     pagination: {
@@ -76,8 +76,7 @@ export class GoalsListPageComponent {
     map((response: GoalResponse) => {
       return response.content;
     })
-  )
-  );
+  ), { initialValue: null });
 
   updateTransactionFilter(startDate: Date) {
     this.transactionFilter.update((filter) => ({
@@ -88,16 +87,19 @@ export class GoalsListPageComponent {
 
   redirectEffect = effect(() => {
 
-    if (this.goals() == undefined) {
+    if (this.goals() == null) {
       return;
     }
 
-    setTimeout(() => {
-      if (this.lastTransaction() === undefined && this.goals()!.length > 0) {
-        this.router.navigateByUrl('goals/operation/' + this.goals()![0].id + '/deposit');
-        return;
-      }
-    }, 100);
+    if (this.lastTransaction() === null) {
+      return;
+    }
+
+    if (this.lastTransaction() === undefined && this.goals()!.length > 0) {
+      this.router.navigateByUrl('goals/operation/' + this.goals()![0].id + '/deposit');
+      return;
+    }
+
     if (this.goals()!.length === 0) {
       this.router.navigateByUrl('goals/create');
       return;

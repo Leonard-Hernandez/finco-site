@@ -6,11 +6,12 @@ import { Router } from '@angular/router';
 import { AccountService } from '@app/account/service/account.service';
 import { FormUtils } from '@app/shared/utils/form-utils';
 import { ErrorModalComponent } from "@app/shared/components/error-modal/error-modal.component";
-import { ResponseError } from '../../../shared/interfaces/response-error.interface';
+import { ResponseError } from '@app/shared/interfaces/response-error.interface';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-register-page',
-  imports: [ReactiveFormsModule, ErrorModalComponent],
+  imports: [ReactiveFormsModule, ErrorModalComponent, RouterLink],
   templateUrl: './register-page.component.html'
 })
 export class RegisterPageComponent implements OnInit {

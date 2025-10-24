@@ -151,12 +151,14 @@
               formControlName="transferAccountId"
             >
               @for (account of accounts(); track $index) {
-              <option
-                [value]="account.id"
-                class="text-finco-secondary-color bg-finco-bg-color"
-              >
-                {{ account.name }}
-              </option>
+                @if (account.id !== this.account().id) {
+                  <option
+                    [value]="account.id"
+                    class="text-finco-secondary-color bg-finco-bg-color"
+                  >
+                    {{ account.name }}
+                  </option>
+                }
               }
             </select>
           </div>

@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { computed, inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '@src/environments/environment.local';
 import { AuthService } from '@app/auth/services/auth.service';
@@ -11,7 +11,10 @@ export class TransactionService {
     private readonly API_URL = `${environment.url}`;
 
     private http = inject(HttpClient);
-    private userId = inject(AuthService).user()?.id;
+
+    private authService = inject(AuthService);
+
+    private userId = computed(() => this.authService.user()?.id);
 
     getTransactions(filter: TransactionFilter): Observable<TransactionResponse> {
 
@@ -30,7 +33,7 @@ export class TransactionService {
         filter.onlyAccountTransactions ? params = params.set('onlyAccountTransactions', filter.onlyAccountTransactions) : null;
         filter.onlyGoalTransactions ? params = params.set('onlyGoalTransactions', filter.onlyGoalTransactions) : null;
 
-        return this.http.get<TransactionResponse>(`${this.API_URL}/users/${this.userId}/transactions`, { params });
+        return this.http.get<TransactionResponse>(`${this.API_URL}/users/${this.userId()}/transactions`, { params });
     }
 
     getLastestTransaction(filter: TransactionFilter): Observable<TransactionResponse> {
@@ -48,12 +51,12 @@ export class TransactionService {
         filter.onlyAccountTransactions ? params = params.set('onlyAccountTransactions', filter.onlyAccountTransactions) : null;
         filter.onlyGoalTransactions ? params = params.set('onlyGoalTransactions', filter.onlyGoalTransactions) : null;
 
-        return this.http.get<TransactionResponse>(`${this.API_URL}/users/${this.userId}/transactions`, { params });
+        return this.http.get<TransactionResponse>(`${this.API_URL}/users/${this.userId()}/transactions`, { params });
 
     }
 
     getCategoriesByUser(): Observable<string[]> {
-        return this.http.get<string[]>(`${this.API_URL}/transactions/categories/${this.userId}`);
+        return this.http.get<string[]>(`${this.API_URL}/transactions/categories/${this.userId()}`);
     }
 
 }

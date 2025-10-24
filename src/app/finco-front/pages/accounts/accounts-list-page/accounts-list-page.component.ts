@@ -41,7 +41,7 @@ export class AccountsListPageComponent {
     map((response: TransactionResponse) => {
       return response.content[0];
     })
-  ));
+  ), { initialValue: null });
 
   accountFilter = signal<AccountFilter>({
     pagination: {
@@ -75,7 +75,7 @@ export class AccountsListPageComponent {
     map((response: AccountResponse) => {
       return response.content;
     })
-  ));
+  ), { initialValue: null });
 
   updateTransactionFilter(startDate: Date) {
     this.transactionFilter.update((filter) => ({
@@ -86,16 +86,18 @@ export class AccountsListPageComponent {
 
   redirectEffect = effect(() => {
 
-    if (this.accounts() == undefined) {
+    if (this.accounts() === null) {
       return
     }
 
-    setTimeout(() => {
-      if (this.lastTransaction() === undefined && this.accounts()!.length > 0) {
-        this.router.navigateByUrl('accounts/operation/' + this.accounts()![0].id + '/deposit');
-        return;
-      }
-    }, 100);
+    if (this.lastTransaction() === null) {
+      return
+    }
+
+    if (this.lastTransaction() === undefined && this.accounts()!.length > 0) {
+      this.router.navigateByUrl('accounts/operation/' + this.accounts()![0].id + '/deposit');
+      return;
+    }
     
     if (this.accounts()!.length === 0) {
       this.router.navigateByUrl('accounts/create');

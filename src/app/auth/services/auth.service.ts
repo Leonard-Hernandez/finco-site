@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { environment } from '../../../environments/environment.local';
+import { environment } from '@src/environments/environment.local';
 import { AuthResponse } from '../interfaces/auth-responses.interface';
 import { catchError, map, Observable, of, throwError } from 'rxjs';
 import { User } from '../interfaces/user.interface';
@@ -14,6 +14,8 @@ type authStatus = 'checking' | 'authenticated' | 'not-authenticated';
   providedIn: 'root'
 })
 export class AuthService {
+
+  private lastCheckStatus: Date | null = null;
 
   private _authStatus = signal<authStatus>('checking');
   private _user = signal<User | null>(null);
@@ -62,6 +64,14 @@ export class AuthService {
       return of(false);
     }
 
+    if (this.lastCheckStatus !== null) {
+      const now = new Date();
+      const timeDiff = now.getTime() - this.lastCheckStatus.getTime();
+      if (timeDiff < 1000 * 60 * 60) {
+        return of(true);
+      }
+    }    
+
     return this.http.get<AuthResponse>(`${environment.url}/auth/check-status`).pipe(
       map((resp) => this.handleAuthSuccess(resp)),
       catchError((error: any) => this.handleAuthError(error))
@@ -74,6 +84,8 @@ export class AuthService {
     this._user.set(null);
     this._token.set(null);
     this._roles.set(null);
+    this.lastCheckStatus = null;
+    
     localStorage.removeItem('token');
   }
 
@@ -82,6 +94,7 @@ export class AuthService {
     this._token.set(token);
     this._roles.set(this.getRoles(token));
     this._authStatus.set('authenticated');
+    this.lastCheckStatus = new Date();
 
     localStorage.setItem('token', token);
 
