@@ -16,6 +16,8 @@ import { RouterLink } from '@angular/router';
 })
 export class RegisterPageComponent implements OnInit {
 
+  isSubmited = signal<boolean>(false);
+
   currencies = signal<string[]>([]);
   hasError = signal<boolean>(false);
   errorMessage = signal<string>('');
@@ -45,9 +47,11 @@ export class RegisterPageComponent implements OnInit {
 
     this.registerForm.markAllAsTouched();
 
-    if (!this.registerForm.valid) {
+    if (!this.registerForm.valid || this.isSubmited()) {
       return;
     }
+
+    this.isSubmited.set(true);
 
     const user: UserRegister = {
       name: this.registerForm.value.name!,
@@ -67,6 +71,7 @@ export class RegisterPageComponent implements OnInit {
           this.errorDetails.set(errorResponse.message);
           setTimeout(() => {
             this.hasError.set(false);
+            this.isSubmited.set(false);
           }, 3000);
         }
       });

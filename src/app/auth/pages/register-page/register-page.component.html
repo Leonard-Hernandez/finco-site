@@ -107,10 +107,14 @@
         <!-- Submit Button -->
         <div class="pt-2">
           <button type="submit"
-            [disabled]="!registerForm.valid"
+            [disabled]="!registerForm.valid || isSubmited()"
             [class]="registerForm.valid ? 'bg-finco-primary-color' : 'bg-finco-primary-color/50'"
             class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-finco-bg-color bg-finco-primary-color hover:bg-finco-primary-color/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-finco-primary-color transition duration-200">
+            @if (isSubmited()) {
+            Processing...
+            } @else {
             Create Account
+            }
           </button>
         </div>
       </form>

@@ -14,6 +14,8 @@ import { FormUtils } from '@app/shared/utils/form-utils';
 })
 export default class LoginPageComponent {
 
+  isSubmited = signal<boolean>(false);
+
   _hasError = signal(false);
   errorMessage = signal<string>('');
   errorDetails = signal<string>('');
@@ -30,18 +32,22 @@ export default class LoginPageComponent {
   });
 
   onSubmit() {
-    if(!this.loginForm.valid) return;
+    this.loginForm.markAllAsTouched();
+
+    if(!this.loginForm.valid || this.isSubmited()) return;
 
     const userLogin = {
       username: this.loginForm.value.username!,
       password: this.loginForm.value.password!
     };
     
+    this.isSubmited.set(true);
     this.authService.login(userLogin.username, userLogin.password).subscribe({
       next: (success) => {
         this.router.navigate(['/']);
       },
       error: (error) => {
+        this.isSubmited.set(false);
         this._hasError.set(true);
         const errorResponse = error.error as ResponseError;
         this.errorMessage.set(errorResponse.error);

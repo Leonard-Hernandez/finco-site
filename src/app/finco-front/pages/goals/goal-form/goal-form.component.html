@@ -122,11 +122,17 @@
                 <!-- Submit Button -->
                 <div class="pt-2">
                     <button type="submit"
-                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-finco-bg-color bg-finco-primary-color hover:bg-finco-primary-color/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-finco-primary-color transition duration-200">
+                        [disabled]="isSubmitting() || !goalForm.valid"
+                        [class]="!goalForm.valid ? 'bg-finco-primary-color/50' : 'bg-finco-primary-color'"
+                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-finco-bg-color hover:bg-finco-primary-color/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-finco-primary-color transition duration-200">
+                        @if (isSubmitting()) {
+                        Loading...
+                        } @else {
                         @if (this.goal()) {
                         Edit Goal
                         } @else {
-                        Create a Goal
+                        Create Goal
+                        }
                         }
                     </button>
                 </div>

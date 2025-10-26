@@ -19,6 +19,7 @@ type operationType = 'deposit' | 'withdraw' | 'transfer';
 })
 export class AccountOpertionComponent {
 
+  isSubmitting = signal<boolean>(false);
   hasError = signal<boolean>(false);
   errorMessage = signal<string>('');
   errorDetails = signal<string>('');
@@ -45,7 +46,7 @@ export class AccountOpertionComponent {
   accounts = signal<Account[]>([]);
 
   transactionForm = this.fb.group({
-    amount: [[Validators.required, Validators.min(0)]],
+    amount: [null,[Validators.required, Validators.min(0)]],
     category: ['', []],
     description: ['', [Validators.maxLength(255)]],
     transferAccountId: [0, []],
@@ -73,9 +74,11 @@ export class AccountOpertionComponent {
 
     this.transactionForm.markAllAsTouched;
 
-    if (!this.transactionForm.valid) {
+    if (!this.transactionForm.valid || this.isSubmitting()) {
       return;
     }
+
+    this.isSubmitting.set(true);
 
     const transactionData: TransactionData = {
       amount: this.transactionForm.value.amount!,
@@ -100,6 +103,7 @@ export class AccountOpertionComponent {
           this.errorMessage.set(errorResponse.error);
           this.errorDetails.set(errorResponse.message);
           setTimeout(() => {
+            this.isSubmitting.set(false);
             this.hasError.set(false);
           }, 3000);
         }
@@ -112,13 +116,7 @@ export class AccountOpertionComponent {
           this.router.navigate([`/accounts/details/${this.account().id}`]);
         },
         error: (error) => {
-          this.hasError.set(true);
-          const errorResponse = error.error as ResponseError;
-          this.errorMessage.set(errorResponse.error);
-          this.errorDetails.set(errorResponse.message);
-          setTimeout(() => {
-            this.hasError.set(false);
-          }, 3000);
+          this.handleError(error);
         }
       });
     }
@@ -139,13 +137,7 @@ export class AccountOpertionComponent {
           this.router.navigate([`/accounts/details/${this.account().id}`]);
         },
         error: (error) => {
-          this.hasError.set(true);
-          const errorResponse = error.error as ResponseError;
-          this.errorMessage.set(errorResponse.error);
-          this.errorDetails.set(errorResponse.message);
-          setTimeout(() => {
-            this.hasError.set(false);
-          }, 3000);
+          this.handleError(error);
         }
       });
     }
@@ -219,5 +211,16 @@ export class AccountOpertionComponent {
 
     return this.balance();
   })
+
+  private handleError(error: any): void {
+    this.hasError.set(true);
+    const errorResponse = error.error as ResponseError;
+    this.errorMessage.set(errorResponse.error);
+    this.errorDetails.set(errorResponse.message);
+    setTimeout(() => {
+      this.hasError.set(false);
+      this.isSubmitting.set(false);
+    }, 3000);
+  }
 
 }

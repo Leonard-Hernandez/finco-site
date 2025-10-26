@@ -1,4 +1,4 @@
-import { Component, effect, inject, Injector, Signal, signal } from '@angular/core';
+import { Component, effect, inject, Signal, signal } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -19,6 +19,7 @@ import { ErrorModalComponent } from "@app/shared/components/error-modal/error-mo
 })
 export class GoalsOpertionComponent {
 
+  isSubmitting = signal<boolean>(false);
   hasError = signal<boolean>(false);
   errorMessage = signal<string>('');
   errorDetails = signal<string>('');
@@ -26,24 +27,22 @@ export class GoalsOpertionComponent {
   router = inject(Router)
   fb = inject(FormBuilder);
   activatedRoute = inject(ActivatedRoute)
+
   goalService = inject(GoalService)
   accountService = inject(AccountService)
   transactionService = inject(TransactionService);
-  formUtils = FormUtils;
 
-  injector = inject(Injector);
+  formUtils = FormUtils;
 
   goalId: Signal<string> = toSignal(this.activatedRoute.params.pipe(map((params) => params['id'])));
   goal: Signal<Goal> = signal({} as Goal);
-
   accountId = signal(0);
-
   operation: Signal<string> = toSignal(this.activatedRoute.params.pipe(map((params) => params['operation'])));
   accounts = signal<Account[]>([]);
 
   transactionForm = this.fb.group({
-    accountId: [0, [Validators.required, Validators.min(0)]],
-    amount: [[Validators.required, Validators.min(0)]],
+    accountId: [null as number | null, [Validators.required, Validators.min(0)]],
+    amount: [null, [Validators.required, Validators.min(0)]],
     category: ['', []],
     description: ['', [Validators.maxLength(255)]],
   });
@@ -77,9 +76,11 @@ export class GoalsOpertionComponent {
 
     this.transactionForm.markAllAsTouched;
 
-    if (!this.transactionForm.valid) {
+    if (!this.transactionForm.valid || this.isSubmitting()) {
       return;
     }
+
+    this.isSubmitting.set(true);
 
     const transactionData: GoalTransactionData = {
       accountId: this.transactionForm.value.accountId!,
@@ -100,13 +101,7 @@ export class GoalsOpertionComponent {
           this.router.navigate([`/goals/details/${this.goal().id}`]);
         },
         error: (error) => {
-          this.hasError.set(true);
-          const errorResponse = error.error as ResponseError;
-          this.errorMessage.set(errorResponse.error);
-          this.errorDetails.set(errorResponse.message);
-          setTimeout(() => {
-            this.hasError.set(false);
-          }, 3000);
+          this.handleError(error);
         }
       });
     }
@@ -117,13 +112,7 @@ export class GoalsOpertionComponent {
           this.router.navigate([`/goals/details/${this.goal().id}`]);
         },
         error: (error) => {
-          this.hasError.set(true);
-          const errorResponse = error.error as ResponseError;
-          this.errorMessage.set(errorResponse.error);
-          this.errorDetails.set(errorResponse.message);
-          setTimeout(() => {
-            this.hasError.set(false);
-          }, 3000);
+          this.handleError(error);
         }
       });
     }
@@ -156,5 +145,16 @@ export class GoalsOpertionComponent {
       })
     }
   })
+
+  private handleError(error: any) {
+    this.hasError.set(true);
+    const errorResponse = error.error as ResponseError;
+    this.errorMessage.set(errorResponse.error);
+    this.errorDetails.set(errorResponse.message);
+    setTimeout(() => {
+      this.hasError.set(false);
+      this.isSubmitting.set(false);
+    }, 3000);
+  }
 
 }

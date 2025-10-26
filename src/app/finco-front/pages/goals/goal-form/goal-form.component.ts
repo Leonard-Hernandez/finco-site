@@ -15,6 +15,9 @@ import { ErrorModalComponent } from "@app/shared/components/error-modal/error-mo
   templateUrl: './goal-form.component.html'
 })
 export class GoalFormComponent {
+
+  isSubmitting = signal<boolean>(false);
+  
   route = inject(ActivatedRoute);
   router = inject(Router)
 
@@ -33,8 +36,8 @@ export class GoalFormComponent {
 
   goalForm = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
-    targetAmount: [0, [Validators.required, Validators.min(0)]],
-    deadLine: [new Date(), [Validators.required]],
+    targetAmount: [null as number | null, [Validators.required, Validators.min(0)]],
+    deadLine: [null as Date | null, [Validators.required]],
     description: ['', [Validators.maxLength(255)]],
     enable: [false, [Validators.required]],
   });
@@ -52,9 +55,11 @@ export class GoalFormComponent {
   onSubmit(): void {
     this.goalForm.markAllAsTouched();
 
-    if (!this.goalForm.valid) {
+    if (!this.goalForm.valid || this.isSubmitting()) {
       return;
     }
+
+    this.isSubmitting.set(true);
 
     const goalToPost: Goal = {
       name: this.goalForm.value.name!,
@@ -74,13 +79,7 @@ export class GoalFormComponent {
             this.router.navigate(['/goals/details/' + this.goal()!.id]);
           },
           error: (error) => {
-            this.hasError.set(true);
-            const errorResponse = error.error as ResponseError;
-            this.errorMessage.set(errorResponse.error);
-            this.errorDetails.set(errorResponse.message);
-            setTimeout(() => {
-              this.hasError.set(false);
-            }, 3000);
+            this.handleError(error);
           }
         }
       )
@@ -91,13 +90,7 @@ export class GoalFormComponent {
             this.router.navigate(['/goals']);
           },
           error: (error) => {
-            this.hasError.set(true);
-            const errorResponse = error.error as ResponseError;
-            this.errorMessage.set(errorResponse.error);
-            this.errorDetails.set(errorResponse.message);
-            setTimeout(() => {
-              this.hasError.set(false);
-            }, 3000);
+            this.handleError(error);
           }
         }
       )
@@ -118,5 +111,16 @@ export class GoalFormComponent {
       }
     );
   })
+
+  private handleError(error: any): void {
+    this.hasError.set(true);
+    const errorResponse = error.error as ResponseError;
+    this.errorMessage.set(errorResponse.error);
+    this.errorDetails.set(errorResponse.message);
+    setTimeout(() => {
+      this.hasError.set(false);
+      this.isSubmitting.set(false);
+    }, 3000);
+  }
 
 }

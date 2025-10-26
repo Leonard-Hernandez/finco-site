@@ -16,6 +16,8 @@ export class FormUtils {
                     return 'Invalid email format';
                 case 'required':
                     return 'This field is required';
+                case 'min':
+                    return `This field must be at least ${errors['min'].min} value`;
                 case 'minlength':
                     return `This field must be at least ${errors['minlength'].requiredLength} characters long`;
                 case 'maxlength':

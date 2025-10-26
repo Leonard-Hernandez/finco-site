@@ -8,12 +8,15 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { map } from 'rxjs';
 import { ResponseError } from '@app/shared/interfaces/response-error.interface';
 import { ErrorModalComponent } from "@app/shared/components/error-modal/error-modal.component";
+import { AuthService } from '@src/app/auth/services/auth.service';
 
 @Component({
   imports: [ErrorModalComponent, ReactiveFormsModule],
   templateUrl: './account-form.component.html'
 })
 export class AccountFormComponent {
+
+  isSubmited = signal<boolean>(false);
   route = inject(ActivatedRoute);
   router = inject(Router)
 
@@ -27,6 +30,9 @@ export class AccountFormComponent {
   accountTypes = signal<string[]>([]);
 
   accountService = inject(AccountService);
+  authService = inject(AuthService);
+
+  defaultCurrency = signal(this.authService.user()?.defaultCurrency);
 
   accountId: Signal<string> = toSignal(this.route.params.pipe(map(({ id }) => id))) || signal('0');
 
@@ -64,9 +70,11 @@ export class AccountFormComponent {
   onSubmit(): void {
     this.accountForm.markAllAsTouched();
 
-    if (!this.accountForm.valid) {
+    if (!this.accountForm.valid || this.isSubmited()) {
       return;
     }
+
+    this.isSubmited.set(true);
 
     const accountToPost: Account = {
       name: this.accountForm.value.name!,
@@ -92,13 +100,7 @@ export class AccountFormComponent {
             this.router.navigate(['/accounts/details/' + this.account()!.id]);
           },
           error: (error) => {
-            this.hasError.set(true);
-            const errorResponse = error.error as ResponseError;
-            this.errorMessage.set(errorResponse.error);
-            this.errorDetails.set(errorResponse.message);
-            setTimeout(() => {
-              this.hasError.set(false);
-            }, 3000);
+            this.handleError(error);
           }
         }
       )
@@ -109,13 +111,7 @@ export class AccountFormComponent {
             this.router.navigate(['/accounts']);
           },
           error: (error) => {
-            this.hasError.set(true);
-            const errorResponse = error.error as ResponseError;
-            this.errorMessage.set(errorResponse.error);
-            this.errorDetails.set(errorResponse.message);
-            setTimeout(() => {
-              this.hasError.set(false);
-            }, 3000);
+            this.handleError(error);
           }
         }
       )
@@ -123,6 +119,11 @@ export class AccountFormComponent {
   }
 
   bindEffect = effect(() => {
+    if (this.defaultCurrency()) {
+      this.accountForm.patchValue({
+        currency: this.defaultCurrency()
+      })
+    }
     if (!this.account()) {
       return;
     }
@@ -140,5 +141,15 @@ export class AccountFormComponent {
     );
   })
 
+  private handleError(error: any): void {
+    this.hasError.set(true);
+    const errorResponse = error.error as ResponseError;
+    this.errorMessage.set(errorResponse.error);
+    this.errorDetails.set(errorResponse.message);
+    setTimeout(() => {
+      this.hasError.set(false);
+      this.isSubmited.set(false);
+    }, 3000);
+  }
 
 }
