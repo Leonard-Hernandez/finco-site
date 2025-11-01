@@ -201,10 +201,10 @@
         <div class="text-sm text-finco-secondary-color">
           {{operation()}}
           @if (operation() === 'transfer' && account() && toAccount()) {
-            {{account()!.currency}}  {{balance()}} to {{toAccount()!.currency}}
+            {{balance() | currency: "" : ""}} {{account()!.currency}} to {{calculateBalance() | currency: "" : ""}} {{toAccount()!.currency}}
+          } @else {
+            {{calculateBalance() | currency: "" : ""}} {{account()!.currency}}            
           }
-
-          {{calculateBalance()}}
 
         </div>
 

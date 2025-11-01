@@ -28,7 +28,7 @@ export class TransactionChartComponent {
   });
 
   eff = effect(() => {
-    if (this.transactions() && this.transactions().length > 0) {
+    if (this.transactions() !== undefined && this.transactions().length > 0) {
       this.generateChart();
     }
   })
@@ -103,7 +103,7 @@ export class TransactionChartComponent {
         transaction.amount = this.exchangeService.convert(transaction.account.currency, transaction.amount);
       }
 
-      if (transaction.type === 'WITHDRAW' || transaction.type === 'DEPOSIT_GOAL') {
+      if ((transaction.type === 'WITHDRAW' || transaction.type === 'WITHDRAW_GOAL') && transaction.amount > 0) {
         transaction.amount = transaction.amount * -1;
       }
       transaction.date = transaction.date.split('T')[0];

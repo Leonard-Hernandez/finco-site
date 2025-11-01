@@ -1,15 +1,15 @@
 @if (loading()) {
 <app-loading-page />
 } @else {
-<div
+<main
   class="flex flex-col py-15 justify-between items-center min-h-screen max-h-screen min-w-screen max-w-screen bg-gradient-to-br from-finco-bg-color to-finco-card-bg-color"
 >
-  <div class="flex flex-col min-w-80 font-bold flex-1">
+  <section class="flex flex-col min-w-80 font-bold flex-1">
     <h2 class="text-finco-secondary-color">Hi {{ name }}</h2>
     <app-total [_total]="totals()!" />
-  </div>
+  </section>
 
-  <div class="flex flex-col gap-2 min-w-85 font-bold flex-2">
+  <section class="flex flex-col gap-2 min-w-85 font-bold flex-2">
     <app-transaction-chart
       [transactionChartOptions]="transactionChartOptions()"
     />
@@ -17,10 +17,10 @@
       [lastTransaction]="lastTransaction()"
       (range)="updateFilter($event)"
     />
-  </div>
+  </section>
 
-  <div class="min-w-80 flex-2 justify-center items-center">
+  <section class="min-w-80 flex-2 justify-center items-center">
     <app-income-expense-pie-chart [transactions]="transactions.value()!" />
-  </div>
-</div>
+  </section>
+</main>
 }

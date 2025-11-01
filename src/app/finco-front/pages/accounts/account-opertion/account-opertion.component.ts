@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, Injector, OnInit, signal, Signal } from '@angular/core';
+import { Component, computed, effect, inject, Injector, signal, Signal } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,12 +9,11 @@ import { TransactionService } from '@src/app/transaction/services/transaction.se
 import { map } from 'rxjs';
 import { ErrorModalComponent } from "@app/shared/components/error-modal/error-modal.component";
 import { ResponseError } from '@app/shared/interfaces/response-error.interface';
-
-type operationType = 'deposit' | 'withdraw' | 'transfer';
+import { CurrencyPipe, formatCurrency } from '@angular/common';
 
 @Component({
   selector: 'app-account-opertion',
-  imports: [ReactiveFormsModule, ErrorModalComponent],
+  imports: [ReactiveFormsModule, ErrorModalComponent, CurrencyPipe],
   templateUrl: './account-opertion.component.html'
 })
 export class AccountOpertionComponent {
