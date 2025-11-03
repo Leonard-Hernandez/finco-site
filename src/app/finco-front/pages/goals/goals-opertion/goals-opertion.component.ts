@@ -43,8 +43,8 @@ export class GoalsOpertionComponent {
   transactionForm = this.fb.group({
     accountId: [null as number | null, [Validators.required, Validators.min(0)]],
     amount: [null, [Validators.required, Validators.min(0)]],
-    category: ['', []],
-    description: ['', [Validators.maxLength(255)]],
+    category: [null, []],
+    description: [null, [Validators.maxLength(255)]],
   });
 
   accountFilter: AccountFilter = {

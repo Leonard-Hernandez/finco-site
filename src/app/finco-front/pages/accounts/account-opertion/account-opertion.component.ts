@@ -46,8 +46,8 @@ export class AccountOpertionComponent {
 
   transactionForm = this.fb.group({
     amount: [null,[Validators.required, Validators.min(0)]],
-    category: ['', []],
-    description: ['', [Validators.maxLength(255)]],
+    category: [null, []],
+    description: [null, [Validators.maxLength(255)]],
     transferAccountId: [0, []],
     exchangeRate: [0],
   });

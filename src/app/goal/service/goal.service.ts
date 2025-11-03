@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, computed } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '@src/environments/environment.local';
 import { AuthService } from '@app/auth/services/auth.service';
@@ -11,7 +11,9 @@ export class GoalService
 
     url: string = environment.url
 
-    userId = inject(AuthService).user()?.id;
+    auth = inject(AuthService)
+
+    userId = computed(() => this.auth.user()?.id)
 
     http = inject(HttpClient)
 
@@ -25,7 +27,7 @@ export class GoalService
         filter.accountId ? params = params.set('accountId', filter.accountId) : null;
         filter.userId ? params = params.set('userId', filter.userId) : null;
 
-        return this.http.get<GoalResponse>(`${this.url}/users/${this.userId}/goals`, { params });
+        return this.http.get<GoalResponse>(`${this.url}/users/${this.userId()}/goals`, { params });
     }
 
     getGoalById(id: string): Observable<Goal> {
@@ -33,7 +35,7 @@ export class GoalService
     }
 
     createGoal(goal: Goal): Observable<Goal> {
-        return this.http.post<Goal>(`${this.url}/users/${this.userId}/goals`, goal);
+        return this.http.post<Goal>(`${this.url}/users/${this.userId()}/goals`, goal);
     }
 
     updateGoal(goal: Goal): Observable<Goal> {
