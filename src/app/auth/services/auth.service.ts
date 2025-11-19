@@ -41,12 +41,24 @@ export class AuthService {
   token = computed(() => this._token());
   roles = computed(() => this._roles());
 
+  OauthLogin(token: string) {
+    localStorage.setItem('token', token);
+    this.checkStatus();
+  }
+
   login(username: string, password: string): Observable<boolean> {
     return this.http.post<AuthResponse>(`${environment.url}/auth/login`, { username, password }).pipe(
       map((resp: AuthResponse) => this.handleAuthSuccess(resp)),
       catchError((error) => {
         return this.handleAuthError(error);
       })
+    );
+  }
+
+  updateUser(user: User) {
+    return this.http.put(`${environment.url}/users/${user.id}`, user).pipe(
+      map((resp) => {}),
+      catchError((error) => this.handleAuthError(error))
     );
   }
 
@@ -70,7 +82,7 @@ export class AuthService {
       if (timeDiff < 1000 * 60 * 60) {
         return of(true);
       }
-    }    
+    }
 
     return this.http.get<AuthResponse>(`${environment.url}/auth/check-status`).pipe(
       map((resp) => this.handleAuthSuccess(resp)),
@@ -85,7 +97,7 @@ export class AuthService {
     this._token.set(null);
     this._roles.set(null);
     this.lastCheckStatus = null;
-    
+
     localStorage.removeItem('token');
   }
 
