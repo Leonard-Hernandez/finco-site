@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '@src/environments/environment.local';
 import { AuthResponse } from '../interfaces/auth-responses.interface';
-import { catchError, map, Observable, of, throwError } from 'rxjs';
+import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
 import { User } from '../interfaces/user.interface';
 import { Router } from '@angular/router';
 import { UserRegister } from '../interfaces/user-register.interface';
@@ -43,7 +43,8 @@ export class AuthService {
 
   OauthLogin(token: string) {
     localStorage.setItem('token', token);
-    this.checkStatus();
+    this._token.set(token);
+    return this.checkStatus();
   }
 
   login(username: string, password: string): Observable<boolean> {
@@ -57,7 +58,7 @@ export class AuthService {
 
   updateUser(user: User) {
     return this.http.put(`${environment.url}/users/${user.id}`, user).pipe(
-      map((resp) => {}),
+      map((resp) => { }),
       catchError((error) => this.handleAuthError(error))
     );
   }

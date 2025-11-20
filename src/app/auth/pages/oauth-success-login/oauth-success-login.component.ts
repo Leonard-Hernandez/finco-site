@@ -1,7 +1,7 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { map } from 'rxjs';
+import { firstValueFrom, map } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { User } from '../../interfaces/user.interface';
 import { TransactionService } from '@src/app/transaction/services/transaction.service';
@@ -43,10 +43,13 @@ export class OauthSuccessLoginComponent {
 
   verification = effect(() => {
     if (this.token()) {
-      this.authService.OauthLogin(this.token()!);
+      let boolean = firstValueFrom(this.authService.OauthLogin(this.token()!));
     }
+  });
 
-    if (this.user() && this.user()?.defaultCurrency == 'USD') {
+  userEffect = effect(() => {
+    if (this.user() != null && this.user()?.defaultCurrency == 'USD') {
+      console.log(this.user());
 
       let transaction = this.transactionService.getLastestTransaction({ userId: this.user()!.id } as TransactionFilter).subscribe((data) => { return data.content; });
 
@@ -59,7 +62,7 @@ export class OauthSuccessLoginComponent {
       this.loading.set(false);
 
     }
-  });
+  })
 
   onSubmit() {
   
