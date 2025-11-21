@@ -5,7 +5,7 @@ import { firstValueFrom, map } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { User } from '../../interfaces/user.interface';
 import { TransactionService } from '@src/app/transaction/services/transaction.service';
-import { TransactionFilter } from '@src/app/transaction/interface/transaction';
+import { Transaction, TransactionFilter } from '@src/app/transaction/interface/transaction';
 import { LoadingPageComponent } from "@src/app/shared/components/loading-page/loading-page.component";
 import { AccountService } from '@src/app/account/service/account.service';
 import { ErrorModalComponent } from "@src/app/shared/components/error-modal/error-modal.component";
@@ -31,9 +31,10 @@ export class OauthSuccessLoginComponent {
   private routeActive = inject(ActivatedRoute);
   private router = inject(Router);
   private authService = inject(AuthService);
-  private user = computed(() => this.authService.user());
   private transactionService = inject(TransactionService);
   private accountService = inject(AccountService);
+
+  private user = signal<User | null>(null);
 
   updateForm = this.fb.group({
     defaultCurrency: ['USD', [Validators.required]]
@@ -43,17 +44,22 @@ export class OauthSuccessLoginComponent {
 
   verification = effect(() => {
     if (this.token()) {
-      let boolean = firstValueFrom(this.authService.OauthLogin(this.token()!));
+      this.authService.OauthLogin(this.token()!).subscribe((user) => this.user.set(user));
     }
+
+    
   });
 
   userEffect = effect(() => {
     if (this.user() != null && this.user()?.defaultCurrency == 'USD') {
-      console.log(this.user());
 
-      let transaction = this.transactionService.getLastestTransaction({ userId: this.user()!.id } as TransactionFilter).subscribe((data) => { return data.content; });
+      let transaction : Transaction | null = null;
+      this.transactionService.getLastestTransaction({ userId: this.user()!.id } as TransactionFilter).pipe(map((data) => { transaction = data.content[0]; }));
 
+      console.log(transaction);
       if (transaction) {
+
+        console.log("redirect")
         this.router.navigate(['/']);
       }
 
@@ -61,44 +67,46 @@ export class OauthSuccessLoginComponent {
 
       this.loading.set(false);
 
+    } else {
+        this.router.navigate(['/']);
     }
   })
 
   onSubmit() {
-  
-      this.updateForm.markAllAsTouched();
-  
-      if (!this.updateForm.valid || this.isSubmited()) {
-        return;
-      }
-  
-      this.isSubmited.set(true);
-  
-      const user: User = {
-        id: this.user()!.id,
-        email: this.user()!.email,
-        name: this.user()!.name,
-        registrationDate: this.user()!.registrationDate,
-        enabled: this.user()!.enabled,
-        defaultCurrency: this.updateForm.value.defaultCurrency!
-      };
-  
-      this.authService.updateUser(user).subscribe({
-          next: (success) => {
-            this.router.navigate(['/']);
-          },
-          error: (error) => {
-            this.hasError.set(true);
-            const errorResponse = error.error as ResponseError;
-            this.errorMessage.set(errorResponse.error);
-            this.errorDetails.set(errorResponse.message);
-            setTimeout(() => {
-              this.hasError.set(false);
-              this.isSubmited.set(false);
-            }, 3000);
-          }
-        });
+
+    this.updateForm.markAllAsTouched();
+
+    if (!this.updateForm.valid || this.isSubmited()) {
+      return;
     }
+
+    this.isSubmited.set(true);
+
+    const user: User = {
+      id: this.user()!.id,
+      email: this.user()!.email,
+      name: this.user()!.name,
+      registrationDate: this.user()!.registrationDate,
+      enabled: this.user()!.enabled,
+      defaultCurrency: this.updateForm.value.defaultCurrency!
+    };
+
+    this.authService.updateUser(user).subscribe({
+      next: (success) => {
+        this.router.navigate(['/']);
+      },
+      error: (error) => {
+        this.hasError.set(true);
+        const errorResponse = error.error as ResponseError;
+        this.errorMessage.set(errorResponse.error);
+        this.errorDetails.set(errorResponse.message);
+        setTimeout(() => {
+          this.hasError.set(false);
+          this.isSubmited.set(false);
+        }, 3000);
+      }
+    });
+  }
 
 
 

@@ -41,10 +41,13 @@ export class AuthService {
   token = computed(() => this._token());
   roles = computed(() => this._roles());
 
-  OauthLogin(token: string) {
-    localStorage.setItem('token', token);
-    this._token.set(token);
-    return this.checkStatus();
+  OauthLogin(token: string): Observable<User> {
+    return this.http.get<AuthResponse>(`${environment.url}/auth/check-status`, { headers: { Authorization: `Bearer ${token}` } }).pipe(
+      map((resp) => {
+        this.handleAuthSuccess(resp)
+        return resp.user;}),
+      catchError((error: any) => this.handleAuthError(error))
+    );
   }
 
   login(username: string, password: string): Observable<boolean> {
@@ -57,7 +60,7 @@ export class AuthService {
   }
 
   updateUser(user: User) {
-    return this.http.put(`${environment.url}/users/${user.id}`, user).pipe(
+    return this.http.patch(`${environment.url}/users/${user.id}`, user).pipe(
       map((resp) => { }),
       catchError((error) => this.handleAuthError(error))
     );
