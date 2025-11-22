@@ -1,9 +1,9 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '@src/environments/environment.local';
-import { AuthResponse } from '../interfaces/auth-responses.interface';
+import { AuthResponse } from '@app/auth/interfaces/auth-responses.interface';
 import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
-import { User } from '../interfaces/user.interface';
+import { User } from '@app/auth/interfaces/user.interface';
 import { Router } from '@angular/router';
 import { UserRegister } from '../interfaces/user-register.interface';
 import { rxResource } from '@angular/core/rxjs-interop';

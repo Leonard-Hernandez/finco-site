@@ -1,9 +1,8 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { firstValueFrom, map } from 'rxjs';
-import { AuthService } from '../../services/auth.service';
-import { User } from '../../interfaces/user.interface';
+import { AuthService } from '@app/auth/services/auth.service';
+import { User } from '@app/auth/interfaces/user.interface';
 import { TransactionService } from '@src/app/transaction/services/transaction.service';
 import { Transaction, TransactionFilter } from '@src/app/transaction/interface/transaction';
 import { LoadingPageComponent } from "@src/app/shared/components/loading-page/loading-page.component";
@@ -11,6 +10,7 @@ import { AccountService } from '@src/app/account/service/account.service';
 import { ErrorModalComponent } from "@src/app/shared/components/error-modal/error-modal.component";
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ResponseError } from '@src/app/shared/interfaces/response-error.interface';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-oauth-success-login',
@@ -46,30 +46,31 @@ export class OauthSuccessLoginComponent {
     if (this.token()) {
       this.authService.OauthLogin(this.token()!).subscribe((user) => this.user.set(user));
     }
-
-    
   });
 
   userEffect = effect(() => {
-    if (this.user() != null && this.user()?.defaultCurrency == 'USD') {
 
-      let transaction : Transaction | null = null;
-      this.transactionService.getLastestTransaction({ userId: this.user()!.id } as TransactionFilter).pipe(map((data) => { transaction = data.content[0]; }));
-
-      console.log(transaction);
-      if (transaction) {
-
-        console.log("redirect")
-        this.router.navigate(['/']);
-      }
-
-      this.accountService.getCurrencies().subscribe((data) => this.currencies.set(data));
-
-      this.loading.set(false);
-
-    } else {
-        this.router.navigate(['/']);
+    if (this.user() == null) {
+      return;
     }
+
+    if (this.user()?.defaultCurrency != 'USD') {
+      this.router.navigate(['/']);
+      return;
+    }
+
+    let transaction: Transaction | null = null;
+    this.transactionService.getLastestTransaction({ userId: this.user()!.id } as TransactionFilter).pipe(map((data) => { transaction = data.content[0]; }));
+
+    if (transaction) {
+      this.router.navigate(['/']);
+      return;
+    }
+
+    this.accountService.getCurrencies().subscribe((data) => this.currencies.set(data));
+
+    this.loading.set(false);
+
   })
 
   onSubmit() {
@@ -107,7 +108,4 @@ export class OauthSuccessLoginComponent {
       }
     });
   }
-
-
-
 }

@@ -5,6 +5,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ErrorModalComponent } from "@app/shared/components/error-modal/error-modal.component";
 import { ResponseError } from '@app/shared/interfaces/response-error.interface';
 import { FormUtils } from '@app/shared/utils/form-utils';
+import { environment } from '@src/environments/environment.local';
 
 @Component({
   selector: 'app-login-page',
@@ -13,6 +14,8 @@ import { FormUtils } from '@app/shared/utils/form-utils';
   templateUrl: './login-page.component.html'
 })
 export default class LoginPageComponent {
+
+  url = environment.url;
 
   isSubmited = signal<boolean>(false);
 
@@ -58,4 +61,13 @@ export default class LoginPageComponent {
       }
     });
   }
+
+  googleLogin() {
+    return this.url + '/oauth2/authorization/google';
+  }
+
+  githubLogin() {
+    return this.url + '/oauth2/authorization/github';
+  }
+
 }
