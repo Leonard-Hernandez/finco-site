@@ -36,7 +36,7 @@ export class AccountDetailsComponent {
   transactionFilter = signal<TransactionFilter>({
     pagination: {
       page: 0,
-      size: 10,
+      size: 1000,
       sortBy: 'date',
       sortDirection: 'desc',
     },
