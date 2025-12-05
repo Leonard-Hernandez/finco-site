@@ -15,6 +15,7 @@
         }}
         {{account()!.name}}
       </h1>
+      <p class="text-finco-secondary-color font-bold">{{ account()!.balance | currency : "" : "" }} {{ account()!.currency }}</p>
     </div>
 
     <div
@@ -38,7 +39,7 @@
               class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
             >
               <svg class="h-5 w-5 text-finco-primary-color">
-                <use xlink:href="/sprite.svg#user" />
+                <use xlink:href="/sprite.svg#currency" />
               </svg>
             </div>
             <input
@@ -69,7 +70,7 @@
               class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
             >
               <svg class="h-5 w-5 text-finco-primary-color">
-                <use xlink:href="/sprite.svg#email" />
+                <use xlink:href="/sprite.svg#graph" />
               </svg>
             </div>
             @if (categories() && categories()!.length > 0) {
@@ -110,7 +111,7 @@
               class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
             >
               <svg class="h-5 w-5 text-finco-primary-color">
-                <use xlink:href="/sprite.svg#lock" />
+                <use xlink:href="/sprite.svg#editIcon" />
               </svg>
             </div>
             <input
@@ -141,7 +142,7 @@
               class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
             >
               <svg class="h-5 w-5 text-finco-primary-color">
-                <use xlink:href="/sprite.svg#currency" />
+                <use xlink:href="/sprite.svg#transferIcon" />
               </svg>
             </div>
             <select
@@ -179,7 +180,7 @@
               class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
             >
               <svg class="h-5 w-5 text-finco-primary-color">
-                <use xlink:href="/sprite.svg#user" />
+                <use xlink:href="/sprite.svg#exchange-rate" />
               </svg>
             </div>
             <input
