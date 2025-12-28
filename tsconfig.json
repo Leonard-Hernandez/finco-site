@@ -23,10 +23,18 @@
       "@app/*": ["src/app/*"]
     }
   },
+  "files": [
+    "src/main.ts",
+    "src/pollyfills.ts"
+  ],
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true
-  }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/pollyfills.ts"
+  ]
 }
