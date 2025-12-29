@@ -1,4 +1,4 @@
-import { Component, Inject, NgModule } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { WebsocketService } from '@src/app/ai/service/websocket.service';
 
@@ -10,16 +10,14 @@ import { WebsocketService } from '@src/app/ai/service/websocket.service';
 export class ChatComponent {
 
   message: string = '';
-  websocketService = Inject(WebsocketService);
+  websocketService = inject(WebsocketService);
   
-  
-
-  constructor() {
+  connect() {
     this.websocketService.connect();
   }
-
+  
   send() {
-    this.websocketService.send();
+    this.websocketService.send(this.message);
   }
 
 
