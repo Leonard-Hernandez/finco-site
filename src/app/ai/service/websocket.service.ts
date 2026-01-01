@@ -1,59 +1,70 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, OnInit } from '@angular/core';
 import SockJS from 'sockjs-client';
-import { Stomp } from '@stomp/stompjs';
+import { Client, IStompSocket, Stomp, StompHeaders } from '@stomp/stompjs';
 import { AuthService } from '@src/app/auth/services/auth.service';
 
 interface AiaskDto {
-  prompt: String, 
-  userId: number, 
-  image: String | null, 
-  imageExtension: string | null, 
+  prompt: String,
+  userId: number,
+  image: String | null,
+  imageExtension: string | null,
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class WebsocketService {
+export class WebsocketService implements OnInit {
 
-  brokerURL: string = "http://localhost:8086/finco-api/v1/ws"
-  stompClient: any
-  authservice = inject(AuthService)
-  username: String = this.authservice.user()!.id + ''
-  token: string | null = this.authservice.token();
+  private client!: Client;
 
+  private token = inject(AuthService).token();
+  private userId = inject(AuthService).user()?.id;
+
+  ngOnInit(): void {
+
+
+  }
   connect() {
-    let ws = new SockJS(this.brokerURL)
-    this.stompClient = Stomp.over(ws)
-    console.log("connected to websocket")
+    this.client = new Client();
+    this.client.webSocketFactory = () => {
+      const ws = new SockJS('http://localhost:8086/finco-api/v1/ws');
+      return ws as IStompSocket;
+    };
 
-    this.stompClient.connect({ "Authorization": "Bearer " + this.token }, () => {
-      this.stompClient.subscribe(`/user/7/queue/chat`, (message: any) => {
-        //the subscribe also triggers a callback which means when a user subscribes to a destination, an event of a message could be returned
-        this.onMessageRecived(message.body)
+    this.client.onConnect = (frame) => {
+      console.log('Connected: ' + frame);
+      this.client.subscribe(`/user/queue/chat`, (message) => {
+        console.log(message.headers);
+        console.log(message.body);
+      });
+    };
 
-      })
+    this.client.onDisconnect = (frame) => {
+      console.log("status " + this.client.connected)
+      console.log("Disconnected: " + frame);
+    }
 
-    },
-      ///error callback
-      (error: Error | any) => {
-        console.log(error.message)
-      }
-    )
+    let header: StompHeaders = {
+      Authorization: 'Bearer ' + this.token
+    };
+
+    this.client.connectHeaders = header;
+    this.client.activate();
   }
 
-  onMessageRecived(message: any) {
-    console.log(message)
-  }
-
-  send(message: String): void {
+  send(message: string) {
     let AiAsk = {
       prompt: message,
-      userId: this.authservice.user()!.id,
+      userId: this.userId,
       image: null,
       imageExtension: null
     } as AiaskDto
 
-    this.stompClient.send("/app/chat", {}, JSON.stringify(AiAsk))
 
+    this.client.publish({
+      destination: '/app/chat',
+      body: JSON.stringify(AiAsk)
+    });
   }
+
 }
