@@ -52,14 +52,13 @@ export class WebsocketService implements OnInit {
     this.client.activate();
   }
 
-  send(message: string) {
+  send(message: string, image: string | null, imageExtension: string | null) {
     let AiAsk = {
       prompt: message,
       userId: this.userId,
-      image: null,
-      imageExtension: null
+      image: image,
+      imageExtension: 'image/' + imageExtension
     } as AiaskDto
-
 
     this.client.publish({
       destination: '/app/chat',

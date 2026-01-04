@@ -1,5 +1,6 @@
 <div class="min-w-full min-h-full pt-30 flex flex-col justify-center align-middle">
     <textarea class="w300 h300" [(ngModel)]="message"></textarea>
+    <input type="file" accept="image/*" (change)="onFileSelected($event)" />
     <button (click)="send()">Send</button>
     <button (click)="connect()">connect</button>
 </div>
