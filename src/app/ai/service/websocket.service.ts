@@ -1,6 +1,6 @@
-import { inject, Injectable, OnInit } from '@angular/core';
+import { computed, inject, Injectable, output, signal } from '@angular/core';
 import SockJS from 'sockjs-client';
-import { Client, IStompSocket, Stomp, StompHeaders } from '@stomp/stompjs';
+import { Client, IStompSocket, StompHeaders } from '@stomp/stompjs';
 import { AuthService } from '@src/app/auth/services/auth.service';
 
 interface AiaskDto {
@@ -13,17 +13,15 @@ interface AiaskDto {
 @Injectable({
   providedIn: 'root'
 })
-export class WebsocketService implements OnInit {
+export class WebsocketService {
 
   private client!: Client;
+  private _message = signal('');
+  public readonly message = computed(this._message);
 
   private token = inject(AuthService).token();
   private userId = inject(AuthService).user()?.id;
 
-  ngOnInit(): void {
-
-
-  }
   connect() {
     this.client = new Client();
     this.client.webSocketFactory = () => {
@@ -34,8 +32,7 @@ export class WebsocketService implements OnInit {
     this.client.onConnect = (frame) => {
       console.log('Connected: ' + frame);
       this.client.subscribe(`/user/queue/chat`, (message) => {
-        console.log(message.headers);
-        console.log(message.body);
+        this._message.set(message.body);
       });
     };
 

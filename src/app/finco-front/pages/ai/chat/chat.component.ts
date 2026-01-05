@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, effect, inject, signal, Signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { WebsocketService } from '@src/app/ai/service/websocket.service';
 
@@ -9,17 +9,18 @@ import { WebsocketService } from '@src/app/ai/service/websocket.service';
 })
 export class ChatComponent {
 
-  fotoBase64: string | null = null;
+  image: string | null = null;
   extension: string | null = null;
   message: string = '';
+  messages = signal([] as string[]);
   websocketService = inject(WebsocketService);
-  
+
   connect() {
     this.websocketService.connect();
   }
-  
+
   send() {
-    this.websocketService.send(this.message, this.fotoBase64, this.extension);
+    this.websocketService.send(this.message, this.image, this.extension);
   }
 
   onFileSelected(ev: Event) {
@@ -31,11 +32,13 @@ export class ChatComponent {
     const reader = new FileReader();
     reader.onload = () => {
       const dataUrl = reader.result as string;
-      this.fotoBase64 = dataUrl.split(',')[1];
+      this.image = dataUrl.split(',')[1];
     };
     reader.readAsDataURL(file);
   }
 
-
+  messafeEffect = effect(() => {
+    this.messages.update(messages => [...messages, this.websocketService.message()]);
+  });
 
 }

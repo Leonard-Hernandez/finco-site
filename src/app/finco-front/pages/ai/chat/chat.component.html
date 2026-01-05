@@ -1,4 +1,7 @@
 <div class="min-w-full min-h-full pt-30 flex flex-col justify-center align-middle">
+    @for (message of messages(); track $index) {
+        <p>{{ message }}</p>
+    }
     <textarea class="w300 h300" [(ngModel)]="message"></textarea>
     <input type="file" accept="image/*" (change)="onFileSelected($event)" />
     <button (click)="send()">Send</button>
