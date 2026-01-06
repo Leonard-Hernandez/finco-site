@@ -3,6 +3,7 @@ import { DashboardPageComponent } from './pages/dashboard-page/dashboard-page.co
 import { TransactionsStatsComponent } from './pages/transactions/transactions-stats/transactions-stats.component';
 import { FincoFrontLayoutComponent } from './layouts/finco-front-layout/finco-front-layout.component';
 import { ChatComponent } from './pages/ai/chat/chat.component';
+import { PremiunGuard } from '../auth/guard/premiun.guard';
 
 export const fincoFrontRoutes: Routes = [
 
@@ -28,7 +29,8 @@ export const fincoFrontRoutes: Routes = [
             },
             {
                 path: 'chat',
-                component: ChatComponent
+                component: ChatComponent,
+                canActivate: [PremiunGuard]
             },            
             {
                 path: '**',

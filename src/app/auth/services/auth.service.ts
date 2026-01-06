@@ -138,6 +138,12 @@ export class AuthService {
     }
   }
 
+  hasRole(role: string): boolean {
 
+    let roles = this.getRoles(this.token()!);
+
+    return roles.includes(role);
+      
+  }
 
 }
