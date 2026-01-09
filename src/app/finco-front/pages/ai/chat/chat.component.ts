@@ -1,5 +1,6 @@
 import { Component, effect, inject, signal, Signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Message } from '@src/app/ai/interface/message.interface';
 import { WebsocketService } from '@src/app/ai/service/websocket.service';
 
 @Component({
@@ -10,9 +11,10 @@ import { WebsocketService } from '@src/app/ai/service/websocket.service';
 export class ChatComponent {
 
   image: string | null = null;
+  imageUrl = signal('');
   extension: string | null = null;
   message: string = '';
-  messages = signal([] as string[]);
+  messages = signal([] as Message[]);
   websocketService = inject(WebsocketService);
 
   connect() {
@@ -21,10 +23,13 @@ export class ChatComponent {
 
   send() {
     this.websocketService.send(this.message, this.image, this.extension);
+    this.messages.update(messages => [...messages, { content: this.message, role: 'User', image: this.imageUrl() }]);
+    this.clear()
   }
 
   onFileSelected(ev: Event) {
     const file = (ev.target as HTMLInputElement).files?.[0];
+    this.imageUrl.set(URL.createObjectURL(file!));
     if (!file) { return; }
 
     this.extension = file.name.split('.').pop()?.toLowerCase() || null;
@@ -38,7 +43,17 @@ export class ChatComponent {
   }
 
   messafeEffect = effect(() => {
-    this.messages.update(messages => [...messages, this.websocketService.message()]);
+    let message = {
+      content: this.websocketService.message()!,
+      role: 'Ai',
+      image: null
+    } as Message
+    this.messages.update(messages => [...messages, message]);
   });
-
+  
+  clear() {
+    this.message = '';
+    this.imageUrl.set('');
+    this.image = null;
+  }
 }

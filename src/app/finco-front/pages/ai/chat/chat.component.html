@@ -1,6 +1,16 @@
 <div class="min-w-full min-h-full pt-30 flex flex-col justify-center align-middle">
     @for (message of messages(); track $index) {
-        <pre>{{ message }}</pre>
+        <pre>{{ message.role }}:</pre>
+        <pre>{{ message.content }}</pre>
+        @if (message.image != null) {
+            <img src="{{ message.image }}" />
+        }
+    }
+
+    @if (image != null) {
+        <div class="max-w-40">
+            <img src="{{ imageUrl() }}" />
+        </div>
     }
     <textarea class="w300 h300" [(ngModel)]="message"></textarea>
     <input type="file" accept="image/*" (change)="onFileSelected($event)" />
