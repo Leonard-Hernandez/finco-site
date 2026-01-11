@@ -1,10 +1,6 @@
 <div class="min-w-full min-h-full pt-30 flex flex-col justify-center align-middle">
-    @for (message of messages(); track $index) {
-        <pre>{{ message.role }}:</pre>
-        <pre>{{ message.content }}</pre>
-        @if (message.image != null) {
-            <img src="{{ message.image }}" />
-        }
+    @for (message of messages(); track message.id) {
+        <app-message [message]="message"/>
     }
 
     @if (image != null) {

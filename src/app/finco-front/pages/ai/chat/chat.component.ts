@@ -2,14 +2,16 @@ import { Component, effect, inject, signal, Signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Message } from '@src/app/ai/interface/message.interface';
 import { WebsocketService } from '@src/app/ai/service/websocket.service';
+import { MessageComponent } from "@src/app/ai/components/message/message.component";
 
 @Component({
   selector: 'app-chat',
-  imports: [FormsModule],
+  imports: [FormsModule, MessageComponent],
   templateUrl: './chat.component.html'
 })
 export class ChatComponent {
 
+  id = 0
   image: string | null = null;
   imageUrl = signal('');
   extension: string | null = null;
@@ -23,7 +25,7 @@ export class ChatComponent {
 
   send() {
     this.websocketService.send(this.message, this.image, this.extension);
-    this.messages.update(messages => [...messages, { content: this.message, role: 'User', image: this.imageUrl() }]);
+    this.messages.update(messages => [...messages, {id: this.id++, content: this.message, role: 'User', image: this.imageUrl() }]);
     this.clear()
   }
 
@@ -44,6 +46,7 @@ export class ChatComponent {
 
   messafeEffect = effect(() => {
     let message = {
+      id: this.id++,
       content: this.websocketService.message()!,
       role: 'Ai',
       image: null
