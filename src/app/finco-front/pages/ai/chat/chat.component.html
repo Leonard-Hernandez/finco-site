@@ -1,15 +1,51 @@
-<div class="min-w-full min-h-full pt-30 flex flex-col justify-center align-middle">
-    @for (message of messages(); track message.id) {
-        <app-message [message]="message"/>
-    }
+<main class="min-h-screen w-full pb-30 flex flex-col justify-center align-middle bg-finco-bg-color">
 
-    @if (image != null) {
-        <div class="max-w-40">
-            <img src="{{ imageUrl() }}" />
+    <section class=" mb-30 mt-15">
+        @for (message of messages(); track message.id) {
+            <app-message [message]="message"/>
+        }
+    </section>
+
+    <footer class="fixed bottom-15 left-0 right-0 p-4">
+        <div class="max-w-3xl mx-auto bg-finco-card-bg-color/50 backdrop-blur-xl border border-finco-bg-color rounded-2xl shadow-2xl p-2 transition-all focus-within:border-finco-secondary-color">
+            
+            @if (image != null) {
+                <div class="relative inline-block m-2 group">
+                    <div class="absolute -top-2 -right-2 z-20">
+                        <button (click)="clear()" class="bg-red-500 hover:bg-red-600 text-white p-1 rounded-full shadow-lg transition-transform active:scale-90">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+                    <img [src]="imageUrl()" class="h-24 w-24 object-cover rounded-xl border-2 border-indigo-500/30 shadow-md transition-opacity group-hover:opacity-90" />
+                </div>
+            }
+
+            <div class="flex items-end gap-2">
+                <button (click)="fileInput.click()" class="p-3 text-finco-primary-color hover:text-finco-secondary-color hover:bg-slate-700/50 rounded-xl transition-all active:scale-95">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                    </svg>
+                </button>
+                <input #fileInput class="hidden" type="file" accept="image/*" (change)="onFileSelected($event)" />
+
+                <textarea 
+                    class="flex-grow bg-transparent border-none focus:ring-0 text-finco-primary-color placeholder-slate-500 py-3 resize-none max-h-32 text-sm focus:outline-none"
+                    rows="1"
+                    placeholder="Send a message..."
+                    [(ngModel)]="message"
+                    (keydown.enter)="$event.preventDefault(); send()"
+                ></textarea>
+
+                <button 
+                    (click)="send()" 
+                    [disabled]="!message && !image"
+                    class="p-3 bg-finco-button-bg-color hover:bg-finco-secondary-color disabled:bg-slate-700 disabled:text-slate-500 text-finco-primary-color rounded-xl transition-all active:scale-95 flex items-center justify-center"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                </button>
+            </div>
         </div>
-    }
-    <textarea class="w300 h300" [(ngModel)]="message"></textarea>
-    <input type="file" accept="image/*" (change)="onFileSelected($event)" />
-    <button (click)="send()">Send</button>
-    <button (click)="connect()">connect</button>
-</div>
+    </footer>
+</main>

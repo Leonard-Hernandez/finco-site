@@ -1,7 +1,8 @@
-import { computed, inject, Injectable, output, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import SockJS from 'sockjs-client';
 import { Client, IStompSocket, StompHeaders } from '@stomp/stompjs';
 import { AuthService } from '@src/app/auth/services/auth.service';
+import { environment } from '@src/environments/environment.local';
 
 interface AiaskDto {
   prompt: String,
@@ -14,7 +15,7 @@ interface AiaskDto {
   providedIn: 'root'
 })
 export class WebsocketService {
-
+  private readonly wsUrl: string = environment.url + '/ws';
   private client!: Client;
   private _message = signal('');
   public readonly message = computed(this._message);
@@ -25,7 +26,7 @@ export class WebsocketService {
   connect() {
     this.client = new Client();
     this.client.webSocketFactory = () => {
-      const ws = new SockJS('http://localhost:8086/finco-api/v1/ws');
+      const ws = new SockJS(this.wsUrl);
       return ws as IStompSocket;
     };
 
@@ -61,6 +62,10 @@ export class WebsocketService {
       destination: '/app/chat',
       body: JSON.stringify(AiAsk)
     });
+  }
+
+  disconnect() {
+    this.client.deactivate();
   }
 
 }

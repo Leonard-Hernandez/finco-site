@@ -1,15 +1,16 @@
-import { Component, effect, inject, signal, Signal } from '@angular/core';
+import { Component, effect, inject, OnDestroy, OnInit, signal, Signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Message } from '@src/app/ai/interface/message.interface';
 import { WebsocketService } from '@src/app/ai/service/websocket.service';
 import { MessageComponent } from "@src/app/ai/components/message/message.component";
+import { AuthService } from '@src/app/auth/services/auth.service';
 
 @Component({
   selector: 'app-chat',
   imports: [FormsModule, MessageComponent],
   templateUrl: './chat.component.html'
 })
-export class ChatComponent {
+export class ChatComponent implements OnInit, OnDestroy{
 
   id = 0
   image: string | null = null;
@@ -18,14 +19,20 @@ export class ChatComponent {
   message: string = '';
   messages = signal([] as Message[]);
   websocketService = inject(WebsocketService);
+  user = inject(AuthService).user()?.name
 
-  connect() {
+  ngOnInit(): void {
     this.websocketService.connect();
   }
 
+  ngOnDestroy(): void {
+    this.websocketService.disconnect();
+  }
+
+
   send() {
     this.websocketService.send(this.message, this.image, this.extension);
-    this.messages.update(messages => [...messages, {id: this.id++, content: this.message, role: 'User', image: this.imageUrl() }]);
+    this.messages.update(messages => [...messages, {id: this.id++, content: this.message, role: "user", image: this.imageUrl(), name: this.user} as Message]);
     this.clear()
   }
 
@@ -45,10 +52,12 @@ export class ChatComponent {
   }
 
   messafeEffect = effect(() => {
+    if (!this.websocketService.message()) { return; }
     let message = {
       id: this.id++,
       content: this.websocketService.message()!,
       role: 'Ai',
+      name: 'Finco Assistant',
       image: null
     } as Message
     this.messages.update(messages => [...messages, message]);
