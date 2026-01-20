@@ -1,4 +1,4 @@
-import { Component, effect, inject, OnDestroy, OnInit, signal, Signal } from '@angular/core';
+import { AfterViewChecked, Component, effect, ElementRef, inject, OnDestroy, OnInit, signal, Signal, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Message } from '@src/app/ai/interface/message.interface';
 import { WebsocketService } from '@src/app/ai/service/websocket.service';
@@ -10,8 +10,9 @@ import { AuthService } from '@src/app/auth/services/auth.service';
   imports: [FormsModule, MessageComponent],
   templateUrl: './chat.component.html'
 })
-export class ChatComponent implements OnInit, OnDestroy{
+export class ChatComponent implements OnInit, OnDestroy {
 
+  @ViewChild('chatContainer') chatContainer!: ElementRef;
   id = 0
   image: string | null = null;
   imageUrl = signal('');
@@ -32,7 +33,7 @@ export class ChatComponent implements OnInit, OnDestroy{
 
   send() {
     this.websocketService.send(this.message, this.image, this.extension);
-    this.messages.update(messages => [...messages, {id: this.id++, content: this.message, role: "user", image: this.imageUrl(), name: this.user} as Message]);
+    this.messages.update(messages => [...messages, { id: this.id++, content: this.message, role: "user", image: this.imageUrl(), name: this.user } as Message]);
     this.clear()
   }
 
@@ -61,11 +62,19 @@ export class ChatComponent implements OnInit, OnDestroy{
       image: null
     } as Message
     this.messages.update(messages => [...messages, message]);
+    setTimeout(() => {
+      this.scrollToBottom();
+    }, 0);
   });
-  
+
   clear() {
     this.message = '';
     this.imageUrl.set('');
     this.image = null;
+  }
+
+  scrollToBottom() {
+    const container = this.chatContainer.nativeElement;
+    container.scrollTop = container.scrollHeight;
   }
 }
