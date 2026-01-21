@@ -1,4 +1,4 @@
-import { AfterViewChecked, Component, effect, ElementRef, inject, OnDestroy, OnInit, signal, Signal, ViewChild } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, effect, ElementRef, inject, OnDestroy, OnInit, signal, Signal, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Message } from '@src/app/ai/interface/message.interface';
 import { WebsocketService } from '@src/app/ai/service/websocket.service';
@@ -35,6 +35,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.websocketService.send(this.message, this.image, this.extension);
     this.messages.update(messages => [...messages, { id: this.id++, content: this.message, role: "user", image: this.imageUrl(), name: this.user } as Message]);
     this.clear()
+    setTimeout(() => this.scrollToBottom(), 0);
   }
 
   onFileSelected(ev: Event) {
@@ -52,7 +53,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     reader.readAsDataURL(file);
   }
 
-  messafeEffect = effect(() => {
+  messageEffect = effect(() => {
     if (!this.websocketService.message()) { return; }
     let message = {
       id: this.id++,
@@ -62,9 +63,8 @@ export class ChatComponent implements OnInit, OnDestroy {
       image: null
     } as Message
     this.messages.update(messages => [...messages, message]);
-    setTimeout(() => {
-      this.scrollToBottom();
-    }, 0);
+    this.clear()
+    setTimeout(() => this.scrollToBottom(), 0);
   });
 
   clear() {

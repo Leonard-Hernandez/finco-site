@@ -1,6 +1,6 @@
 <main class="min-h-screen w-full pb-30 flex flex-col bg-finco-bg-color">
 
-    <section #chatContainer class="flex-1 pt-15 pb-5 overflow-y-auto flex flex-col justify-end">
+    <section #chatContainer class="flex-1 pb-10 pt-15 overflow-scroll flex flex-col">
         @for (message of messages(); track message.id) {
             <app-message [message]="message"/>
         }
