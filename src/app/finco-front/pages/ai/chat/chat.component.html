@@ -1,8 +1,20 @@
-<main class="min-h-screen w-full pb-30 flex flex-col bg-finco-bg-color">
+<main class="h-screen w-full pb-30 flex flex-col bg-finco-bg-color">
 
+    @if (messages().length === 0) {
+        <div class="flex flex-col items-center justify-center h-full">
+            <img src="/fincologo-preview.png" alt="Finco Logo" class="w-24 h-24">
+            <p class="text-finco-primary-color text-center">Start a conversation with Finco Assistant</p>
+        </div>
+    }
     <section #chatContainer class="flex-1 pb-10 pt-15 overflow-scroll flex flex-col">
         @for (message of messages(); track message.id) {
             <app-message [message]="message"/>
+        }
+        @if (loading()) {
+            <div class="flex items-center gap-3 px-4 py-3 bg-finco-card-bg-color/50 rounded-2xl border border-finco-secondary-color shadow-md w-fit">
+                <div class="h-4 w-4 rounded-full border-2 border-finco-primary-color border-t-transparent animate-spin"></div>
+                <span class="text-sm text-finco-primary-color">Thinking...</span>
+            </div>
         }
     </section>
 
@@ -39,11 +51,16 @@
                 <button 
                     (click)="send()" 
                     [disabled]="!message && !image"
+                    [disabled]="loading()"
                     class="p-3 bg-finco-button-bg-color hover:bg-finco-secondary-color disabled:bg-slate-700 disabled:text-slate-500 text-finco-primary-color rounded-xl transition-all active:scale-95 flex items-center justify-center"
-                >
+                >   
+                @if (!loading()) {
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                     </svg>
+                } @else {
+                    <div class="h-4 w-4 rounded-full border-2 border-finco-primary-color border-t-transparent animate-spin"></div>
+                }
                 </button>
             </div>
         </div>

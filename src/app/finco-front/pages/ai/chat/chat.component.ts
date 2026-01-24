@@ -14,6 +14,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   @ViewChild('chatContainer') chatContainer!: ElementRef;
   id = 0
+  loading = signal(false);
   image: string | null = null;
   imageUrl = signal('');
   extension: string | null = null;
@@ -32,9 +33,11 @@ export class ChatComponent implements OnInit, OnDestroy {
 
 
   send() {
+    if(this.loading()) { return; }
     this.websocketService.send(this.message, this.image, this.extension);
     this.messages.update(messages => [...messages, { id: this.id++, content: this.message, role: "user", image: this.imageUrl(), name: this.user } as Message]);
     this.clear()
+    this.loading.set(true);
     setTimeout(() => this.scrollToBottom(), 0);
   }
 
@@ -64,6 +67,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     } as Message
     this.messages.update(messages => [...messages, message]);
     this.clear()
+    this.loading.set(false);
     setTimeout(() => this.scrollToBottom(), 0);
   });
 
