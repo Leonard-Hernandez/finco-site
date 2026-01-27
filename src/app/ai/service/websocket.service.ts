@@ -3,6 +3,7 @@ import SockJS from 'sockjs-client';
 import { Client, IStompSocket, StompHeaders } from '@stomp/stompjs';
 import { AuthService } from '@src/app/auth/services/auth.service';
 import { environment } from '@src/environments/environment.local';
+import { ResponseError } from '@src/app/shared/interfaces/response-error.interface';
 
 interface AiaskDto {
   prompt: String,
@@ -18,7 +19,9 @@ export class WebsocketService {
   private readonly wsUrl: string = environment.url + '/ws';
   private client!: Client;
   private _message = signal('');
+  private _error = signal('');
   public readonly message = computed(this._message);
+  public readonly error = computed(this._error);
 
   private token = inject(AuthService).token();
   private userId = inject(AuthService).user()?.id;
@@ -34,6 +37,11 @@ export class WebsocketService {
       console.log('Connected: ' + frame);
       this.client.subscribe(`/user/queue/chat`, (message) => {
         this._message.set(message.body);
+      });
+
+      this.client.subscribe(`/user/queue/error`, (message: { body: string }) => {
+        const error = JSON.parse(message.body) as ResponseError;
+        this._error.set(error.message);
       });
     };
 
