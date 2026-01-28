@@ -6,7 +6,7 @@
             <p class="text-finco-primary-color text-center">Start a conversation with Finco Assistant</p>
         </div>
     }
-    <section #chatContainer class="flex-1 pb-10 pt-15 overflow-scroll flex flex-col">
+    <section #chatContainer class="flex-1 pb-10 pt-15 overflow-scroll scrollbar-hide flex flex-col">
         @for (message of messages(); track message.id) {
             <app-message [message]="message"/>
         }
