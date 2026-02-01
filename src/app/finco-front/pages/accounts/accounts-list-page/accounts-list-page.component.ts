@@ -1,7 +1,7 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
-import { map } from 'rxjs';
+import { map, of } from 'rxjs';
 import { AccountComponent } from "@app/account/components/account/account.component";
 import { AccountFilter, AccountResponse } from '@app/account/interface/account.interface';
 import { AccountService } from '@app/account/service/account.service';
@@ -43,6 +43,19 @@ export class AccountsListPageComponent {
     })
   ), { initialValue: null });
 
+  transactionsResource = rxResource({
+    request: () => this.transactionFilter(),
+    loader: ({ request: filter }) => {
+      if (!filter.startDate) { return of([]); }
+      return this.transactionsService.getTransactions(filter).pipe(
+        map((response: TransactionResponse) => {
+          this.transactions.set(response.content);
+          return response.content;
+        })
+      );
+    }
+  });
+
   accountFilter = signal<AccountFilter>({
     pagination: {
       page: 0,
@@ -59,16 +72,6 @@ export class AccountsListPageComponent {
       limitSeries: 5,
       convertToDefaultCurrency: true
     };
-  });
-
-  transactionsResource = rxResource({
-    request: () => this.transactionFilter(),
-    loader: () => this.transactionsService.getTransactions(this.transactionFilter()).pipe(
-      map((response: TransactionResponse) => {
-        this.transactions.set(response.content);
-        return response.content;
-      })
-    )
   });
 
   accounts = toSignal(this.accountService.getAccounts(this.accountFilter()).pipe(

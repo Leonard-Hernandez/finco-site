@@ -1,7 +1,7 @@
 import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { map } from 'rxjs';
+import { map, of } from 'rxjs';
 import { AccountService } from '@app/account/service/account.service';
 import { AuthService } from '@app/auth/services/auth.service';
 import { TotalComponent } from "@app/shared/components/total/total.component";
@@ -46,11 +46,14 @@ export class DashboardPageComponent {
 
   transactions = rxResource({
     request: () => this.filter(),
-    loader: () => this.transactionsService.getTransactions(this.filter()).pipe(
-      map((response: TransactionResponse) => {
-        return response.content;
-      })
-    )
+    loader: ({ request: filter }) => {
+      if (!filter.startDate) { return of([]); }
+      return this.transactionsService.getTransactions(filter).pipe(
+        map((response: TransactionResponse) => {
+          return response.content;
+        })
+      );
+    }
   });
 
   transactionChartOptions = computed<TransactionChartOptions>(() => {

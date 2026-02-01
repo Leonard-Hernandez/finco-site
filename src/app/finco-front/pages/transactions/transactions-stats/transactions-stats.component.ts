@@ -6,7 +6,7 @@ import { TransactionService } from '@src/app/transaction/services/transaction.se
 import { Router } from '@angular/router';
 import { Transaction, TransactionChartOptions, TransactionFilter, TransactionResponse, TransactionType } from '@src/app/transaction/interface/transaction';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';
+import { map, of } from 'rxjs';
 import { IncomeExpensePieChartComponent } from '@src/app/transaction/components/income-expense-pie-chart/income-expense-pie-chart.component';
 import { AccountFilter, AccountResponse } from '@src/app/account/interface/account.interface';
 import { AccountService } from '@src/app/account/service/account.service';
@@ -85,22 +85,28 @@ export class TransactionsStatsComponent {
 
   lastTransactionResource = rxResource({
     request: () => this.transactionFilter(),
-    loader: () => this.transactionsService.getLastestTransaction(this.transactionFilter()).pipe(
-      map((response: TransactionResponse) => {
-        this.lastTransaction.set(response.content[0]);
-        return response.content[0];
-      })
-    )
+    loader: ({ request: filter }) => {
+      if (!filter.startDate) { return of(null); }
+      return this.transactionsService.getLastestTransaction(filter).pipe(
+        map((response: TransactionResponse) => {
+          this.lastTransaction.set(response.content[0]);
+          return response.content[0];
+        })
+      );
+    }
   });
 
   transactionsResource = rxResource({
     request: () => this.transactionFilter(),
-    loader: () => this.transactionsService.getTransactions(this.transactionFilter()).pipe(
-      map((response: TransactionResponse) => {
-        this.transactions.set(response.content);
-        return response.content;
-      })
-    )
+    loader: ({ request: filter }) => {
+      if (!filter.startDate) { return of([]); }
+      return this.transactionsService.getTransactions(filter).pipe(
+        map((response: TransactionResponse) => {
+          this.transactions.set(response.content);
+          return response.content;
+        })
+      );
+    }
   });
 
   accounts = toSignal(this.accountsService.getAccounts(this.accountFilter()).pipe(
