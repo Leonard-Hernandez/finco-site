@@ -85,15 +85,12 @@ export class TransactionsStatsComponent {
 
   lastTransactionResource = rxResource({
     request: () => this.transactionFilter(),
-    loader: ({ request: filter }) => {
-      if (!filter.startDate) { return of(null); }
-      return this.transactionsService.getLastestTransaction(filter).pipe(
-        map((response: TransactionResponse) => {
-          this.lastTransaction.set(response.content[0]);
-          return response.content[0];
-        })
-      );
-    }
+    loader: () => this.transactionsService.getLastestTransaction(this.transactionFilter()).pipe(
+      map((response: TransactionResponse) => {
+        this.lastTransaction.set(response.content[0]);
+        return response.content[0];
+      })
+    )
   });
 
   transactionsResource = rxResource({
