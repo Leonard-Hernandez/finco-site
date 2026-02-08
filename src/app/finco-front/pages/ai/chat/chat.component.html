@@ -1,0 +1,71 @@
+<main class="h-screen w-full pb-30 flex flex-col bg-finco-bg-color">
+
+    @if (messages().length === 0) {
+        <div class="flex flex-col items-center justify-center h-full">
+            <img src="/fincologo-preview.png" alt="Finco Logo" class="w-24 h-24">
+            <p class="text-finco-primary-color text-center">Start a conversation with Finco Assistant</p>
+        </div>
+    }
+    <section #chatContainer class="flex-1 pb-10 pt-15 overflow-scroll scrollbar-hide flex flex-col">
+        @for (message of messages(); track message.id) {
+            <app-message [message]="message"/>
+        }
+        @if (loading()) {
+            <div class="flex items-center gap-3 px-4 py-3 bg-finco-card-bg-color/50 rounded-2xl border border-finco-secondary-color shadow-md w-fit">
+                <div class="h-4 w-4 rounded-full border-2 border-finco-primary-color border-t-transparent animate-spin"></div>
+                <span class="text-sm text-finco-primary-color">Thinking...</span>
+            </div>
+        }
+    </section>
+
+    <footer class="fixed bottom-15 left-0 right-0 p-4">
+        <div class="max-w-3xl mx-auto bg-finco-card-bg-color/50 backdrop-blur-xl border border-finco-bg-color rounded-2xl shadow-2xl p-2 transition-all focus-within:border-finco-secondary-color">
+            
+            @if (image != null) {
+                <div class="relative inline-block m-2 group">
+                    <div class="absolute -top-2 -right-2 z-20">
+                        <button (click)="clear()" class="bg-red-500 hover:bg-red-600 text-white p-1 rounded-full shadow-lg transition-transform active:scale-90">
+                            <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <use href="/sprite.svg#close" />
+                            </svg>
+                        </button>
+                    </div>
+                    <img [src]="imageUrl()" class="h-24 w-24 object-cover rounded-xl border-2 border-indigo-500/30 shadow-md transition-opacity group-hover:opacity-90" />
+                </div>
+            }
+
+            <div class="flex items-end gap-2">
+                <button (click)="fileInput.click()" class="p-3 text-finco-primary-color hover:text-finco-secondary-color hover:bg-slate-700/50 rounded-xl transition-all active:scale-95">
+                    <svg class="h-6 w-6 text-finco-primary-color">
+                        <use href="/sprite.svg#attach" />
+                    </svg>
+                </button>
+                <input #fileInput class="hidden" type="file" accept="image/*" (change)="onFileSelected($event)" />
+
+                <textarea 
+                    class="flex-grow bg-transparent border-none focus:ring-0 text-finco-primary-color placeholder-slate-500 py-3 resize-none max-h-32 text-sm focus:outline-none"
+                    rows="1"
+                    placeholder="Send a message..."
+                    [(ngModel)]="message"
+                    (keydown.enter)="$event.preventDefault(); send()"
+                ></textarea>
+
+                <button 
+                    (click)="send()" 
+                    [disabled]="loading() || (!message && !image)"
+                    class="p-3 bg-finco-button-bg-color hover:bg-finco-secondary-color disabled:bg-slate-700 disabled:text-slate-500 text-finco-primary-color rounded-xl transition-all active:scale-95 flex items-center justify-center"
+                >   
+                @if (!loading()) {
+                    <svg class="h-5 w-5 rotate-90 text-finco-primary-color">
+                        <use href="/sprite.svg#send" />
+                    </svg>
+                } @else {
+                    <div class="h-4 w-4 rounded-full border-2 border-finco-primary-color border-t-transparent animate-spin"></div>
+                }
+                </button>
+            </div>
+        </div>
+    </footer>
+</main>
+
+<app-error-modal [_message]="errorMessage()" [_signal]="hasError()" [_details]="errorDetails()" />

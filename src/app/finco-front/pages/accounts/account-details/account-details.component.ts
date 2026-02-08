@@ -2,7 +2,7 @@ import { Component, computed, effect, inject, signal, Signal } from '@angular/co
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AccountService } from '@app/account/service/account.service';
 import { rxResource, toSignal } from '@angular/core/rxjs-interop';
-import { map } from 'rxjs';
+import { map, of } from 'rxjs';
 import { Account } from '@app/account/interface/account.interface';
 import { CurrencyPipe, PercentPipe } from '@angular/common';
 import { TransactionChartComponent } from "@app/transaction/components/transaction-chart/transaction-chart.component";
@@ -61,13 +61,16 @@ export class AccountDetailsComponent {
 
   transactionsResource = rxResource({
     request: () => this.transactionFilter(),
-    loader: () => this.transactionService.getTransactions(this.transactionFilter()).pipe(
-      map((response: TransactionResponse) => {
-        this.transactions.set(response.content);
-        return response.content;
-      })
-    )
-  })
+    loader: ({ request: filter }) => {
+      if (!filter.startDate) { return of([]); }
+      return this.transactionService.getTransactions(filter).pipe(
+        map((response: TransactionResponse) => {
+          this.transactions.set(response.content);
+          return response.content;
+        })
+      );
+    }
+  });
 
   transactionChartOptions = computed<TransactionChartOptions>(() => {
     return {

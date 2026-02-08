@@ -1,4 +1,4 @@
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, effect, input, output } from '@angular/core';
 import { Transaction } from '@app/transaction/interface/transaction';
 
 interface Range {
@@ -33,12 +33,23 @@ export class TransactionRangesButtonsComponent {
 
   shouldDisable(rangeDate: Date): boolean {
     const lastDate = this.lastTransactionDate();
-
     return !!lastDate && rangeDate.getTime() > lastDate.getTime();
   }
 
   onRangeClick(range: Date) {
     this.range.emit(range);
   }
+
+  minDate = effect(() => {
+    const lastDate = this.lastTransactionDate();
+    const dates = this.ranges().map(r => r.date).sort((a, b) => a.getTime() - b.getTime());
+    let minDate: Date | undefined;
+    dates.forEach((date) => {
+      if (date.getTime() < lastDate!.getTime()) {
+        minDate = date;
+      }
+    });
+    this.range.emit(minDate!);
+  })
 
 }
