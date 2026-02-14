@@ -144,9 +144,29 @@ export class IncomeExpensePieChartComponent implements AfterViewInit {
     });
 
     incomeData.sort((a, b) => b.value - a.value);
-    expenseData.sort((a, b) => a.value - b.value);
+    expenseData.sort((a, b) => b.value - a.value);
 
-    return { incomeData: incomeData.slice(0, 5), expenseData: expenseData.slice(0, 5) };
+    // Process income data: top 4 + others
+    let processedIncomeData = this.processChartData(incomeData);
+    let processedExpenseData = this.processChartData(expenseData);
+
+    return { incomeData: processedIncomeData, expenseData: processedExpenseData };
+  }
+
+  private processChartData(data: { label: string; value: number }[]): { label: string; value: number }[] {
+    if (data.length <= 4) {
+      return data;
+    }
+
+    let top4 = data.slice(0, 4);
+    
+    let othersSum = data.slice(5).reduce((sum, item) => sum + item.value, 0);
+    
+    if (othersSum > 0) {
+      top4.push({ label: 'Others', value: othersSum });
+    }
+    
+    return top4;
   }
 
 }
