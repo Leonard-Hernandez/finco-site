@@ -5,7 +5,7 @@ import { GoalFilter, GoalResponse } from '@src/app/goal/interface/goal.interface
 import { GoalService } from '@src/app/goal/service/goal.service';
 import { Transaction, TransactionChartOptions, TransactionFilter, TransactionResponse } from '@src/app/transaction/interface/transaction';
 import { TransactionService } from '@src/app/transaction/services/transaction.service';
-import { map } from 'rxjs';
+import { map, of } from 'rxjs';
 import { TransactionComponent } from "@app/transaction/components/transaction/transaction.component";
 import { TransactionChartComponent } from "@app/transaction/components/transaction-chart/transaction-chart.component";
 import { TransactionRangesButtonsComponent } from "@app/transaction/components/transaction-ranges-buttons/transaction-ranges-buttons.component";
@@ -64,12 +64,15 @@ export class GoalsListPageComponent {
 
   transactionsResource = rxResource({
     request: () => this.transactionFilter(),
-    loader: () => this.transactionsService.getTransactions(this.transactionFilter()).pipe(
-      map((response: TransactionResponse) => {
-        this.transactions.set(response.content);
-        return response.content;
-      })
-    )
+    loader: ({ request: filter }) => {
+      if (!filter.startDate) { return of([]); }
+      return this.transactionsService.getTransactions(filter).pipe(
+        map((response: TransactionResponse) => {
+          this.transactions.set(response.content);
+          return response.content;
+        })
+      );
+    }
   });
 
   goals = toSignal(this.goalService.getGoals(this.goalFilter()).pipe(

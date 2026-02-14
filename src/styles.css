@@ -47,6 +47,14 @@
   transition: all 0.3s ease-in;
 }
 
+*{
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+*::-webkit-scrollbar {
+  display: none;
+}
+
 @theme {
     --font-sansaction: [sansaction, "sans-serif"];
 

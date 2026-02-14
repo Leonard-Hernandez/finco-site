@@ -1,0 +1,41 @@
+<div class="flex flex-col mb-4 px-2"
+    [ngClass]="{
+                'items-end': message().role === 'user',
+                'items-start': message().role !== 'user'
+            }">
+    
+    <span class="text-[10px] font-bold uppercase tracking-widest mb-1 px-2"
+            [ngClass]="{
+                'text-finco-light-blue-color': message().role === 'user',
+                'text-finco-gold-color': message().role !== 'user'
+            }"
+          [style.color]="message().role === 'user' ? 'var(--color-finco-light-blue-color)' : 'var(--color-finco-gold-color)'">
+        {{ message().name }}
+    </span>
+
+    <section 
+        class="relative max-w-[90%] md:max-w-[75%] bg-finco-card-bg-color border-finco-secondary-color p-4 rounded-2xl border transition-all duration-300 shadow-lg"
+        [ngClass]="{
+            'rounded-tr-none': message().role === 'user',
+            'rounded-tl-none': message().role !== 'user'
+        }"
+    >
+
+        
+        @if (message().image) {
+            <div class="mb-3 overflow-hidden rounded-lg border-finco-primary-color">
+                <img [src]="message().image" 
+                     class="w-full h-auto max-h-72 object-cover" />
+            </div>
+        }
+
+        <p class="text-sm leading-relaxed whitespace-pre-wrap break-words text-finco-primary-color">
+            {{ message().content }}
+        </p>
+
+        @if (message().role === 'FincoAi') {
+            <div class="absolute -bottom-1 -right-1 w-2 h-2 rounded-full bg-finco-button-bg-color">
+            </div>
+        }
+    </section>
+</div>

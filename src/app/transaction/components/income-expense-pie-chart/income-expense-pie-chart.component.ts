@@ -103,13 +103,11 @@ export class IncomeExpensePieChartComponent implements AfterViewInit {
         },
       },
     });
-
-
   }
 
   generateData() {
-    let incomeTransactions = this._transactions()!.filter((transaction) => transaction.type === 'DEPOSIT' || transaction.type === 'DEPOSIT_GOAL');
-    let expenseTransactions = this._transactions()!.filter((transaction) => transaction.type === 'WITHDRAW' || transaction.type === 'WITHDRAW_GOAL');
+    let incomeTransactions = this._transactions()!.filter((transaction) => (transaction.type === 'DEPOSIT' || transaction.type === 'DEPOSIT_GOAL') && transaction.transferAccount === null);
+    let expenseTransactions = this._transactions()!.filter((transaction) => (transaction.type === 'WITHDRAW' || transaction.type === 'WITHDRAW_GOAL') && transaction.transferAccount === null);
 
     let incomeMap = new Map<string, number>();
     let expenseMap = new Map<string, number>();
