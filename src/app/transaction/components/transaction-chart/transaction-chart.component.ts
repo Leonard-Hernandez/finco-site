@@ -140,7 +140,7 @@ export class TransactionChartComponent {
     let map = new Map<string, number>();
 
     transaction.sort((a, b) => {
-      return a.id - b.id;
+      return new Date(a.date).getTime() - new Date(b.date).getTime();
     });
 
     transaction.forEach((transaction) => {
