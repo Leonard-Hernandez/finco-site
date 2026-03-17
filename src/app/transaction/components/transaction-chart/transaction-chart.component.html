@@ -1,9 +1,9 @@
-<div>
-    <p class="text-finco-secondary-color">Status: Transactions {{transactionsCount()}}</p>
-    <div class="flex gap-2">
+<div class="w-full min-w-0">
+    <p class="text-finco-secondary-color text-sm">Status: Transactions {{transactionsCount()}}</p>
+    <div class="flex gap-2 flex-wrap">
         @for (series of series(); track $index) {
             <p class="text-sm" [class]="classColors[$index]" >{{series}}</p>
         }
-    </div>    
+    </div>
     <div id="statusChart" class="w-full h-52 shadow-2xl"></div>
 </div>

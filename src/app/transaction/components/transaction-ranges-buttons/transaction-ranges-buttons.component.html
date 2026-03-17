@@ -1,4 +1,4 @@
-<div class="flex gap-1 justify-between px-10 py-1">
+<div class="flex gap-1 justify-between overflow-x-auto px-2 sm:px-4 py-1 scrollbar-hide">
   @for (range of ranges(); track $index) {
   <button
     [disabled]="shouldDisable(range.date)"
@@ -6,7 +6,7 @@
     [class.cursor-not-allowed]="shouldDisable(range.date)"
     [class.text-finco-primary-color]="!shouldDisable(range.date)"
     [class.text-gray-500]="shouldDisable(range.date)"
-    class="text-finco-primary-color py-1 shadow-sm shadow-finco-secondary-color px-3 rounded-2xl"
+    class="text-finco-primary-color py-1 shadow-sm shadow-finco-secondary-color px-2 sm:px-3 rounded-2xl text-xs sm:text-sm whitespace-nowrap shrink-0"
     (click)="onRangeClick(range.date)"
   >
     {{ range.name }}

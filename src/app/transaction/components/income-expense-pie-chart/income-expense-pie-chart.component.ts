@@ -25,6 +25,8 @@ export class IncomeExpensePieChartComponent implements AfterViewInit {
   incomeChart: Chart | undefined;
   expenseChart: Chart | undefined;
 
+  hasData = signal<boolean>(true);
+
   chartEffect = effect(() => {
     if (this.transactions() && this.transactions()!.length > 0 && this.viewInit()) {
       this.generateCharts();
@@ -44,6 +46,12 @@ export class IncomeExpensePieChartComponent implements AfterViewInit {
     }
 
     let { incomeData, expenseData } = this.generateData();
+
+    if (incomeData.length === 0 && expenseData.length === 0) {
+      this.hasData.set(false);
+      return;
+    }
+    this.hasData.set(true);
 
     this.incomeChart = new Chart(this.incomeChartCanvas.nativeElement, {
       type: 'pie',
@@ -106,7 +114,7 @@ export class IncomeExpensePieChartComponent implements AfterViewInit {
   }
 
   generateData() {
-    let incomeTransactions = this._transactions()!.filter((transaction) => (transaction.type === 'DEPOSIT' || transaction.type === 'DEPOSIT_GOAL') && transaction.transferAccount === null);
+    let incomeTransactions = this._transactions()!.filter((transaction) => (transaction.type === 'DEPOSIT' || transaction.type === 'DEPOSIT_GOAL') && transaction.transferAccount === null && transaction.account.type !== 'CREDIT');
     let expenseTransactions = this._transactions()!.filter((transaction) => (transaction.type === 'WITHDRAW' || transaction.type === 'WITHDRAW_GOAL') && transaction.transferAccount === null);
 
     let incomeMap = new Map<string, number>();

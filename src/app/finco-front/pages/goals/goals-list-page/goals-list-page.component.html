@@ -2,41 +2,38 @@
   <app-loading-page />
 } @else {
 <div
-  class="flex flex-col py-15 justify-between items-center min-h-screen max-h-screen min-w-screen max-w-screen bg-gradient-to-br from-finco-bg-color to-finco-card-bg-color"
+  class="flex flex-col gap-2 items-center min-h-[calc(100vh-7rem)] w-full px-4 py-3 bg-gradient-to-br from-finco-bg-color to-finco-card-bg-color"
 >
-  <div class="flex flex-col gap-2 min-w-85 font-bold">
+  <section class="w-full max-w-lg">
     <app-transaction-chart
       [transactionChartOptions]="transactionChartOptions()"
     />
     <transaction-ranges-buttons [lastTransaction]="lastTransaction()" (range)="updateTransactionFilter($event)" />
-  </div>
+  </section>
 
-  <div class="w-full px-4">
-    <h2 class="text-finco-secondary-color">Goals</h2>
+  <section class="w-full max-w-lg">
+    <h2 class="text-finco-secondary-color font-bold">Goals</h2>
     <div class="flex gap-4 overflow-x-auto pb-4 snap-x snap-proximity">
       @for (goal of goals(); track $index) {
       <app-goal [goal]="goal"/>
       }
     </div>
-  </div>
+  </section>
 
-  <div
-    class="w-95 h-full flex-2 flex flex-col p-3 gap-2 overflow-y-auto rounded-xl z-1"
-  >
-    <div>
-      <h2 class="text-finco-secondary-color">Transactions</h2>
-    </div>
+  <section class="w-full max-w-lg flex-1 flex flex-col gap-2 overflow-y-auto">
+    <h2 class="text-finco-secondary-color font-bold">Transactions</h2>
     <div class="flex flex-col gap-2 overflow-y-auto">
       @for (transaction of transactions(); track $index) {
       <app-transaction [transaction]="transaction" />
       }
     </div>
-  </div>
+  </section>
 </div>
 
 <a
   class="fixed top-15 right-4 h-10 w-10 rounded-full shadow-sm shadow-finco-secondary-color text-finco-primary-color font-bold text-4xl flex justify-center items-center"
   routerLink="/goals/create"
+  aria-label="Create goal"
 >
   <svg class="w-5 h-5 text-finco-primary-color font-bold">
     <use xlink:href="/sprite.svg#plusIcon" />

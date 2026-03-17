@@ -8,12 +8,13 @@ import { FormUtils } from '@src/app/shared/utils/form-utils';
 import { TransactionService } from '@src/app/transaction/services/transaction.service';
 import { map } from 'rxjs';
 import { ErrorModalComponent } from "@app/shared/components/error-modal/error-modal.component";
+import { ConfirmationModalComponent, TransactionSummary } from "@app/shared/components/confirmation-modal/confirmation-modal.component";
 import { ResponseError } from '@app/shared/interfaces/response-error.interface';
 import { CurrencyPipe, formatCurrency } from '@angular/common';
 
 @Component({
   selector: 'app-account-opertion',
-  imports: [ReactiveFormsModule, ErrorModalComponent, CurrencyPipe],
+  imports: [ReactiveFormsModule, ErrorModalComponent, ConfirmationModalComponent, CurrencyPipe],
   templateUrl: './account-opertion.component.html'
 })
 export class AccountOpertionComponent {
@@ -22,6 +23,8 @@ export class AccountOpertionComponent {
   hasError = signal<boolean>(false);
   errorMessage = signal<string>('');
   errorDetails = signal<string>('');
+  showConfirmation = signal<boolean>(false);
+  transactionSummary = signal<TransactionSummary | null>(null);
 
   router = inject(Router)
   fb = inject(FormBuilder);
@@ -46,8 +49,8 @@ export class AccountOpertionComponent {
 
   transactionForm = this.fb.group({
     amount: [null,[Validators.required, Validators.min(0)]],
-    category: [null, []],
-    description: [null, [Validators.maxLength(255)]],
+    category: [null, [Validators.maxLength(100)]],
+    description: [null, [Validators.maxLength(500)]],
     transferAccountId: [0, []],
     exchangeRate: [0],
   });
@@ -77,18 +80,67 @@ export class AccountOpertionComponent {
       return;
     }
 
+    const amount = this.transactionForm.value.amount!;
+    const category = this.transactionForm.value.category ? String(this.transactionForm.value.category).trim() : undefined;
+    const description = this.transactionForm.value.description ? String(this.transactionForm.value.description).trim() : undefined;
+
+    const summary: TransactionSummary = {
+      operationType: this.operation() as 'deposit' | 'withdraw' | 'transfer',
+      sourceAccountName: this.account().name,
+      sourceAccountCurrency: this.account().currency,
+      sourceAccountBalance: this.account().balance,
+      amount: amount,
+      fee: 0,
+      finalAmount: this.calculateBalance(),
+      category: category,
+      description: description,
+    };
+
+    if (this.operation() === 'deposit') {
+      // Backend: fee = amount * depositFee, added to balance = amount - fee
+      summary.fee = amount * (this.account().depositFee ?? 0);
+    }
+
+    if (this.operation() === 'withdraw') {
+      // Backend: fee = amount * withdrawFee, deducted from balance = amount + fee
+      summary.fee = amount * (this.account().withdrawFee ?? 0);
+    }
+
+    if (this.operation() === 'transfer') {
+      // Backend: source withdraw fee = amount * withdrawFee (deducted from source)
+      const withdrawFee = amount * (this.account().withdrawFee ?? 0);
+      summary.fee = withdrawFee;
+      summary.totalDeducted = amount + withdrawFee;
+      summary.targetAccountName = this.toAccount().name;
+      summary.targetAccountCurrency = this.toAccount().currency;
+
+      // Backend: destination deposit fee applied to depositAmount
+      var depositAmount: number = amount;
+      if (this.exchangeRate() > 0) {
+        summary.exchangeRate = this.exchangeRate();
+        depositAmount = amount * this.exchangeRate();
+      }
+      summary.targetFee = depositAmount * (this.toAccount().depositFee ?? 0);
+    }
+
+    this.transactionSummary.set(summary);
+    this.showConfirmation.set(true);
+  }
+
+  confirmTransaction() {
     this.isSubmitting.set(true);
+    this.showConfirmation.set(false);
 
     const transactionData: TransactionData = {
       amount: this.transactionForm.value.amount!,
     }
 
     if (this.transactionForm.value.category != null) {
-      transactionData.category = this.transactionForm.value.category!;
+      transactionData.category = String(this.transactionForm.value.category!).trim();
     }
 
     if (this.transactionForm.value.description != null) {
-      transactionData.description = this.transactionForm.value.description!;
+      transactionData.description = String(this.transactionForm.value.description!).trim();
     }
 
     if (this.operation() == 'deposit') {
@@ -97,14 +149,7 @@ export class AccountOpertionComponent {
           this.router.navigate([`/accounts/details/${this.account().id}`]);
         },
         error: (error) => {
-          this.hasError.set(true);
-          const errorResponse = error.error as ResponseError;
-          this.errorMessage.set(errorResponse.error);
-          this.errorDetails.set(errorResponse.message);
-          setTimeout(() => {
-            this.isSubmitting.set(false);
-            this.hasError.set(false);
-          }, 3000);
+          this.handleError(error);
         }
       });
     }
@@ -122,14 +167,13 @@ export class AccountOpertionComponent {
 
     if (this.operation() == 'transfer') {
       var transferData: TransferData = {
-        ... transactionData, 
+        ... transactionData,
         transferAccountId: this.transactionForm.value.transferAccountId!
       }
 
       if (this.transactionForm.value.exchangeRate) {
-        transferData.exchangeRate = this.transactionForm.value.exchangeRate!  
+        transferData.exchangeRate = this.transactionForm.value.exchangeRate!
       }
-
 
       this.accountService.transferAccount(this.account().id!, transferData).subscribe({
         next: (success) => {
@@ -140,7 +184,11 @@ export class AccountOpertionComponent {
         }
       });
     }
+  }
 
+  cancelConfirmation() {
+    this.showConfirmation.set(false);
+    this.transactionSummary.set(null);
   }
 
   validateEffect = effect(() => {
@@ -192,20 +240,24 @@ export class AccountOpertionComponent {
   calculateBalance = computed(() => {
 
     if (this.operation() === 'deposit') {
+      // Backend: balance += amount - (amount * depositFee)
       return this.balance() - (this.balance() * (this.account()?.depositFee ?? 0));
     }
 
     if (this.operation() === 'withdraw') {
+      // Backend: balance -= amount + (amount * withdrawFee)
       return this.balance() + (this.balance() * (this.account()?.withdrawFee ?? 0));
     }
 
     if (this.operation() === 'transfer') {
-      var resume = this.balance();
-      resume = resume - (resume * (this.account()?.withdrawFee ?? 0));
+      // Backend: recipient gets deposit(depositAmount) where depositAmount = amount * exchangeRate
+      // deposit() adds: depositAmount - (depositAmount * depositFee)
+      // The source withdrawFee does NOT affect what the recipient receives
+      var depositAmount = this.balance();
       if (this.exchangeRate() > 0) {
-        resume = resume * this.exchangeRate();
+        depositAmount = depositAmount * this.exchangeRate();
       }
-      return resume - (resume * (this.toAccount()?.depositFee ?? 0));
+      return depositAmount - (depositAmount * (this.toAccount()?.depositFee ?? 0));
     }
 
     return this.balance();

@@ -1,49 +1,49 @@
 <div
-  class="w-full h-30 aspect-ratio-2/1 rounded-xl bg-finco-card-bg-color border-2 border-finco-button-bg-color px-4 py-2"
+  class="w-full rounded-xl bg-finco-card-bg-color border-2 border-finco-button-bg-color px-3 py-2 sm:px-4 sm:py-3"
 >
   <div
-    class="flex justify-between items-center text-sm text-finco-primary-color"
+    class="flex justify-between items-center text-xs sm:text-sm text-finco-primary-color"
   >
     @if (transaction().type === 'WITHDRAW' || transaction().type ===
     'WITHDRAW_GOAL') {
-    <p class="text-red-500">{{ transaction().type.replace('_', ' ') }}</p>
+    <p class="text-red-500 font-semibold">{{ transaction().type.replace('_', ' ') }}</p>
     } @else if (transaction().type === 'DEPOSIT' || transaction().type ===
     'DEPOSIT_GOAL') {
-    <p class="text-green-500">{{ transaction().type.replace('_', ' ') }}</p>
+    <p class="text-green-500 font-semibold">{{ transaction().type.replace('_', ' ') }}</p>
     }
-    <p>{{ transaction().date | date : "medium" }}</p>
+    <p class="text-xs sm:text-sm shrink-0 ml-2">{{ transaction().date | date : "medium" }}</p>
   </div>
   <div
-    class="flex justify-between items-center text-sm text-finco-primary-color"
+    class="flex justify-between items-center text-xs sm:text-sm text-finco-primary-color mt-1"
   >
-    <p>{{ transaction().account.name }}</p>
+    <p class="truncate">{{ transaction().account.name }}</p>
     @if (transaction().transferAccount) { @if (transaction().type ===
     'WITHDRAW') {
-    <p class="text-red-500 text-xs">TO</p>
+    <p class="text-red-500 text-xs shrink-0 mx-1">TO</p>
     } @else {
-    <p class="text-green-500 text-xs">FROM</p>
+    <p class="text-green-500 text-xs shrink-0 mx-1">FROM</p>
     }
-    <p>{{ transaction().transferAccount.name }}</p>
+    <p class="truncate text-right">{{ transaction().transferAccount.name }}</p>
     } @else if (transaction().goal) { @if (transaction().type ===
     'DEPOSIT_GOAL') {
-    <p class="text-red-500 text-xs">TO</p>
+    <p class="text-red-500 text-xs shrink-0 mx-1">TO</p>
     } @else {
-    <p class="text-green-500 text-xs">FROM</p>
+    <p class="text-green-500 text-xs shrink-0 mx-1">FROM</p>
     }
-    <p>{{ transaction().goal.name }}</p>
+    <p class="truncate text-right">{{ transaction().goal.name }}</p>
     }
   </div>
   <div
-    class="flex justify-between items-center text-sm text-finco-primary-color"
+    class="flex justify-between items-center text-xs sm:text-sm text-finco-primary-color mt-1"
   >
     <p>amount:</p>
-    <p>
+    <p class="shrink-0 ml-2">
       {{ transaction().amount | currency : "" : "" }}
       {{ transaction().account.currency }}
     </p>
   </div>
   <div
-    class="flex justify-between items-center text-sm text-finco-primary-color"
+    class="flex justify-between items-center text-xs sm:text-sm text-finco-primary-color mt-1"
   >
     <p>
       fee: {{ transaction().fee | currency : "" : "" }}
@@ -52,7 +52,7 @@
     @if (transaction().transferAccount && transaction().account.currency !==
     transaction().transferAccount.currency && transaction().type === 'WITHDRAW')
     {
-    <p>
+    <p class="text-xs shrink-0 ml-2">
       Ex rate ({{ transaction().account.currency }}/{{
         transaction().transferAccount.currency
       }}):{{ transaction().exchangeRate }}
@@ -60,9 +60,13 @@
     }
   </div>
   <div
-    class="flex justify-between items-center text-sm text-finco-primary-color"
+    class="flex flex-col sm:flex-row sm:justify-between sm:items-center text-xs sm:text-sm text-finco-primary-color mt-1 gap-0.5 sm:gap-2 min-w-0"
   >
-    <p>{{ transaction().category }}</p>
-    <p>{{ transaction().description }}</p>
+    @if (transaction().category) {
+    <p class="shrink-0">{{ transaction().category }}</p>
+    }
+    @if (transaction().description) {
+    <p class="break-words line-clamp-2 sm:line-clamp-1 sm:text-right min-w-0">{{ transaction().description }}</p>
+    }
   </div>
 </div>
