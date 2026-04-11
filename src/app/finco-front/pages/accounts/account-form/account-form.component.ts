@@ -56,6 +56,9 @@ export class AccountFormComponent {
     })
     this.accountService.getAccountTypes().subscribe((accountTypes) => {
       this.accountTypes.set(accountTypes);
+      if (!this.account() && accountTypes.length > 0 && !this.accountForm.value.type) {
+        this.accountForm.patchValue({ type: accountTypes[0] });
+      }
     })
 
     if (!isNaN(parseInt(this.accountId()))) {
