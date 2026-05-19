@@ -53,6 +53,13 @@
                 </button>
                 <input #fileInput class="hidden" type="file" multiple accept="image/*,application/pdf,.pdf" (change)="onFileSelected($event)" />
 
+                <button (click)="cameraInput.click()" class="sm:hidden p-2 text-finco-primary-color hover:text-finco-secondary-color hover:bg-slate-700/50 rounded-xl transition-all active:scale-95 shrink-0" aria-label="Take photo">
+                    <svg class="h-5 w-5 text-finco-primary-color">
+                        <use href="/sprite.svg#camera" />
+                    </svg>
+                </button>
+                <input #cameraInput class="hidden" type="file" accept="image/*" capture="environment" (change)="onFileSelected($event)" />
+
                 <textarea
                     class="flex-grow bg-transparent border-none focus:ring-0 text-finco-primary-color placeholder-slate-500 py-3 resize-none max-h-32 text-sm focus:outline-none min-w-0"
                     rows="1"
