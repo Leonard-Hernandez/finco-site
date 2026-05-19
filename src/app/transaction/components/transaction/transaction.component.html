@@ -66,7 +66,25 @@
     <p class="shrink-0">{{ transaction().category }}</p>
     }
     @if (transaction().description) {
-    <p class="break-words line-clamp-2 sm:line-clamp-1 sm:text-right min-w-0">{{ transaction().description }}</p>
+    <div class="flex items-start gap-1 min-w-0 sm:justify-end" [class.flex-1]="descriptionExpanded()">
+      <p
+        class="break-words min-w-0 sm:text-right"
+        [class.line-clamp-2]="!descriptionExpanded()"
+        [class.sm:line-clamp-1]="!descriptionExpanded()"
+        [class.whitespace-pre-wrap]="descriptionExpanded()"
+        [attr.data-testid]="'transaction-description'"
+        [attr.data-expanded]="descriptionExpanded()"
+      >{{ transaction().description }}</p>
+      @if (isLongDescription()) {
+      <button
+        type="button"
+        (click)="toggleDescription($event)"
+        class="text-finco-secondary-color hover:text-finco-gold-color text-xs font-semibold shrink-0 underline"
+        [attr.aria-label]="descriptionExpanded() ? 'Collapse description' : 'Expand description'"
+        data-testid="toggle-description"
+      >{{ descriptionExpanded() ? 'less' : 'more' }}</button>
+      }
+    </div>
     }
   </div>
 </div>
