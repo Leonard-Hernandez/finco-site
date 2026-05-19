@@ -5,11 +5,15 @@ import { AuthService } from '@src/app/auth/services/auth.service';
 import { environment } from '@src/environments/environment.local';
 import { ResponseError } from '@src/app/shared/interfaces/response-error.interface';
 
+export interface AttachmentPayload {
+  data: string;
+  mimeType: string;
+}
+
 interface AiaskDto {
-  prompt: String,
-  userId: number,
-  image: String | null,
-  imageExtension: string | null,
+  prompt: string;
+  userId: number;
+  attachments: AttachmentPayload[];
 }
 
 @Injectable({
@@ -27,7 +31,10 @@ export class WebsocketService {
   private userId = inject(AuthService).user()?.id;
 
   connect() {
-    this.client = new Client();
+    this.client = new Client({
+      splitLargeFrames: true,
+      maxWebSocketChunkSize: 16 * 1024,
+    });
     this.client.webSocketFactory = () => {
       const ws = new SockJS(this.wsUrl);
       return ws as IStompSocket;
@@ -58,12 +65,11 @@ export class WebsocketService {
     this.client.activate();
   }
 
-  send(message: string, image: string | null, imageExtension: string | null) {
+  send(message: string, attachments: AttachmentPayload[]) {
     let AiAsk = {
       prompt: message,
       userId: this.userId,
-      image: image,
-      imageExtension: 'image/' + imageExtension
+      attachments: attachments,
     } as AiaskDto
 
     this.client.publish({

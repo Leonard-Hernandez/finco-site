@@ -3,7 +3,7 @@
                 'items-end': message().role === 'user',
                 'items-start': message().role !== 'user'
             }">
-    
+
     <span class="text-[10px] font-bold uppercase tracking-widest mb-1 px-2"
             [ngClass]="{
                 'text-finco-light-blue-color': message().role === 'user',
@@ -13,7 +13,7 @@
         {{ message().name }}
     </span>
 
-    <section 
+    <section
         class="relative max-w-[90%] md:max-w-[75%] bg-finco-card-bg-color border-finco-secondary-color p-4 rounded-2xl border transition-all duration-300 shadow-lg"
         [ngClass]="{
             'rounded-tr-none': message().role === 'user',
@@ -21,11 +21,20 @@
         }"
     >
 
-        
-        @if (message().image) {
-            <div class="mb-3 overflow-hidden rounded-lg border-finco-primary-color">
-                <img [src]="message().image" 
-                     class="w-full h-auto max-h-72 object-cover" />
+        @if (message().attachments && message().attachments.length > 0) {
+            <div class="mb-3 flex flex-wrap gap-2">
+                @for (att of message().attachments; track $index) {
+                    @if (att.mimeType.startsWith('image/')) {
+                        <div class="overflow-hidden rounded-lg border-finco-primary-color">
+                            <img [src]="att.url" [alt]="att.name" class="w-full h-auto max-h-72 object-cover" />
+                        </div>
+                    } @else {
+                        <div class="flex items-center gap-2 px-3 py-2 bg-finco-bg-color rounded-lg border border-finco-secondary-color">
+                            <span class="text-xs font-bold text-finco-secondary-color">PDF</span>
+                            <span class="text-xs text-finco-primary-color break-all">{{ att.name }}</span>
+                        </div>
+                    }
+                }
             </div>
         }
 

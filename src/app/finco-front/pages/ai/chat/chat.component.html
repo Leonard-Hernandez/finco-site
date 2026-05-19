@@ -6,7 +6,7 @@
             <p class="text-finco-primary-color text-center px-4">Start a conversation with Finco Assistant</p>
         </div>
     }
-    <section #chatContainer class="flex-1 pt-14 pb-28 overflow-y-auto scrollbar-hide flex flex-col px-2 sm:px-4">
+    <section #chatContainer class="flex-1 pt-14 pb-32 overflow-y-auto scrollbar-hide flex flex-col px-2 sm:px-4">
         @for (message of messages(); track message.id) {
             <app-message [message]="message"/>
         }
@@ -18,29 +18,40 @@
         }
     </section>
 
-    <footer class="fixed bottom-14 left-0 right-0 p-2 sm:p-4">
+    <footer class="fixed bottom-16 left-0 right-0 p-2 sm:p-4">
         <div class="max-w-3xl mx-auto bg-finco-card-bg-color/50 backdrop-blur-xl border border-finco-bg-color rounded-2xl shadow-2xl p-2 transition-all focus-within:border-finco-secondary-color">
 
-            @if (image != null) {
-                <div class="relative inline-block m-2 group">
-                    <div class="absolute -top-2 -right-2 z-20">
-                        <button (click)="clear()" class="bg-red-500 hover:bg-red-600 text-white p-1 rounded-full shadow-lg transition-transform active:scale-90" aria-label="Remove image">
-                            <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <use href="/sprite.svg#close" />
-                            </svg>
-                        </button>
-                    </div>
-                    <img [src]="imageUrl()" alt="Attached image" class="h-20 w-20 sm:h-24 sm:w-24 object-cover rounded-xl border-2 border-indigo-500/30 shadow-md transition-opacity group-hover:opacity-90" />
+            @if (attachments().length > 0) {
+                <div class="flex flex-wrap gap-2 m-2">
+                    @for (att of attachments(); track $index) {
+                        <div class="relative inline-block group">
+                            <div class="absolute -top-2 -right-2 z-20">
+                                <button (click)="removeAttachment($index)" class="bg-red-500 hover:bg-red-600 text-white p-1 rounded-full shadow-lg transition-transform active:scale-90" aria-label="Remove attachment">
+                                    <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <use href="/sprite.svg#close" />
+                                    </svg>
+                                </button>
+                            </div>
+                            @if (isImage(att.mimeType)) {
+                                <img [src]="att.url" [alt]="att.name" class="h-20 w-20 sm:h-24 sm:w-24 object-cover rounded-xl border-2 border-indigo-500/30 shadow-md transition-opacity group-hover:opacity-90" />
+                            } @else {
+                                <div class="h-20 w-20 sm:h-24 sm:w-24 flex flex-col items-center justify-center bg-finco-bg-color rounded-xl border-2 border-indigo-500/30 shadow-md p-1">
+                                    <span class="text-[10px] font-bold text-finco-secondary-color mb-1">PDF</span>
+                                    <span class="text-[9px] text-finco-primary-color text-center break-all line-clamp-3">{{ att.name }}</span>
+                                </div>
+                            }
+                        </div>
+                    }
                 </div>
             }
 
             <div class="flex items-end gap-1 sm:gap-2">
-                <button (click)="fileInput.click()" class="p-2 sm:p-3 text-finco-primary-color hover:text-finco-secondary-color hover:bg-slate-700/50 rounded-xl transition-all active:scale-95 shrink-0" aria-label="Attach image">
+                <button (click)="fileInput.click()" class="p-2 sm:p-3 text-finco-primary-color hover:text-finco-secondary-color hover:bg-slate-700/50 rounded-xl transition-all active:scale-95 shrink-0" aria-label="Attach files">
                     <svg class="h-5 w-5 sm:h-6 sm:w-6 text-finco-primary-color">
                         <use href="/sprite.svg#attach" />
                     </svg>
                 </button>
-                <input #fileInput class="hidden" type="file" accept="image/*" (change)="onFileSelected($event)" />
+                <input #fileInput class="hidden" type="file" multiple accept="image/*,application/pdf,.pdf" (change)="onFileSelected($event)" />
 
                 <textarea
                     class="flex-grow bg-transparent border-none focus:ring-0 text-finco-primary-color placeholder-slate-500 py-3 resize-none max-h-32 text-sm focus:outline-none min-w-0"
@@ -52,7 +63,7 @@
 
                 <button
                     (click)="send()"
-                    [disabled]="loading() || (!message && !image)"
+                    [disabled]="loading() || (!message && attachments().length === 0)"
                     class="p-2 sm:p-3 bg-finco-button-bg-color hover:bg-finco-secondary-color disabled:bg-slate-700 disabled:text-slate-500 text-finco-primary-color rounded-xl transition-all active:scale-95 flex items-center justify-center shrink-0"
                     aria-label="Send message"
                 >
