@@ -2,19 +2,17 @@
   <app-loading-page />
 } @else {
 <div
-  class="flex flex-col gap-2 justify-center items-center bg-gradient-to-br from-finco-bg-color to-finco-card-bg-color min-h-screen max-h-screen min-w-screen max-w-screen pt-17 pb-13"
+  class="flex flex-col gap-2 items-center w-full min-h-[calc(100vh-7rem)] px-4 py-3 bg-gradient-to-br from-finco-bg-color to-finco-card-bg-color"
 >
-  <div class="flex flex-col gap-2 min-w-85 font-bold">
+  <section class="w-full max-w-lg">
     <app-transaction-chart
       [transactionChartOptions]="transactionChartOptions()"
     />
     <transaction-ranges-buttons (range)="updateTransactionFilter($event)" />
-  </div>
+  </section>
 
-  <section class="goal-details min-w-90 max-w-90 rounded-xl bg-finco-card-bg-color border border-gray-200 p-3">
-      <header
-      class="flex justify-between items-start text-xs text-finco-secondary-color"
-    >
+  <section class="w-full max-w-lg rounded-xl bg-finco-card-bg-color border border-gray-200 p-3">
+    <header class="flex justify-between items-start text-xs text-finco-secondary-color">
       <p class="flex items-center">
         <span class="material-icons-outlined text-sm mr-1">event_available</span>
         {{ goal()!.creationDate | date : "mediumDate" }}
@@ -24,52 +22,43 @@
         {{ goal()!.deadLine | date : "mediumDate" }}
       </p>
     </header>
-    <div class="flex justify-between items-center text-lg font-bold text-finco-primary-color">
-      <p>{{ goal()!.name }}</p>
-      <p>Total {{ total() | currency : "" : "" }} {{exchangeService.defaultCurrency()!}}</p>
+
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 mt-2">
+      <h3 class="text-lg font-bold text-finco-primary-color truncate">{{ goal()!.name }}</h3>
+      <p class="text-sm font-bold text-finco-primary-color shrink-0">Total {{ total() | currency : "" : "" }} {{exchangeService.defaultCurrency()!}}</p>
     </div>
+
     <!-- Action Buttons -->
-    <div class="grid grid-cols-2 gap-2 mt-1">
-      <!-- Withdraw Button -->
+    <div class="grid grid-cols-2 gap-2 mt-2">
       <button
-        (click)="
-          router.navigate([
-            '/goals/operation/' + goal()!.id + '/withdraw'
-          ])
-        "
-        class="flex flex-col items-center justify-center p-1.5 rounded-lg"
+        (click)="router.navigate(['/goals/operation/' + goal()!.id + '/withdraw'])"
+        class="flex flex-col items-center justify-center p-1.5 rounded-lg hover:bg-red-500/10 transition-colors"
+        aria-label="Withdraw from goal"
       >
-        <div
-          class="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center"
-        >
+        <div class="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center">
           <svg class="w-5 h-5 text-red-500">
             <use xlink:href="/sprite.svg#minusIcon" />
           </svg>
         </div>
+        <span class="text-xs text-finco-secondary-color mt-1">Withdraw</span>
       </button>
-      <!-- Deposit Button -->
       <button
-        (click)="
-          router.navigate([
-            '/goals/operation/' + goal()!.id + '/deposit'
-          ])
-        "
+        (click)="router.navigate(['/goals/operation/' + goal()!.id + '/deposit'])"
         class="flex flex-col items-center justify-center p-1.5 rounded-lg hover:bg-finco-button-bg-color/10 transition-colors"
+        aria-label="Deposit to goal"
       >
-        <div
-          class="w-10 h-10 rounded-full bg-finco-button-bg-color/10 flex items-center justify-center"
-        >
+        <div class="w-10 h-10 rounded-full bg-finco-button-bg-color/10 flex items-center justify-center">
           <svg class="w-5 h-5 text-finco-primary-color">
             <use xlink:href="/sprite.svg#plusIcon" />
           </svg>
         </div>
+        <span class="text-xs text-finco-secondary-color mt-1">Deposit</span>
       </button>
     </div>
+
     @if (goal()!.goalAccountBalances) {
-      <div>
-        <h2 class="text-finco-secondary-color">Accounts</h2>
-      </div>
-      <div class="mt-2 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+      <h4 class="text-finco-secondary-color font-bold text-sm mt-3">Accounts</h4>
+      <div class="mt-1 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
       @for (goalAccountBalance of goal()!.goalAccountBalances; track $index) {
         <div class="px-2 py-1 rounded-full whitespace-nowrap bg-finco-primary-color/10">
           <span class="text-xs font-medium text-finco-secondary-color">
@@ -81,30 +70,23 @@
     }
   </section>
 
-  <div
-    class="w-95 h-full flex-2 flex flex-col p-3 gap-2 overflow-y-auto rounded-xl z-1"
-  >
-    <div>
-      <h2 class="text-finco-secondary-color">Transactions</h2>
-    </div>
+  <section class="w-full max-w-lg flex-1 flex flex-col gap-2 overflow-y-auto">
+    <h2 class="text-finco-secondary-color font-bold">Transactions</h2>
     <div class="flex flex-col gap-2 overflow-y-auto">
       @for (transaction of transactions(); track $index) {
       <app-transaction [transaction]="transaction" />
       }
     </div>
-  </div>
+  </section>
 </div>
 
 <a
   class="fixed top-15 right-4 h-10 w-10 rounded-full shadow-sm shadow-finco-secondary-color text-finco-primary-color font-bold text-4xl flex justify-center items-center"
   routerLink="/goals/edit/{{ goal()?.id }}"
+  aria-label="Edit goal"
 >
-  <div
-    class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-  >
-    <svg class="h-5 w-5 text-finco-primary-color">
-      <use xlink:href="/sprite.svg#editIcon" />
-    </svg>
-  </div>
+  <svg class="h-5 w-5 text-finco-primary-color">
+    <use xlink:href="/sprite.svg#editIcon" />
+  </svg>
 </a>
 }

@@ -11,10 +11,11 @@ import { FormUtils } from '@src/app/shared/utils/form-utils';
 import { TransactionService } from '@app/transaction/services/transaction.service';
 import { map } from 'rxjs';
 import { ErrorModalComponent } from "@app/shared/components/error-modal/error-modal.component";
+import { ConfirmationModalComponent, TransactionSummary } from "@app/shared/components/confirmation-modal/confirmation-modal.component";
 
 @Component({
   selector: 'app-goals-opertion',
-  imports: [ReactiveFormsModule, ErrorModalComponent],
+  imports: [ReactiveFormsModule, ErrorModalComponent, ConfirmationModalComponent],
   templateUrl: './goals-opertion.component.html'
 })
 export class GoalsOpertionComponent {
@@ -23,6 +24,8 @@ export class GoalsOpertionComponent {
   hasError = signal<boolean>(false);
   errorMessage = signal<string>('');
   errorDetails = signal<string>('');
+  showConfirmation = signal<boolean>(false);
+  transactionSummary = signal<TransactionSummary | null>(null);
 
   router = inject(Router)
   fb = inject(FormBuilder);
@@ -43,8 +46,8 @@ export class GoalsOpertionComponent {
   transactionForm = this.fb.group({
     accountId: [null as number | null, [Validators.required, Validators.min(0)]],
     amount: [null, [Validators.required, Validators.min(0)]],
-    category: [null, []],
-    description: [null, [Validators.maxLength(255)]],
+    category: [null, [Validators.maxLength(100)]],
+    description: [null, [Validators.maxLength(500)]],
   });
 
   accountFilter: AccountFilter = {
@@ -80,7 +83,49 @@ export class GoalsOpertionComponent {
       return;
     }
 
+    const amount = this.transactionForm.value.amount!;
+    const accountId = this.transactionForm.value.accountId!;
+    const category = this.transactionForm.value.category ?? undefined;
+    const description = this.transactionForm.value.description ?? undefined;
+
+    const selectedAccount = this.accounts().find(a => a.id == accountId);
+    let selectedAccountName = '';
+    let selectedAccountCurrency = '';
+    let selectedAccountBalance: number | undefined;
+
+    if (selectedAccount) {
+      selectedAccountName = selectedAccount.name;
+      selectedAccountCurrency = selectedAccount.currency;
+      selectedAccountBalance = selectedAccount.balance;
+    } else if (this.operation() === 'withdraw' && this.goal().goalAccountBalances) {
+      const gab = this.goal().goalAccountBalances!.find(g => g.account.id == accountId);
+      if (gab) {
+        selectedAccountName = gab.account.name;
+        selectedAccountCurrency = gab.account.currency;
+        selectedAccountBalance = gab.balance;
+      }
+    }
+
+    const summary: TransactionSummary = {
+      operationType: this.operation() === 'deposit' ? 'deposit_goal' : 'withdraw_goal',
+      sourceAccountName: selectedAccountName,
+      sourceAccountCurrency: selectedAccountCurrency,
+      sourceAccountBalance: selectedAccountBalance,
+      amount: amount,
+      fee: 0,
+      finalAmount: amount,
+      category: category,
+      description: description,
+      goalName: this.goal().name,
+    };
+
+    this.transactionSummary.set(summary);
+    this.showConfirmation.set(true);
+  }
+
+  confirmTransaction() {
     this.isSubmitting.set(true);
+    this.showConfirmation.set(false);
 
     const transactionData: GoalTransactionData = {
       accountId: this.transactionForm.value.accountId!,
@@ -116,7 +161,11 @@ export class GoalsOpertionComponent {
         }
       });
     }
+  }
 
+  cancelConfirmation() {
+    this.showConfirmation.set(false);
+    this.transactionSummary.set(null);
   }
 
   validateEffect = effect(() => {

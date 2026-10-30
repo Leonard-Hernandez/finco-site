@@ -1,0 +1,15 @@
+node_modules
+dist
+.angular
+.git
+.gitignore
+.vscode
+.agents
+.atl
+.claude
+plans
+coverage
+out-tsc
+*.md
+Dockerfile
+.dockerignore

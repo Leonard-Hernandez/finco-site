@@ -1,14 +1,14 @@
 <button
   (click)="router.navigate(['/goals/details/', goal().id])"
-  class="min-w-85 max-w-85 aspect-ratio-2/1 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 border-2 border-finco-button-bg-color p-4 flex flex-col justify-between snap-center"
+  class="min-w-72 sm:min-w-85 max-w-85 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 border-2 border-finco-button-bg-color p-4 flex flex-col justify-between snap-center"
 >
-  <div class="mt-2">
-    <div class="flex justify-between items-center">
-      <h3 class="font-bold text-lg text-finco-primary-color mb-1 line-clamp-1">
+  <div class="mt-2 min-w-0">
+    <div class="flex justify-between items-center gap-2">
+      <h3 class="font-bold text-base sm:text-lg text-finco-primary-color mb-1 line-clamp-1 min-w-0">
         {{ goal().name }}
       </h3>
-      <div class="bg-finco-primary-color/10 px-2 py-1 rounded-full">
-        <p class="text-xs font-medium text-finco-primary-color">
+      <div class="bg-finco-primary-color/10 px-2 py-1 rounded-full shrink-0">
+        <p class="text-xs font-medium text-finco-primary-color whitespace-nowrap">
           {{ total() | currency : "" : "" }}
           {{ exchageService.defaultCurrency() }}
         </p>

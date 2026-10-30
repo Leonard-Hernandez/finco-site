@@ -1,0 +1,174 @@
+@if (visible && summary) {
+<div class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" (click)="onCancel()"></div>
+
+  <!-- Modal -->
+  <div class="relative w-full max-w-md bg-finco-card-bg-color/95 backdrop-blur-md rounded-2xl shadow-2xl border border-white/10 animate-slide-in-right max-h-[90vh] overflow-y-auto">
+    <!-- Header -->
+    <div class="px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4 border-b border-white/10">
+      <h2 class="text-lg sm:text-xl font-bold text-finco-primary-color">Confirm {{ operationLabel }}</h2>
+      <p class="text-xs sm:text-sm text-finco-secondary-color mt-1">Please review the transaction details</p>
+    </div>
+
+    <!-- Body -->
+    <div class="px-4 sm:px-6 py-3 sm:py-4 space-y-3 sm:space-y-4">
+
+      <!-- Operation Type -->
+      <div class="flex justify-between items-center">
+        <span class="text-xs sm:text-sm text-finco-secondary-color">Operation</span>
+        <span class="text-xs sm:text-sm font-semibold text-white">{{ operationLabel }}</span>
+      </div>
+
+      <!-- Source Account -->
+      <div class="flex justify-between items-center min-w-0">
+        <span class="text-xs sm:text-sm text-finco-secondary-color shrink-0 mr-2">
+          @if (isTransfer) { From } @else { Account }
+        </span>
+        <span class="text-xs sm:text-sm font-semibold text-white truncate">{{ summary.sourceAccountName }}</span>
+      </div>
+
+      <!-- Goal Name -->
+      @if (isGoalOperation && summary.goalName) {
+      <div class="flex justify-between items-center min-w-0">
+        <span class="text-xs sm:text-sm text-finco-secondary-color shrink-0 mr-2">Goal</span>
+        <span class="text-xs sm:text-sm font-semibold text-white truncate">{{ summary.goalName }}</span>
+      </div>
+      }
+
+      <!-- Target Account (Transfer) -->
+      @if (isTransfer && summary.targetAccountName) {
+      <div class="flex justify-between items-center min-w-0">
+        <span class="text-xs sm:text-sm text-finco-secondary-color shrink-0 mr-2">To</span>
+        <span class="text-xs sm:text-sm font-semibold text-white truncate">{{ summary.targetAccountName }}</span>
+      </div>
+      }
+
+      <!-- Account Balance -->
+      @if (summary.sourceAccountBalance !== undefined) {
+      <div class="flex justify-between items-center">
+        <span class="text-xs sm:text-sm text-finco-secondary-color shrink-0 mr-2">Current Balance</span>
+        <span class="text-xs sm:text-sm text-white">{{ summary.sourceAccountBalance | currency: "" : "" }} {{ summary.sourceAccountCurrency }}</span>
+      </div>
+      }
+
+      <div class="border-t border-white/10 my-1 sm:my-2"></div>
+
+      <!-- Amount -->
+      <div class="flex justify-between items-center">
+        <span class="text-xs sm:text-sm text-finco-secondary-color">Amount</span>
+        <span class="text-xs sm:text-sm font-semibold text-white">{{ summary.amount | currency: "" : "" }} {{ summary.sourceAccountCurrency }}</span>
+      </div>
+
+      <!-- Fee for Deposit: subtracted from amount -->
+      @if (!isTransfer && !isWithdraw && summary.fee > 0) {
+      <div class="flex justify-between items-center">
+        <span class="text-xs sm:text-sm text-finco-secondary-color">Fee</span>
+        <span class="text-xs sm:text-sm text-red-400">- {{ summary.fee | currency: "" : "" }} {{ summary.sourceAccountCurrency }}</span>
+      </div>
+      }
+
+      <!-- Fee for Withdraw: added cost -->
+      @if (isWithdraw && summary.fee > 0) {
+      <div class="flex justify-between items-center">
+        <span class="text-xs sm:text-sm text-finco-secondary-color">Fee</span>
+        <span class="text-xs sm:text-sm text-red-400">+ {{ summary.fee | currency: "" : "" }} {{ summary.sourceAccountCurrency }}</span>
+      </div>
+      }
+
+      <!-- Transfer: Source Fee (withdraw fee) -->
+      @if (isTransfer && summary.fee > 0) {
+      <div class="flex justify-between items-center">
+        <span class="text-xs sm:text-sm text-finco-secondary-color">Source Fee</span>
+        <span class="text-xs sm:text-sm text-red-400">+ {{ summary.fee | currency: "" : "" }} {{ summary.sourceAccountCurrency }}</span>
+      </div>
+      }
+
+      <!-- Transfer: Total Deducted from source -->
+      @if (isTransfer && summary.totalDeducted) {
+      <div class="flex justify-between items-center">
+        <span class="text-xs sm:text-sm text-finco-secondary-color">Total Deducted</span>
+        <span class="text-xs sm:text-sm font-semibold text-white">{{ summary.totalDeducted | currency: "" : "" }} {{ summary.sourceAccountCurrency }}</span>
+      </div>
+      }
+
+      <!-- Exchange Rate -->
+      @if (hasCurrencyConversion) {
+      <div class="flex justify-between items-center">
+        <span class="text-xs sm:text-sm text-finco-secondary-color">Exchange Rate</span>
+        <span class="text-xs sm:text-sm text-white">1 {{ summary.sourceAccountCurrency }} = {{ summary.exchangeRate }} {{ summary.targetAccountCurrency }}</span>
+      </div>
+      }
+
+      <!-- Transfer: Destination Fee (deposit fee) -->
+      @if (isTransfer && summary.targetFee && summary.targetFee > 0) {
+      <div class="flex justify-between items-center">
+        <span class="text-xs sm:text-sm text-finco-secondary-color">Destination Fee</span>
+        <span class="text-xs sm:text-sm text-red-400">- {{ summary.targetFee | currency: "" : "" }} {{ summary.targetAccountCurrency }}</span>
+      </div>
+      }
+
+      <div class="border-t border-white/10 my-1 sm:my-2"></div>
+
+      <!-- Final Amount: Deposit = what's added, Withdraw = total deducted -->
+      <div class="flex justify-between items-center">
+        <span class="text-xs sm:text-sm text-finco-secondary-color font-semibold">
+          @if (isTransfer) {
+            Recipient receives
+          } @else if (isWithdraw) {
+            Total Deducted
+          } @else {
+            Final Amount
+          }
+        </span>
+        <span class="text-base sm:text-lg font-bold text-finco-primary-color">
+          {{ summary.finalAmount | currency: "" : "" }}
+          @if (isTransfer && summary.targetAccountCurrency) {
+            {{ summary.targetAccountCurrency }}
+          } @else {
+            {{ summary.sourceAccountCurrency }}
+          }
+        </span>
+      </div>
+
+      <!-- Category -->
+      @if (summary.category) {
+      <div class="flex justify-between items-center min-w-0">
+        <span class="text-xs sm:text-sm text-finco-secondary-color shrink-0 mr-2">Category</span>
+        <span class="text-xs sm:text-sm text-white truncate">{{ summary.category }}</span>
+      </div>
+      }
+
+      <!-- Description -->
+      @if (summary.description) {
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 min-w-0">
+        <span class="text-xs sm:text-sm text-finco-secondary-color shrink-0">Description</span>
+        <span class="text-xs sm:text-sm text-white break-words sm:text-right min-w-0">{{ summary.description }}</span>
+      </div>
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="px-4 sm:px-6 pb-4 sm:pb-6 pt-2 flex gap-3">
+      <button
+        (click)="onCancel()"
+        [disabled]="isSubmitting"
+        class="flex-1 py-2.5 sm:py-3 px-4 rounded-xl border border-white/10 text-finco-secondary-color text-xs sm:text-sm font-bold hover:bg-white/5 transition duration-200"
+      >
+        Cancel
+      </button>
+      <button
+        (click)="onConfirm()"
+        [disabled]="isSubmitting"
+        class="flex-1 py-2.5 sm:py-3 px-4 rounded-xl bg-finco-primary-color text-finco-bg-color text-xs sm:text-sm font-bold hover:bg-finco-primary-color/90 transition duration-200"
+      >
+        @if (isSubmitting) {
+          Loading...
+        } @else {
+          Confirm
+        }
+      </button>
+    </div>
+  </div>
+</div>
+}

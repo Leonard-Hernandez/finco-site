@@ -5,11 +5,15 @@ import { AuthService } from '@src/app/auth/services/auth.service';
 import { environment } from '@src/environments/environment.local';
 import { ResponseError } from '@src/app/shared/interfaces/response-error.interface';
 
+export interface AttachmentPayload {
+  data: string;
+  mimeType: string;
+}
+
 interface AiaskDto {
-  prompt: String,
-  userId: number,
-  image: String | null,
-  imageExtension: string | null,
+  prompt: string;
+  userId: number;
+  attachments: AttachmentPayload[];
 }
 
 @Injectable({
@@ -23,11 +27,13 @@ export class WebsocketService {
   public readonly message = computed(this._message);
   public readonly error = computed(this._error);
 
-  private token = inject(AuthService).token();
-  private userId = inject(AuthService).user()?.id;
+  private authService = inject(AuthService);
 
   connect() {
-    this.client = new Client();
+    this.client = new Client({
+      splitLargeFrames: true,
+      maxWebSocketChunkSize: 16 * 1024,
+    });
     this.client.webSocketFactory = () => {
       const ws = new SockJS(this.wsUrl);
       return ws as IStompSocket;
@@ -50,20 +56,22 @@ export class WebsocketService {
       console.log("Disconnected: " + frame);
     }
 
-    let header: StompHeaders = {
-      Authorization: 'Bearer ' + this.token
+    // Read the token on every (re)connect: it is short-lived and replaced on each login.
+    this.client.beforeConnect = () => {
+      const header: StompHeaders = {
+        Authorization: 'Bearer ' + this.authService.token()
+      };
+      this.client.connectHeaders = header;
     };
 
-    this.client.connectHeaders = header;
     this.client.activate();
   }
 
-  send(message: string, image: string | null, imageExtension: string | null) {
+  send(message: string, attachments: AttachmentPayload[]) {
     let AiAsk = {
       prompt: message,
-      userId: this.userId,
-      image: image,
-      imageExtension: 'image/' + imageExtension
+      userId: this.authService.user()?.id,
+      attachments: attachments,
     } as AiaskDto
 
     this.client.publish({

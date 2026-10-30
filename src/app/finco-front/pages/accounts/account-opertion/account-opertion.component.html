@@ -230,3 +230,11 @@
 </div>
 
 <app-error-modal [_message]="errorMessage()" [_signal]="hasError()" [_details]="errorDetails()" />
+
+<app-confirmation-modal
+  [visible]="showConfirmation()"
+  [summary]="transactionSummary()"
+  [isSubmitting]="isSubmitting()"
+  (confirmed)="confirmTransaction()"
+  (cancelled)="cancelConfirmation()"
+/>

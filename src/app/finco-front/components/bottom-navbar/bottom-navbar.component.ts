@@ -1,6 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { AuthService } from '@src/app/auth/services/auth.service';
+import { AuthService, FincoRoles } from '@src/app/auth/services/auth.service';
 
 @Component({
   selector: 'bottom-navbar',
@@ -10,5 +10,7 @@ import { AuthService } from '@src/app/auth/services/auth.service';
 export class BottomNavbarComponent {
 
   authService = inject(AuthService);
+
+  isPremium = computed(() => this.authService.hasRole(FincoRoles.PREMIUM));
 
 }

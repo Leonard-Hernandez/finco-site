@@ -194,3 +194,11 @@
   [_signal]="hasError()"
   [_details]="errorDetails()"
 />
+
+<app-confirmation-modal
+  [visible]="showConfirmation()"
+  [summary]="transactionSummary()"
+  [isSubmitting]="isSubmitting()"
+  (confirmed)="confirmTransaction()"
+  (cancelled)="cancelConfirmation()"
+/>

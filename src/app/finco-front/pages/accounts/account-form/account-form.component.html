@@ -50,7 +50,7 @@
                             class="block w-full pl-10 pr-3 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-finco-primary-color focus:border-transparent transition duration-200"
                             formControlName="type">
                             @for (type of accountTypes(); track $index) {
-                            <option [value]="type" [selected]="type === 'CASH'"
+                            <option [value]="type"
                                 class="text-finco-secondary-color bg-finco-bg-color">
                                 {{ type }}
                             </option>
