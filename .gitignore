@@ -47,3 +47,7 @@ Thumbs.db
 plans/
 CLAUDE.md
 pnpm-lock.yaml
+
+# Ai
+.agents/*
+skills-lock.json
