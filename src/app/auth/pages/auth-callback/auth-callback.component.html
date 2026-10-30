@@ -18,6 +18,8 @@
     </div>
   </div>
 </div>
+} @else if (onboardingReturnUrl() !== null) {
+<app-default-currency-form (saved)="resume(onboardingReturnUrl()!)" />
 } @else {
 <app-loading-page />
 }

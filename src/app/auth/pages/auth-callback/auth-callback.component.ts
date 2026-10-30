@@ -4,6 +4,10 @@ import { AuthService } from '@app/auth/services/auth.service';
 import { OAuthService } from '@app/auth/services/oauth.service';
 import { AuthorizationResponse, OAuthError } from '@app/auth/interfaces/oauth.interface';
 import { LoadingPageComponent } from '@app/shared/components/loading-page/loading-page.component';
+import { DefaultCurrencyFormComponent } from '@app/auth/components/default-currency-form/default-currency-form.component';
+import { TransactionService } from '@app/transaction/services/transaction.service';
+import { TransactionFilter } from '@app/transaction/interface/transaction';
+import { catchError, map, Observable, of } from 'rxjs';
 
 /**
  * redirect_uri of the authco client: exchanges the authorization code, loads the user
@@ -11,17 +15,20 @@ import { LoadingPageComponent } from '@app/shared/components/loading-page/loadin
  */
 @Component({
   selector: 'app-auth-callback',
-  imports: [LoadingPageComponent],
+  imports: [LoadingPageComponent, DefaultCurrencyFormComponent],
   templateUrl: './auth-callback.component.html'
 })
 export class AuthCallbackComponent implements OnInit {
 
   errorMessage = signal<string | null>(null);
+  /** Where to go once a first-time user has picked the default currency; null otherwise. */
+  onboardingReturnUrl = signal<string | null>(null);
 
   private authService = inject(AuthService);
   private oauth = inject(OAuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private transactionService = inject(TransactionService);
 
   private returnUrl = '/';
 
@@ -37,7 +44,9 @@ export class AuthCallbackComponent implements OnInit {
     this.returnUrl = this.oauth.pendingReturnUrl();
 
     this.authService.completeLogin(response).subscribe({
-      next: (returnUrl) => this.router.navigateByUrl(returnUrl, { replaceUrl: true }),
+      next: (returnUrl) => this.isNewUser().subscribe((isNew) => isNew
+        ? this.onboardingReturnUrl.set(returnUrl)
+        : this.resume(returnUrl)),
       error: (error: unknown) => this.errorMessage.set(error instanceof OAuthError
         ? error.message
         : 'Could not load your Finco account. Please try again.')
@@ -48,6 +57,21 @@ export class AuthCallbackComponent implements OnInit {
     this.errorMessage.set(null);
     this.oauth.startLogin(this.returnUrl).catch(() =>
       this.errorMessage.set('Could not reach the login page. Please try again.'));
+  }
+
+  resume(returnUrl: string) {
+    this.router.navigateByUrl(returnUrl, { replaceUrl: true });
+  }
+
+  // A new finco account starts in USD with no transactions: ask for the default currency first.
+  private isNewUser(): Observable<boolean> {
+    if (this.authService.user()?.defaultCurrency !== 'USD') {
+      return of(false);
+    }
+    return this.transactionService.getLastestTransaction({} as TransactionFilter).pipe(
+      map((page) => page.content.length === 0),
+      catchError(() => of(false))
+    );
   }
 
 }
