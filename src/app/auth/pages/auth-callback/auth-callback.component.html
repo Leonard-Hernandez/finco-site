@@ -1,0 +1,23 @@
+@if (errorMessage(); as message) {
+<div
+  class="min-h-screen w-full bg-gradient-to-br from-finco-bg-color to-finco-card-bg-color flex items-center justify-center p-4"
+>
+  <div class="w-full max-w-md">
+    <div
+      class="bg-white/10 backdrop-blur-md rounded-2xl p-8 shadow-xl border border-white/5 text-center space-y-6"
+    >
+      <h1 class="text-2xl font-bold text-finco-primary-color">Login failed</h1>
+      <p class="text-finco-secondary-color">{{ message }}</p>
+      <button
+        type="button"
+        (click)="retry()"
+        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-finco-bg-color bg-finco-primary-color hover:bg-finco-primary-color/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-finco-primary-color transition duration-200"
+      >
+        Try again
+      </button>
+    </div>
+  </div>
+</div>
+} @else {
+<app-loading-page />
+}

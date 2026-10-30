@@ -3,6 +3,9 @@ import { of, tap } from 'rxjs';
 
 const cache = new Map<string, any>();
 
+/** Drops every cached response, e.g. when the session ends (responses are per user). */
+export const clearHttpCache = (): void => cache.clear();
+
 const generateCacheKey = (req: HttpRequest<any>): string => {
   const params = new URLSearchParams();
   if (req.params instanceof HttpParams) {
@@ -24,7 +27,7 @@ export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
   const cacheKey = generateCacheKey(req);
   const cachedResponse = cache.get(cacheKey);
 
-  if (cachedResponse && !cacheKey.includes('check-status')) {
+  if (cachedResponse && !cacheKey.includes('/users/me')) {
     return of(cachedResponse);
   }
   return next(req).pipe(

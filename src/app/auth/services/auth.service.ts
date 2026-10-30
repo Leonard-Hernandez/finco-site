@@ -1,149 +1,142 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { environment } from '@src/environments/environment.local';
-import { AuthResponse } from '@app/auth/interfaces/auth-responses.interface';
-import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
-import { User } from '@app/auth/interfaces/user.interface';
 import { Router } from '@angular/router';
-import { UserRegister } from '../interfaces/user-register.interface';
-import { rxResource } from '@angular/core/rxjs-interop';
+import { catchError, finalize, map, Observable, of, switchMap, tap } from 'rxjs';
+import { environment } from '@src/environments/environment.local';
+import { User } from '@app/auth/interfaces/user.interface';
+import { AuthorizationResponse } from '@app/auth/interfaces/oauth.interface';
+import { OAuthService } from '@app/auth/services/oauth.service';
+import { scopesOf } from '@app/auth/utils/jwt';
+import { clearHttpCache } from '@app/shared/interceptors/cache.interceptor';
 
 type authStatus = 'checking' | 'authenticated' | 'not-authenticated';
 
+/** Role scopes authco adds to the access token from the user's roles. */
+export const FincoRoles = {
+  ADMIN: 'finco:admin',
+  PREMIUM: 'finco:premium'
+} as const;
+
+/**
+ * Session of the logged-in user. Tokens come from authco (see OAuthService); the user
+ * profile comes from finco (/users/me), roles from the access token `scope` claim.
+ */
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  private lastCheckStatus: Date | null = null;
-
-  private _authStatus = signal<authStatus>('checking');
-  private _user = signal<User | null>(null);
-  private _token = signal<string | null>(localStorage.getItem('token'));
-  private _roles = signal<string[] | null>(JSON.parse(localStorage.getItem('roles')!));
-
   private router = inject(Router);
   private http = inject(HttpClient);
+  private oauth = inject(OAuthService);
 
-  checkStatusResource = rxResource({
-    loader: () => this.checkStatus(),
+  private _checking = signal(true);
+  private _user = signal<User | null>(null);
+
+  private redirecting = false;
+  // A 401 while completing a login is shown on the callback page: restarting the login
+  // there would loop through authco forever (e.g. a misconfigured audience).
+  private completingLogin = false;
+
+  readonly user = this._user.asReadonly();
+  readonly authStatus = computed<authStatus>(() => {
+    if (this._checking()) return 'checking';
+    return this._user() ? 'authenticated' : 'not-authenticated';
+  });
+  readonly token = computed(() => this.oauth.session()?.accessToken ?? null);
+  readonly roles = computed(() => {
+    const token = this.token();
+    return token ? scopesOf(token) : [];
   });
 
-  authStatus = computed<authStatus>(() => {
-    if (this._authStatus() === 'checking') return 'checking';
-    if (this._user()) {
-      return 'authenticated';
-    }
-    return 'not-authenticated';
-  });
-
-  user = computed(() => this._user());
-  token = computed(() => this._token());
-  roles = computed(() => this._roles());
-
-  OauthLogin(token: string): Observable<User> {
-    return this.http.get<AuthResponse>(`${environment.url}/auth/check-status`, { headers: { Authorization: `Bearer ${token}` } }).pipe(
-      map((resp) => {
-        this.handleAuthSuccess(resp)
-        return resp.user;}),
-      catchError((error: any) => this.handleAuthError(error))
+  /** Handles the authco redirect: code exchange, then the user profile. Emits where to go next. */
+  completeLogin(response: AuthorizationResponse): Observable<string> {
+    this.completingLogin = true;
+    return this.oauth.completeLogin(response).pipe(
+      switchMap((returnUrl) => this.loadUser().pipe(map(() => returnUrl))),
+      catchError((error) => {
+        this.clearSession();
+        throw error;
+      }),
+      finalize(() => (this.completingLogin = false))
     );
   }
 
-  login(username: string, password: string): Observable<boolean> {
-    return this.http.post<AuthResponse>(`${environment.url}/auth/login`, { username, password }).pipe(
-      map((resp: AuthResponse) => this.handleAuthSuccess(resp)),
-      catchError((error) => {
-        return this.handleAuthError(error);
+  checkStatus(): Observable<boolean> {
+    if (!this.hasValidToken()) {
+      this.clearSession();
+      return of(false);
+    }
+
+    if (this._user()) {
+      return of(true);
+    }
+
+    return this.loadUser().pipe(
+      map(() => true),
+      catchError(() => {
+        this.clearSession();
+        return of(false);
       })
     );
   }
 
   updateUser(user: User) {
-    return this.http.patch(`${environment.url}/users/${user.id}`, user).pipe(
-      map((resp) => { }),
-      catchError((error) => this.handleAuthError(error))
+    return this.http.patch<User>(`${environment.url}/users/${user.id}`, {
+      name: user.name,
+      enable: user.enable,
+      defaultCurrency: user.defaultCurrency
+    }).pipe(
+      tap((updated) => this._user.set(updated))
     );
   }
 
-  register(userRegister: UserRegister) {
-    return this.http.post(`${environment.url}/users`, userRegister).pipe(
-      map((resp) => this.router.navigate(['/auth/login'])),
-      catchError((error) => this.handleAuthError(error))
-    );
-  }
-
-  checkStatus(): Observable<boolean> {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      this.logout();
-      return of(false);
-    }
-
-    if (this.lastCheckStatus !== null) {
-      const now = new Date();
-      const timeDiff = now.getTime() - this.lastCheckStatus.getTime();
-      if (timeDiff < 1000 * 60 * 60) {
-        return of(true);
-      }
-    }
-
-    return this.http.get<AuthResponse>(`${environment.url}/auth/check-status`).pipe(
-      map((resp) => this.handleAuthSuccess(resp)),
-      catchError((error: any) => this.handleAuthError(error))
-    );
-
-  }
-
+  /** Clears the local session and ends the authco session (OIDC RP-initiated logout). */
   logout() {
-    this._authStatus.set('not-authenticated');
-    this._user.set(null);
-    this._token.set(null);
-    this._roles.set(null);
-    this.lastCheckStatus = null;
+    const idToken = this.oauth.session()?.idToken;
+    this.clearSession();
 
-    localStorage.removeItem('token');
-  }
-
-  private handleAuthSuccess({ token, user }: AuthResponse) {
-    this._user.set(user);
-    this._token.set(token);
-    this._roles.set(this.getRoles(token));
-    this._authStatus.set('authenticated');
-    this.lastCheckStatus = new Date();
-
-    localStorage.setItem('token', token);
-
-    return true;
-  }
-
-  private handleAuthError(error: HttpErrorResponse) {
-    this.logout();
-    this.router.navigate(['/auth/login']);
-    return throwError(() => error);
-  }
-
-  getRoles(token: string): string[] {
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-
-      const authorities = JSON.parse(payload.authorities);
-
-      return authorities.map((auth: { authority: string }) => {
-        const role = auth.authority;
-        return role.startsWith('ROLE_') ? role.substring(5) : role;
-      });
-    } catch (error) {
-      return [];
+    if (idToken) {
+      this.redirecting = true;
+      window.location.assign(this.oauth.endSessionUrl(idToken));
+      return;
     }
+    this.router.navigate(['/auth/login']);
+  }
+
+  /** The access token expired or finco rejected it: without refresh tokens, log in again. */
+  restartLogin() {
+    if (this.redirecting || this.completingLogin) {
+      return;
+    }
+    this.clearSession();
+    this.redirecting = true;
+    this.oauth.startLogin(this.router.url);
   }
 
   hasRole(role: string): boolean {
+    return this.roles().includes(role);
+  }
 
-    let roles = this.getRoles(this.token()!);
+  private loadUser(): Observable<User> {
+    return this.http.get<User>(`${environment.url}/users/me`).pipe(
+      tap((user) => {
+        this._user.set(user);
+        this._checking.set(false);
+      })
+    );
+  }
 
-    return roles.includes(role);
-      
+  private hasValidToken(): boolean {
+    const session = this.oauth.session();
+    return !!session && Date.now() < session.expiresAt;
+  }
+
+  private clearSession() {
+    this._checking.set(false);
+    this._user.set(null);
+    this.oauth.clearSession();
+    clearHttpCache();
   }
 
 }

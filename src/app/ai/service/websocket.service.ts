@@ -27,8 +27,7 @@ export class WebsocketService {
   public readonly message = computed(this._message);
   public readonly error = computed(this._error);
 
-  private token = inject(AuthService).token();
-  private userId = inject(AuthService).user()?.id;
+  private authService = inject(AuthService);
 
   connect() {
     this.client = new Client({
@@ -57,18 +56,21 @@ export class WebsocketService {
       console.log("Disconnected: " + frame);
     }
 
-    let header: StompHeaders = {
-      Authorization: 'Bearer ' + this.token
+    // Read the token on every (re)connect: it is short-lived and replaced on each login.
+    this.client.beforeConnect = () => {
+      const header: StompHeaders = {
+        Authorization: 'Bearer ' + this.authService.token()
+      };
+      this.client.connectHeaders = header;
     };
 
-    this.client.connectHeaders = header;
     this.client.activate();
   }
 
   send(message: string, attachments: AttachmentPayload[]) {
     let AiAsk = {
       prompt: message,
-      userId: this.userId,
+      userId: this.authService.user()?.id,
       attachments: attachments,
     } as AiaskDto
 

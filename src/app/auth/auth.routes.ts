@@ -1,8 +1,21 @@
 import { Routes } from '@angular/router';
 import { AuthLayoutComponent } from '@app/auth/layouts/auth-layout/auth-layout.component';
 import LoginPageComponent from '@app/auth/pages/login-page/login-page.component';
-import { RegisterPageComponent } from '@app/auth/pages/register-page/register-page.component';
-import { OauthSuccessLoginComponent } from '@app/auth/pages/oauth-success-login/oauth-success-login.component';
+import { AuthCallbackComponent } from '@app/auth/pages/auth-callback/auth-callback.component';
+
+/** OAuth redirect_uri registered in authco: <origin>/auth/callback. */
+export const authCallbackRoutes: Routes = [
+    {
+        path: '',
+        component: AuthLayoutComponent,
+        children: [
+            {
+                path: '',
+                component: AuthCallbackComponent
+            }
+        ]
+    }
+];
 
 export const authRoutes: Routes = [
     {
@@ -12,14 +25,6 @@ export const authRoutes: Routes = [
             {
                 path: 'login',
                 component: LoginPageComponent
-            },
-            {
-                path: 'register',
-                component: RegisterPageComponent
-            },
-            {
-                path: 'oauth-success',
-                component: OauthSuccessLoginComponent
             },
             {
                 path: '**',

@@ -40,7 +40,7 @@
         <span class="text-xs mt-1">Stats</span>
       </a>
 
-      @if (authService.hasRole('PREMIUM')) {
+      @if (isPremium()) {
       <a
         routerLink="/chat"
         routerLinkActive="scale-110 font-bold"
