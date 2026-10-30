@@ -51,10 +51,18 @@ export class AuthService {
 
   /** Handles the authco redirect: code exchange, then the user profile. Emits where to go next. */
   completeLogin(response: AuthorizationResponse): Observable<string> {
+    // A stale or replayed callback (e.g. the Back button) must not end the session the
+    // user already has: only a session created by this call is cleared when it fails.
+    const hadValidSession = this.hasValidToken();
+    let createdSession = false;
     this.completingLogin = true;
     return this.oauth.completeLogin(response).pipe(
+      tap(() => (createdSession = true)),
       switchMap((returnUrl) => this.loadUser().pipe(map(() => returnUrl))),
       catchError((error) => {
+        if (hadValidSession && !createdSession) {
+          return of('/');
+        }
         this.clearSession();
         throw error;
       }),
@@ -109,9 +117,15 @@ export class AuthService {
     if (this.redirecting || this.completingLogin) {
       return;
     }
+    const returnUrl = this.currentUrl();
     this.clearSession();
     this.redirecting = true;
-    this.oauth.startLogin(this.router.url);
+    this.oauth.startLogin(returnUrl).catch((error: unknown) => {
+      // The redirect could not start (e.g. no WebCrypto outside a secure context): retry from the login page.
+      this.redirecting = false;
+      console.error('Could not start the login', error);
+      this.router.navigate(['/auth/login'], { queryParams: returnUrl !== '/' ? { returnUrl } : {} });
+    });
   }
 
   hasRole(role: string): boolean {
@@ -125,6 +139,14 @@ export class AuthService {
         this._checking.set(false);
       })
     );
+  }
+
+  // During the first navigation (a guard loading /users/me) router.url is still '/':
+  // the page the user asked for is the target of the navigation in flight.
+  private currentUrl(): string {
+    const navigation = this.router.getCurrentNavigation();
+    const target = navigation?.finalUrl ?? navigation?.extractedUrl;
+    return target ? this.router.serializeUrl(target) : this.router.url;
   }
 
   private hasValidToken(): boolean {

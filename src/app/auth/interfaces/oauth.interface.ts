@@ -18,7 +18,8 @@ export interface TokenResponse {
   access_token: string;
   id_token?: string;
   token_type: string;
-  expires_in: number;
+  /** Seconds. Optional (RFC 6749 5.1): the access token `exp` claim is used instead. */
+  expires_in?: number;
 }
 
 /** The session persisted in sessionStorage. */

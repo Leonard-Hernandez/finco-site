@@ -48,6 +48,11 @@ export class OAuthService {
     );
   }
 
+  /** Return URL of the login this tab started and has not completed yet; '/' if there is none. */
+  pendingReturnUrl(): string {
+    return safeReturnUrl(parseJson<PendingLogin>(sessionStorage.getItem(PENDING_LOGIN_KEY))?.returnUrl);
+  }
+
   /** OIDC RP-initiated logout URL; ends the authco session and comes back to the app. */
   endSessionUrl(idToken: string): string {
     const params = new URLSearchParams({
@@ -142,7 +147,19 @@ function toTokenSet(response: TokenResponse, nonce: string): TokenSet {
   if (idToken) {
     validateIdToken(idToken, nonce);
   }
-  return { accessToken: response.access_token, idToken, expiresAt: Date.now() + response.expires_in * 1000 };
+  return { accessToken: response.access_token, idToken, expiresAt: expiresAt(response) };
+}
+
+// expires_in is only RECOMMENDED (RFC 6749 5.1): fall back to the access token `exp` claim.
+function expiresAt(response: TokenResponse): number {
+  if (typeof response.expires_in === 'number' && Number.isFinite(response.expires_in)) {
+    return Date.now() + response.expires_in * 1000;
+  }
+  const exp = decodeJwtPayload(response.access_token)?.['exp'];
+  if (typeof exp === 'number' && Number.isFinite(exp)) {
+    return exp * 1000;
+  }
+  throw new OAuthError('invalid_token_response', 'The token response does not say when the access token expires');
 }
 
 // The ID token comes straight from the token endpoint over the back channel, so its
@@ -154,9 +171,14 @@ function validateIdToken(idToken: string, nonce: string): void {
   if (!claims
     || claims['nonce'] !== nonce
     || !audiences.includes(environment.clientId)
-    || claims['iss'] !== environment.authUrl) {
+    || typeof claims['iss'] !== 'string'
+    || withoutTrailingSlash(claims['iss']) !== withoutTrailingSlash(environment.authUrl)) {
     throw new OAuthError('invalid_id_token', 'The ID token does not belong to this login');
   }
+}
+
+function withoutTrailingSlash(url: string): string {
+  return url.replace(/\/+$/, '');
 }
 
 function readStoredSession(): TokenSet | null {

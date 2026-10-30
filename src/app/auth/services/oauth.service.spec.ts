@@ -63,11 +63,38 @@ describe('OAuthService', () => {
     expect(sessionStorage.getItem(PENDING_LOGIN_KEY)).toBeNull();
   });
 
+  it('takes the expiry from the access token exp claim when expires_in is missing', async () => {
+    const exp = Math.floor(Date.now() / 1000) + 600;
+    await completeWith({ access_token: fakeJwt({ exp }), token_type: 'Bearer', id_token: idToken() });
+
+    expect(service.session()?.expiresAt).toBe(exp * 1000);
+  });
+
+  it('rejects a token response that does not say when the access token expires', async () => {
+    const error = await completeWith({ access_token: 'opaque', token_type: 'Bearer', id_token: idToken() });
+
+    expect(error).toEqual(jasmine.any(OAuthError));
+    expect((error as OAuthError).code).toBe('invalid_token_response');
+    expect(service.session()).toBeNull();
+  });
+
+  it('accepts an ID token issuer that differs only by a trailing slash', async () => {
+    const result = await completeWith({ access_token: 'access', token_type: 'Bearer', expires_in: 900, id_token: idToken({ iss: `${environment.authUrl}/` }) });
+
+    expect(result).toBe('/accounts');
+  });
+
   it('rejects an ID token from another issuer', async () => {
     const error = await completeWith({ access_token: 'access', token_type: 'Bearer', expires_in: 900, id_token: idToken({ iss: 'https://evil.example.com' }) });
 
     expect((error as OAuthError).code).toBe('invalid_id_token');
     expect(service.session()).toBeNull();
+  });
+
+  it('remembers the return URL of the pending login until it completes', () => {
+    expect(service.pendingReturnUrl()).toBe('/accounts');
+    sessionStorage.removeItem(PENDING_LOGIN_KEY);
+    expect(service.pendingReturnUrl()).toBe('/');
   });
 
 });

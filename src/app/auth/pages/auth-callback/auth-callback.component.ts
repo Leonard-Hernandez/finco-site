@@ -23,6 +23,8 @@ export class AuthCallbackComponent implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
+  private returnUrl = '/';
+
   ngOnInit(): void {
     const query = this.route.snapshot.queryParamMap;
     const response: AuthorizationResponse = {
@@ -31,6 +33,8 @@ export class AuthCallbackComponent implements OnInit {
       error: query.get('error'),
       error_description: query.get('error_description')
     };
+    // completeLogin consumes the pending login: keep its return URL for a retry.
+    this.returnUrl = this.oauth.pendingReturnUrl();
 
     this.authService.completeLogin(response).subscribe({
       next: (returnUrl) => this.router.navigateByUrl(returnUrl, { replaceUrl: true }),
@@ -42,7 +46,8 @@ export class AuthCallbackComponent implements OnInit {
 
   retry() {
     this.errorMessage.set(null);
-    this.oauth.startLogin('/');
+    this.oauth.startLogin(this.returnUrl).catch(() =>
+      this.errorMessage.set('Could not reach the login page. Please try again.'));
   }
 
 }
