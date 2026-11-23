@@ -1,15 +1,15 @@
 import { inject, Injectable, computed } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { environment } from '@src/environments/environment.local';
 import { AuthService } from '@app/auth/services/auth.service';
 import { Observable } from 'rxjs';
 import { Goal, GoalFilter, GoalResponse, GoalTransactionData } from '@app/goal/interface/goal.interface';
+import { appConfig } from '@src/app/core/config/app-config';
 
 @Injectable({providedIn: 'root'})
 export class GoalService
  {
 
-    url: string = environment.url
+    url: string = appConfig().apiUrl
 
     auth = inject(AuthService)
 

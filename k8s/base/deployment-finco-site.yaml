@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: finco-site
+  name: finco-site
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: finco-site
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: finco-site
+    spec:
+      containers:
+      - image: leonard20/finco-site
+        name: finco-site
+        ports:
+        - containerPort: 80
+        envFrom:
+          - configMapRef:
+              name: finco-site-config
+        resources:
+          requests:
+            cpu: 20m
+            memory: 32Mi
+          limits:
+            memory: 128Mi
+        readinessProbe:
+          httpGet:
+            path: /config.json
+            port: 80
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          periodSeconds: 30

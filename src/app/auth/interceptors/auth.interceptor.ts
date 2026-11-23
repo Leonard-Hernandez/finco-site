@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { HttpErrorResponse, HttpEvent, HttpHandlerFn, HttpRequest } from '@angular/common/http';
 import { catchError, Observable, throwError } from 'rxjs';
 import { AuthService } from '@app/auth/services/auth.service';
-import { environment } from '@src/environments/environment.local';
+import { appConfig } from '@src/app/core/config/app-config';
 
 /**
  * Attaches the access token to finco API requests only: never to authco (the code
@@ -10,7 +10,7 @@ import { environment } from '@src/environments/environment.local';
  * A 401 from finco means the token expired or was revoked: start a new login.
  */
 export function authInterceptor(req: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<any>> {
-    if (!req.url.startsWith(`${environment.url}/`)) {
+    if (!req.url.startsWith(`${appConfig().apiUrl}/`)) {
         return next(req);
     }
 

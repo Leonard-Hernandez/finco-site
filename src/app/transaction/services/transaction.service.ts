@@ -1,14 +1,14 @@
 import { computed, inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { environment } from '@src/environments/environment.local';
 import { AuthService } from '@app/auth/services/auth.service';
 import { TransactionFilter, TransactionResponse } from '@app/transaction/interface/transaction';
 import { Observable } from 'rxjs';
+import { appConfig } from '@src/app/core/config/app-config';
 
 @Injectable({ providedIn: 'root' })
 export class TransactionService {
 
-    private readonly API_URL = `${environment.url}`;
+    private readonly API_URL = appConfig().apiUrl;
 
     private http = inject(HttpClient);
 

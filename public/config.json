@@ -1,0 +1,6 @@
+{
+  "apiUrl": "/finco-api/v1",
+  "authUrl": "http://localhost:8093/authco",
+  "clientId": "finco-site",
+  "resource": "http://localhost:8086/finco-api/v1"
+}

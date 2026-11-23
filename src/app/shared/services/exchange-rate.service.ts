@@ -1,13 +1,13 @@
 import { effect, inject, Injectable, signal } from "@angular/core";
 import { AuthService } from "@app/auth/services/auth.service";
-import { environment } from "@src/environments/environment.local";
+import { exchangeApiUrl } from "@src/app/core/config/app-config";
 
 @Injectable({
     providedIn: 'root'
 })
 export class ExchangeRateService {
 
-    baseurl = environment.exchangeApiUrl;
+    baseurl = exchangeApiUrl;
     defaultCurrency = signal<string>(inject(AuthService).user()?.defaultCurrency! || 'USD');
 
     exchangeRate = signal<any>(null);

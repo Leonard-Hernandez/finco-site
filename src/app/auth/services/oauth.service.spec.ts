@@ -2,10 +2,10 @@ import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { firstValueFrom } from 'rxjs';
-import { environment } from '@src/environments/environment.local';
 import { OAuthService, safeReturnUrl } from './oauth.service';
 import { base64UrlEncode } from '@app/auth/utils/oauth-crypto';
 import { OAuthError, PendingLogin } from '@app/auth/interfaces/oauth.interface';
+import { appConfig } from '@src/app/core/config/app-config';
 
 const SESSION_KEY = 'finco.auth.session';
 const PENDING_LOGIN_KEY = 'finco.oauth.pending';
@@ -16,8 +16,8 @@ const fakeJwt = (payload: object) =>
 const pending: PendingLogin = { state: 'the-state', nonce: 'the-nonce', codeVerifier: 'the-verifier', returnUrl: '/accounts' };
 
 const idToken = (claims: object = {}) => fakeJwt({
-  iss: environment.authUrl,
-  aud: [environment.clientId],
+  iss: appConfig().authUrl,
+  aud: [appConfig().clientId],
   nonce: pending.nonce,
   ...claims
 });
@@ -45,7 +45,7 @@ describe('OAuthService', () => {
   async function completeWith(tokens: object): Promise<string | unknown> {
     const result = firstValueFrom(service.completeLogin({ code: 'the-code', state: pending.state, error: null, error_description: null }))
       .catch((error: unknown) => error);
-    const request = http.expectOne(`${environment.authUrl}/oauth2/token`);
+    const request = http.expectOne(`${appConfig().authUrl}/oauth2/token`);
     expect(request.request.body).toContain('code=the-code');
     expect(request.request.body).toContain(`code_verifier=${pending.codeVerifier}`);
     request.flush(tokens);
@@ -79,7 +79,7 @@ describe('OAuthService', () => {
   });
 
   it('accepts an ID token issuer that differs only by a trailing slash', async () => {
-    const result = await completeWith({ access_token: 'access', token_type: 'Bearer', expires_in: 900, id_token: idToken({ iss: `${environment.authUrl}/` }) });
+    const result = await completeWith({ access_token: 'access', token_type: 'Bearer', expires_in: 900, id_token: idToken({ iss: `${appConfig().authUrl}/` }) });
 
     expect(result).toBe('/accounts');
   });

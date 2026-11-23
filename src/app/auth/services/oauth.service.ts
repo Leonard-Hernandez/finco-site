@@ -1,7 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { catchError, map, Observable, tap, throwError } from 'rxjs';
-import { environment } from '@src/environments/environment.local';
 import { codeChallengeS256, randomString } from '@app/auth/utils/oauth-crypto';
 import { decodeJwtPayload } from '@app/auth/utils/jwt';
 import {
@@ -11,6 +10,7 @@ import {
   TokenResponse,
   TokenSet
 } from '@app/auth/interfaces/oauth.interface';
+import { appConfig, postLogoutRedirectUri, redirectUri, scope } from '@src/app/core/config/app-config';
 
 const PENDING_LOGIN_KEY = 'finco.oauth.pending';
 const SESSION_KEY = 'finco.auth.session';
@@ -57,10 +57,10 @@ export class OAuthService {
   endSessionUrl(idToken: string): string {
     const params = new URLSearchParams({
       id_token_hint: idToken,
-      client_id: environment.clientId,
-      post_logout_redirect_uri: environment.postLogoutRedirectUri
+      client_id: appConfig().clientId,
+      post_logout_redirect_uri: postLogoutRedirectUri()
     });
-    return `${environment.authUrl}/connect/logout?${params}`;
+    return `${appConfig().authUrl}/connect/logout?${params}`;
   }
 
   clearSession() {
@@ -85,15 +85,15 @@ export class OAuthService {
       fromObject: {
         grant_type: 'authorization_code',
         code: response.code,
-        redirect_uri: environment.redirectUri,
-        client_id: environment.clientId,
+        redirect_uri: redirectUri(),
+        client_id: appConfig().clientId,
         code_verifier: pending.codeVerifier,
-        resource: environment.resource
+        resource: appConfig().resource
       }
     });
     const headers = new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
 
-    return this.http.post<TokenResponse>(`${environment.authUrl}/oauth2/token`, body.toString(), { headers }).pipe(
+    return this.http.post<TokenResponse>(`${appConfig().authUrl}/oauth2/token`, body.toString(), { headers }).pipe(
       catchError((error: HttpErrorResponse) => throwError(() => new OAuthError(
         error.error?.error ?? 'token_request_failed',
         error.error?.error_description ?? 'Could not exchange the authorization code'))),
@@ -126,16 +126,16 @@ function newPendingLogin(returnUrl: string): PendingLogin {
 async function authorizeUrl(pending: PendingLogin): Promise<string> {
   const params = new URLSearchParams({
     response_type: 'code',
-    client_id: environment.clientId,
-    redirect_uri: environment.redirectUri,
-    scope: environment.scope,
+    client_id: appConfig().clientId,
+    redirect_uri: redirectUri(),
+    scope: scope(),
     state: pending.state,
     nonce: pending.nonce,
     code_challenge: await codeChallengeS256(pending.codeVerifier),
     code_challenge_method: 'S256',
-    resource: environment.resource
+    resource: appConfig().resource
   });
-  return `${environment.authUrl}/oauth2/authorize?${params}`;
+  return `${appConfig().authUrl}/oauth2/authorize?${params}`;
 }
 
 function toTokenSet(response: TokenResponse, nonce: string): TokenSet {
@@ -170,9 +170,9 @@ function validateIdToken(idToken: string, nonce: string): void {
   const audiences = Array.isArray(aud) ? aud : [aud];
   if (!claims
     || claims['nonce'] !== nonce
-    || !audiences.includes(environment.clientId)
+    || !audiences.includes(appConfig().clientId)
     || typeof claims['iss'] !== 'string'
-    || withoutTrailingSlash(claims['iss']) !== withoutTrailingSlash(environment.authUrl)) {
+    || withoutTrailingSlash(claims['iss']) !== withoutTrailingSlash(appConfig().authUrl)) {
     throw new OAuthError('invalid_id_token', 'The ID token does not belong to this login');
   }
 }

@@ -4,10 +4,10 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { DefaultUrlSerializer, Router } from '@angular/router';
 import { signal } from '@angular/core';
 import { firstValueFrom, of, throwError } from 'rxjs';
-import { environment } from '@src/environments/environment.local';
 import { AuthService } from './auth.service';
 import { OAuthService } from './oauth.service';
 import { OAuthError, TokenSet } from '@app/auth/interfaces/oauth.interface';
+import { appConfig } from '@src/app/core/config/app-config';
 
 const response = { code: 'the-code', state: 'stale', error: null, error_description: null };
 
@@ -73,7 +73,7 @@ describe('AuthService', () => {
       });
 
       const result = firstValueFrom(service.completeLogin(response));
-      http.expectOne(`${environment.url}/users/me`).flush(null, { status: 500, statusText: 'Server Error' });
+      http.expectOne(`${appConfig().apiUrl}/users/me`).flush(null, { status: 500, statusText: 'Server Error' });
 
       await expectAsync(result).toBeRejected();
       expect(oauth.clearSession).toHaveBeenCalled();
