@@ -128,7 +128,7 @@ async function authorizeUrl(pending: PendingLogin): Promise<string> {
     response_type: 'code',
     client_id: appConfig().clientId,
     redirect_uri: redirectUri(),
-    scope: scope(),
+    scope: scope,
     state: pending.state,
     nonce: pending.nonce,
     code_challenge: await codeChallengeS256(pending.codeVerifier),
