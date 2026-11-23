@@ -33,7 +33,7 @@ export const exchangeApiUrl = "https://cdn.jsdelivr.net/npm/@fawazahmed0/currenc
 
 export const scope = "openid profile email"
 
-export const redirectUri = () => `${appConfig().authUrl}/auth/callback`;
+export const redirectUri = () => `${window.location.origin}/auth/callback`;
 export const postLogoutRedirectUri = () => `${window.location.origin}/`;
 
 /** Absolute API base: an absolute apiUrl (k3s) is kept as is, a relative one (docker) is resolved against the origin. */
