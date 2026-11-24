@@ -2,8 +2,8 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import SockJS from 'sockjs-client';
 import { Client, IStompSocket, StompHeaders } from '@stomp/stompjs';
 import { AuthService } from '@src/app/auth/services/auth.service';
-import { environment } from '@src/environments/environment.local';
 import { ResponseError } from '@src/app/shared/interfaces/response-error.interface';
+import { appConfig } from '@src/app/core/config/app-config';
 
 export interface AttachmentPayload {
   data: string;
@@ -20,7 +20,7 @@ interface AiaskDto {
   providedIn: 'root'
 })
 export class WebsocketService {
-  private readonly wsUrl: string = environment.url + '/ws';
+  private readonly wsUrl: string = appConfig().apiUrl + '/ws';
   private client!: Client;
   private _message = signal('');
   private _error = signal('');

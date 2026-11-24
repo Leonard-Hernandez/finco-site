@@ -1,14 +1,14 @@
 import { computed, inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { environment } from '@src/environments/environment.local';
 import { AuthService } from '@app/auth/services/auth.service';
 import { Account, AccountFilter, AccountResponse, Total, TransactionData, TransferData } from '@app/account/interface/account.interface';
 import { Observable } from 'rxjs';
+import { appConfig } from '@src/app/core/config/app-config';
 
 @Injectable({providedIn: 'root'})
 export class AccountService {
 
-    private readonly API_URL: string = environment.url
+    private readonly API_URL: string = appConfig().apiUrl;
 
     private authService = inject(AuthService);
 

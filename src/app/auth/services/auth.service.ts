@@ -2,12 +2,12 @@ import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, finalize, map, Observable, of, switchMap, tap } from 'rxjs';
-import { environment } from '@src/environments/environment.local';
 import { User } from '@app/auth/interfaces/user.interface';
 import { AuthorizationResponse } from '@app/auth/interfaces/oauth.interface';
 import { OAuthService } from '@app/auth/services/oauth.service';
 import { scopesOf } from '@app/auth/utils/jwt';
 import { clearHttpCache } from '@app/shared/interceptors/cache.interceptor';
+import { appConfig } from '@src/app/core/config/app-config';
 
 type authStatus = 'checking' | 'authenticated' | 'not-authenticated';
 
@@ -90,7 +90,7 @@ export class AuthService {
   }
 
   updateUser(user: User) {
-    return this.http.patch<User>(`${environment.url}/users/${user.id}`, {
+    return this.http.patch<User>(`${appConfig().apiUrl}/users/${user.id}`, {
       name: user.name,
       enable: user.enable,
       defaultCurrency: user.defaultCurrency
@@ -133,7 +133,7 @@ export class AuthService {
   }
 
   private loadUser(): Observable<User> {
-    return this.http.get<User>(`${environment.url}/users/me`).pipe(
+    return this.http.get<User>(`${appConfig().apiUrl}/users/me`).pipe(
       tap((user) => {
         this._user.set(user);
         this._checking.set(false);

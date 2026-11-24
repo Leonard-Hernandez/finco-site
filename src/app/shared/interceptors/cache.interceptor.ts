@@ -1,6 +1,6 @@
 import { HttpInterceptorFn, HttpRequest, HttpParams, HttpEventType } from '@angular/common/http';
+import { appConfig } from '@src/app/core/config/app-config';
 import { of, tap } from 'rxjs';
-import { environment } from '@src/environments/environment.local';
 
 const cache = new Map<string, any>();
 
@@ -19,7 +19,7 @@ const generateCacheKey = (req: HttpRequest<any>): string => {
 
 /** Caches finco API GETs only; writes to finco invalidate them. authco and third parties pass through. */
 export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
-  if (!req.url.startsWith(`${environment.url}/`)) {
+  if (!req.url.startsWith(`${appConfig().apiUrl}/`)) {
     return next(req);
   }
 
